@@ -12,14 +12,14 @@ VERSION:="$(DESCRIBE)-$(BRANCH)"
 CFLAGS += -D__VERSION=\"$(VERSION)\" -D__COMMITDATE=\""$(COMMITDATE)"\"
 
 ####################################################
-LIB_Blas	= $(SuperLU_DIR)/lib/libblas.a
-LIB_SuperLU = $(SuperLU_DIR)/lib/libsuperlu_4.3.a
+LIB_Blas	= $(SuperLU_dir)/lib/libblas.a
+LIB_SuperLU = $(SuperLU_dir)/lib/libsuperlu_4.3.a
 LIBS 		= $(LIB_SuperLU) $(LIB_Blas)
 
 
 CFLAGS 		+= -std=c++11
-CFLAGS 		+= -I${HDF5_DIR}/include
-LDFLAGS 	+= -L${HDF5_DIR}/lib -lhdf5 -lz
+CFLAGS 		+= -I${hdf5_dir}/include
+LDFLAGS 	+= -L${hdf5_dir}/lib -lhdf5 -lz
 
 CFLAGS 		+= -I$(SuperLU_DIR)/SRC
 LDFLAGS 	+= $(LIBS)
