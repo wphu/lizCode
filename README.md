@@ -1,4 +1,7 @@
-#SmileiSE
+#lizCode
+
+lizCode is a Particle(粒子) Code, including PIC, MCC and DSMC methods.
+
 This code is developed based on Smilei v2.0:
 https://github.com/SmileiPIC/Smilei
 http://www.maisondelasimulation.fr/projects/Smilei/html/#
@@ -9,4 +12,4 @@ The main difference is that the electromagnetic field is changed to static elect
 make -jN (N is number of processes)
 
 
-Email:  wanpengh@gmail.com | wphu@qq.com
+Email:  wphu@swip.ac.cn | wphu@qq.com
