@@ -21,7 +21,7 @@ CFLAGS 		+= -std=c++11
 CFLAGS 		+= -I${hdf5_dir}/include
 LDFLAGS 	+= -L${hdf5_dir}/lib -lhdf5 -lz
 
-CFLAGS 		+= -I$(SuperLU_DIR)/SRC
+CFLAGS 		+= -I$(SuperLU_dir)/SRC
 LDFLAGS 	+= $(LIBS)
 
 ####################################################
