@@ -12,7 +12,6 @@ Collisions1D_Ionization_Simple class
 #include "InputData.h"
 #include "Species.h"
 #include "Collisions1D.h"
-#include "H5.h"
 
 using namespace std;
 

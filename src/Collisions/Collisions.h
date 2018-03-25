@@ -38,7 +38,6 @@ Several collision types can be defined. For each type, add a group "Collisions()
 #include "PicParams.h"
 #include "InputData.h"
 #include "Species.h"
-#include "H5.h"
 
 class Particles;
 

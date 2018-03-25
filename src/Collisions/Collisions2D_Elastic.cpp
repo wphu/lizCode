@@ -1,8 +1,6 @@
 #include "Collisions2D_Elastic.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
-#include "H5.h"
-
 
 #include <cmath>
 #include <iomanip>
@@ -86,7 +84,6 @@ void Collisions2D_Elastic::collide(PicParams& params, SmileiMPI* smpi, ElectroMa
 
     Field2D *smean, *logLmean, *ncol;//, *temperature
     ostringstream name;
-    hid_t did;
 
     sg1 = &species_group1;
     sg2 = &species_group2;

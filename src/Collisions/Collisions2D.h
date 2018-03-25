@@ -11,7 +11,6 @@ Collisions2D class
 #include "PicParams.h"
 #include "InputData.h"
 #include "Species.h"
-#include "H5.h"
 #include "Collisions.h"
 
 

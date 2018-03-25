@@ -1,8 +1,6 @@
 #include "PSI2D_Sputtering.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
-#include "H5.h"
-
 
 #include <cmath>
 #include <iomanip>

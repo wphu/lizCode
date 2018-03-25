@@ -9,7 +9,6 @@
 #include "InputData.h"
 #include "Species.h"
 #include "PSI2D.h"
-#include "H5.h"
 
 class PSI2D_SEE : public PSI2D
 {

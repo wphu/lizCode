@@ -3,7 +3,6 @@
 #include "Field1D.h"
 #include "Field2D.h"
 #include "ElectroMagn.h"
-#include "H5.h"
 
 
 #include <cmath>
@@ -1046,7 +1045,6 @@ void Collisions1D_Coulomb::collide_relativistic(PicParams& params, SmileiMPI* sm
            newpx_COM, newpy_COM, newpz_COM, U, vcp;
     Field2D *smean, *logLmean, *ncol;//, *temperature
     ostringstream name;
-    hid_t did;
 
     sg1 = &species_group1;
     sg2 = &species_group2;

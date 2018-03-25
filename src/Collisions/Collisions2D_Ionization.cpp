@@ -1,8 +1,6 @@
 #include "Collisions2D_Ionization.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
-#include "H5.h"
-
 
 #include <cmath>
 #include <iomanip>
@@ -80,7 +78,6 @@ void Collisions2D_Ionization::collide(PicParams& params, SmileiMPI* smpi, Electr
 
     Field2D *smean, *logLmean, *ncol;//, *temperature
     ostringstream name;
-    hid_t did;
 
     sg1 = &species_group1;
     sg2 = &species_group2;

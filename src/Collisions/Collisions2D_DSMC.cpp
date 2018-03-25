@@ -1,8 +1,6 @@
 #include "Collisions2D_DSMC.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
-#include "H5.h"
-
 
 #include <cmath>
 #include <iomanip>
@@ -93,7 +91,6 @@ void Collisions2D_DSMC::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn*
 
     Field2D *smean, *logLmean, *ncol;//, *temperature
     ostringstream name;
-    hid_t did;
 
     sg1 = &species_group1;
     sg2 = &species_group2;

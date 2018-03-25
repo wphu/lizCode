@@ -14,7 +14,6 @@ Collisions1D_DSMC class
 #include "InputData.h"
 #include "Species.h"
 #include "Collisions1D.h"
-#include "H5.h"
 
 
 using namespace std;

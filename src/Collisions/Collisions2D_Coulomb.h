@@ -12,7 +12,6 @@ Collisions2D_Coulomb class
 #include "InputData.h"
 #include "Species.h"
 #include "Collisions2D.h"
-#include "H5.h"
 
 class Collisions2D_Coulomb : public Collisions2D
 {

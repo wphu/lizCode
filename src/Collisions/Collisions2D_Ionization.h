@@ -12,7 +12,6 @@ Collisions2D_Ionization class
 #include "InputData.h"
 #include "Species.h"
 #include "Collisions2D.h"
-#include "H5.h"
 
 using namespace std;
 

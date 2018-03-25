@@ -16,7 +16,6 @@ Ref: Subroutines for some plasma surface interaction processes:
 #include "InputData.h"
 #include "Species.h"
 #include "PSI1D.h"
-#include "H5.h"
 
 class PSI1D_Backscattering : public PSI1D
 {

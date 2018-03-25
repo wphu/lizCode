@@ -12,7 +12,6 @@ Collisions1D class
 #include "InputData.h"
 #include "Species.h"
 #include "Collisions1D.h"
-#include "H5.h"
 
 class Collisions1D_ChargeExchange : public Collisions1D
 {
