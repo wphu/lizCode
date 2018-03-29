@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QAction, QFileDial
 
 from HdfTreeModel import *
 from PlotWidget import *
-from HdfDatasetWidget import *
 from HdfTreeWidget import *
 
 class ApplicationWindow(QMainWindow):
@@ -39,14 +38,6 @@ class ApplicationWindow(QMainWindow):
 
         #> the left part: the hdf5 tree view
         self.filename = "data/data0.h5"
-        self.f=h5.File(self.filename)
-        try:
-            dset = self.f["/Fields/Phi_global_avg"]
-        except:
-            dset = self.f["/Fields/Rho_global"]
-            print( "the data is 2d !!!" )
-        print( "Attention: the dataset must be 4 dimensions" )
-
         self.tree_widget = HDFTreeWidget(self.main_widget)
         self.tree_model = HDFTreeModel([])
         self.tree_model.openFile(self.filename, 'r+')
@@ -55,24 +46,13 @@ class ApplicationWindow(QMainWindow):
 
         self.tree_widget.doubleClicked.connect(self.reload)
         self.sigOpen.connect(self.tree_widget.openFiles)
+        
+        #> plotWidget
+        self.plot_widget = PlotWidget(self.main_widget)
+        hSplitter.addWidget(self.plot_widget)
 
-
-
-        #> the right part (a TabWidget): figures and data
-        tab_widget = QTabWidget(self.main_widget)
-        hSplitter.addWidget(tab_widget)
-        hSplitter.setStretchFactor(0, 4)
+        hSplitter.setStretchFactor(0, 2)
         hSplitter.setStretchFactor(1, 3)
-
-
-        #> figures tab
-        self.plot_widget = PlotWidget(self.main_widget, dset)
-        tab_widget.addTab(self.plot_widget, "Figures")
-
-        #> data tab
-        self.data_widget = HDFDatasetWidget(dataset=dset)
-        tab_widget.addTab(self.data_widget, "data")
-
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
@@ -81,9 +61,8 @@ class ApplicationWindow(QMainWindow):
     def reload(self, index):
     	item = self.tree_model.getItem(index)
     	if (item is not None) and item.isDataset():
-            dset = item.h5node
-            self.plot_widget.redraw(dset)
-            self.data_widget.setDataset(dset)
+            dataSetFullName = item.name
+            self.plot_widget.reloadData(dataSetFullName)
 
     def createActions(self):
         self.openFileReadOnlyAction = QAction('Open file(s) readonly', self,
@@ -150,5 +129,6 @@ if __name__ == '__main__':
     aw = ApplicationWindow()
     aw.setWindowTitle("SmileiSE-Draw")
     aw.show()
+    aw.resize(1000, 600)
     #sys.exit(qApp.exec_())
     app.exec_()

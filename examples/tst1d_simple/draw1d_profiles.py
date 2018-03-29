@@ -19,7 +19,7 @@ x_step = 20
 amplification_factor = 80.0
 
 
-data_temp = collect("Fields", "Phi_global_avg")
+data_temp = collect("/Fields/", "Phi_global_avg")
 nx = data_temp.shape[3]
 
 
@@ -45,7 +45,7 @@ fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
 ##============potential======================================================
 ax0=fig.add_subplot(3,1,1)
 
-val = collect("Fields", "Phi_global_avg")
+val = collect("/Fields/", "Phi_global_avg")
 val_1d = np.transpose(val[t, 0, 0, :])
 print( "potential max: ", val_1d.max() )
 print( "potential: ",val_1d[x0], val_1d[x1] )
@@ -64,7 +64,7 @@ ax0.set_yticks(major_ticks)
 
 #double y axis
 ax0_twinx = ax0.twinx()
-val = collect("Fields", "Ex_global_avg")
+val = collect("/Fields/", "Ex_global_avg")
 val = val / Ex0
 val_1d = np.transpose(val[t, 0, 0, :])
 val_1d = val_1d[::x_step]
@@ -89,7 +89,7 @@ ax0.annotate(r"$\mathbf{(a)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ##============rho======================================================
 ax0=fig.add_subplot(3,1,2)
 
-val = collect("Fields", "Rho_global_e_avg")
+val = collect("/Fields/", "Rho_global_e_avg")
 val = val / n0
 val_1d = np.transpose(val[t, 0, 0, :])
 print( "Electron density: ",val_1d[x0], val_1d[x1] )
@@ -98,7 +98,7 @@ val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r"Electron")
 
 
-val = collect("Fields", "Rho_global_D1_avg")
+val = collect("/Fields/", "Rho_global_D1_avg")
 val = val / n0
 val_1d = np.transpose(val[t, 0, 0, :])
 val1_1d = val_1d
@@ -145,7 +145,7 @@ ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ##============ Temperature ======================================================
 ax0=fig.add_subplot(3,1,3)
 
-val = collect("Fields", "T_global_e_avg")
+val = collect("/Fields/", "T_global_e_avg")
 val_1d = np.transpose(val[t, 0, 0, :])
 print( "Electron Temperature: ",val_1d[x0], val_1d[x1] )
 val_1d = val_1d[::x_step]
@@ -154,7 +154,7 @@ line0=ax0.plot(x_less, val_1d, label = "Electron")
 
 ax0.grid(True)
 
-val = collect("Fields", "T_global_D1_avg")
+val = collect("/Fields/", "T_global_D1_avg")
 val_1d = np.transpose(val[t, 0, 0, :])
 print( "D+1 ion temperature: ",val_1d[x0], val_1d[x1] )
 val_1d = val_1d[::x_step]

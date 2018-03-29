@@ -1,0 +1,14 @@
+# lizCode environments
+export PATH=${lizHomePath}/src:$PATH
+export PATH=${lizHomePath}/tools/lizPlot:$PATH
+export PYTHONPATH=${lizHomePath}/tools/pylib:$PYTHONPATH
+
+
+# dependencies
+export PATH=/home/wphu/opt/mpich-intel/bin:$PATH
+
+export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
+export SuperLU_dir=/home/wphu/opt/SuperLU_4.3-intel
+
+export LD_LIBRARY_PATH=/home/wphu/opt/hdf5-intel-mpi/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/wphu/opt/anaconda3/lib:$LD_LIBRARY_PATH
