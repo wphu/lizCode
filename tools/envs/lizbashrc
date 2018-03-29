@@ -1,14 +1,17 @@
+# dependencies
+export mpich_dir=/home/wphu/opt/mpich-intel
+export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
+export SuperLU_dir=/home/wphu/opt/SuperLU_4.3-intel
+export anaconda3_dir=/home/wphu/opt/anaconda3
+
+export PATH=${mpich_dir}/bin:$PATH
+export PATH=${anaconda3_dir}/bin:$PATH
+export LD_LIBRARY_PATH=${mpich_dir}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${anaconda3_dir}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${hdf5_dir}/lib:$LD_LIBRARY_PATH
+
+
 # lizCode environments
 export PATH=${lizHomePath}/src:$PATH
 export PATH=${lizHomePath}/tools/lizPlot:$PATH
 export PYTHONPATH=${lizHomePath}/tools/pylib:$PYTHONPATH
-
-
-# dependencies
-export PATH=/home/wphu/opt/mpich-intel/bin:$PATH
-
-export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
-export SuperLU_dir=/home/wphu/opt/SuperLU_4.3-intel
-
-export LD_LIBRARY_PATH=/home/wphu/opt/hdf5-intel-mpi/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt/anaconda3/lib:$LD_LIBRARY_PATH
