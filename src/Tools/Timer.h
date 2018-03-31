@@ -24,6 +24,7 @@ public:
     void restart();
     //! Return accumulated time
     double getTime(){return time_acc_;}
+    std::string getDateTime();
     //! Print accumulated time in stdout
     void print(double tot);
     void print();    

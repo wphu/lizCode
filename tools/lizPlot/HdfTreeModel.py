@@ -112,7 +112,6 @@ class HDFTreeItem(object):
         self.h5node = data
         self.children = []
         self.name = self.h5node.name
-        print(self.name)
 
     def child(self, row):
         if isinstance(self.h5node, h5.Group):
@@ -340,7 +339,6 @@ class HDFTreeModel(QtCore.QAbstractItemModel):
         self.beginInsertRows(parent, position, position+rows-1)
         parentItem.insertChildren(position, rows, self.rootItem.columnCount())
         self.endInsertRows()
-        print("insert Rows")
         return True
 
     def removeRows(self, position, rows, parent=QtCore.QModelIndex()):

@@ -502,7 +502,14 @@ int main (int argc, char* argv[])
     timer[0].update();
     for( int i = 0; i < timer.size(); i++)
     {
-        TITLE(timer[i].name() << " = " << timer[i].getTime());
+        if(i == 0)
+        {
+            TITLE(timer[i].name() << " = " << timer[i].getDateTime());
+        }
+        else 
+        {
+            TITLE(timer[i].name() << " = " << timer[i].getTime() <<" s");
+        }
     }
 
 

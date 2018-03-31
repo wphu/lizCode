@@ -79,23 +79,24 @@ class MyStaticMplCanvas1D(MyMplCanvas):
 
 class MyStaticMplCanvas2D(MyMplCanvas):
     """Simple canvas with a sine plot."""
-    def compute_initial_figure(self, data = None):
+    def compute_initial_figure(self, data4d = None):
         self.fig.clear()
         self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
         self.axes1 = self.fig.add_subplot(111)
 
-        nx = data.shape[0]
-        ny = data.shape[1]
+        self.data3d = data4d[:,0,:,:]
+        nx = self.data3d.shape[1]
+        ny = self.data3d.shape[2]
         dx=1.0
         dy=1.0
         self.y,self.x=np.mgrid[slice(dx,dx*(nx+1),dx), slice(dy,dy*(ny+0.5),dy)]
-        levels=MaxNLocator(nbins=100).tick_values(data.min(),data.max())
+        levels=MaxNLocator(nbins=100).tick_values(self.data3d.min(),self.data3d.max())
 
-        if(data.min() == data.max()):
-        	ticks_val=np.linspace(data.min(),data.max()+1.0,5)
+        if(self.data3d.min() == self.data3d.max()):
+        	ticks_val=np.linspace(self.data3d.min(),self.data3d.max()+1.0,5)
         else:
-        	ticks_val=np.linspace(data.min(),data.max(),5)
-        self.cf = self.axes1.contourf(self.x,self.y,data,cmap=cm.get_cmap('jet'),levels=levels)
+        	ticks_val=np.linspace(self.data3d.min(),self.data3d.max(),5)
+        self.cf = self.axes1.contourf(self.x,self.y,self.data3d[0],cmap=cm.get_cmap('jet'),levels=levels)
         self.fig.colorbar(self.cf,ticks=ticks_val)
 
 
@@ -106,18 +107,18 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         self.axes1.set_xlabel('x(mm)')
         self.axes1.set_ylabel('y(mm)')
 
-    def update_figure(self, data):
+    def update_figure(self, itime):
         self.fig.clear()
         self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
         self.axes1 = self.fig.add_subplot(111)
-        levels=MaxNLocator(nbins=100).tick_values(data.min(),data.max())
+        levels=MaxNLocator(nbins=100).tick_values(self.data3d.min(),self.data3d.max())
 
-        if(data.min() == data.max()):
-        	ticks_val=np.linspace(data.min(),data.max()+1.0,5)
+        if(self.data3d.min() == self.data3d.max()):
+        	ticks_val=np.linspace(self.data3d.min(),self.data3d.max()+1.0,5)
         else:
-        	ticks_val=np.linspace(data.min(),data.max(),5)
+        	ticks_val=np.linspace(self.data3d.min(),self.data3d.max(),5)
 
-        self.cf = self.axes1.contourf(self.x,self.y,data,cmap=cm.get_cmap('jet'),levels=levels)
+        self.cf = self.axes1.contourf(self.x,self.y,self.data3d[itime],cmap=cm.get_cmap('jet'),levels=levels)
         self.fig.colorbar(self.cf,ticks=ticks_val)
 
 
@@ -127,8 +128,6 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         self.axes1.set_title('rho')
         self.axes1.set_xlabel('x(mm)')
         self.axes1.set_ylabel('y(mm)')
-
-        return self.im
 
     def save_animation(self):
         self.ani = animation.FuncAnimation(self.fig, self.update_figure, frames=self.ntime, blit=False, interval=500, repeat=False)

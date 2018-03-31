@@ -1,11 +1,6 @@
 # ----------------------------------------------------------------------------------------
-# 					SIMULATION PARAMETERS FOR THE PIC-CODE SMILEI
+# 					SIMULATION PARAMETERS FOR lizCode
 # ----------------------------------------------------------------------------------------
-#
-# Remember: never override the following names:
-#           SmileiComponent, Species, Laser, Collisions, DiagProbe, DiagParticles,
-#           DiagScalar, DiagPhase or ExtField
-#
 
 import math
 
@@ -27,12 +22,11 @@ n_procs = 24
 #> number of timestep of incrementing averaged electromagnetic fields
 ntime_step_avg = ns
 
-ion_step = 1
-
 #> Timestep to output some fields into hdf5 file
 dump_step = int( Tsim / number_output )
 timesteps_restore = dump_step
 
+ion_step = 1
 
 
 # dim: Geometry of the simulation

@@ -98,6 +98,12 @@ number_of_procs = [4, 5]
 random_seed = 0
 
 
+# The default plasma potential is 0 V
+Grid(
+	gridType = "rectangle",
+	potential_wall = 0.0
+)
+
 
 # DEFINE ALL SPECIES
 # species_type       = string, given name to the species (e.g. ion, electron, positron, test ...)

@@ -1,39 +1,32 @@
 # ----------------------------------------------------------------------------------------
-# 					SIMULATION PARAMETERS FOR THE PIC-CODE SMILEI
+# 					SIMULATION PARAMETERS FOR lizCode
 # ----------------------------------------------------------------------------------------
-#
-# Remember: never override the following names:
-#           SmileiComponent, Species, Laser, Collisions, DiagProbe, DiagParticles,
-#           DiagScalar, DiagPhase or ExtField
-#
+
 import math
 
 method = 'explicit'
 
-l0 = 0.4e-5  #(SI)
-t0 = 2.0e-12
-
+l0 = 0.4e-5
 nx = 200
 ny = 300
+Lsim = [nx*l0,ny*l0]
 
-Lsim = [nx*l0,ny*l0]	# length of the simulation
+t0 = 0.5e-12
+ns = int(1.0e-9 / t0)
+Tsim = 5 * ns			# duration of the simulation
+number_output = 5
 
-Tsim = 5000			# duration of the simulation
-
+number_of_procs = [4, 6]
 
 
 #> number of timestep of incrementing averaged electromagnetic fields
-ntime_step_avg = 50
+ntime_step_avg = ns
 
 #> Timestep to output some fields into hdf5 file
-dump_step = 500
+dump_step = int( Tsim / number_output )
 timesteps_restore = dump_step
 
-timesteps_collision = 20
-
-timesteps_coulomb = 40
-
-timesteps_DSMC = 40
+ion_step = 1
 
 is_calVDF = 0
 
@@ -90,10 +83,7 @@ vz = 0.0
 #vy = 0.0
 #vz = 0.0
 
-#Topology:
-#number_of_procs: Number of MPI processes in each direction.
-#clrw: width of a cluster in number of cell. Warning: clrw must divide nspace_win_x.
-number_of_procs = [4, 6]
+
 
 
 # RANDOM seed
@@ -150,8 +140,8 @@ Species(
 	temperature = [20],
 	mean_velocity = [0.0, 0.0, 0.0],
 	time_frozen = 0.,
-	bc_part_type_west  = 'none',
-	bc_part_type_east  = 'none',
+	bc_part_type_west  = 'periodic',
+	bc_part_type_east  = 'periodic',
 	bc_part_type_south = 'supp',
 	bc_part_type_north = 'supp'
 )
@@ -171,8 +161,8 @@ Species(
 	temperature = [20],
 	mean_velocity = [vx, vy, vz],
 	time_frozen = 0.0,
-	bc_part_type_west  = 'none',
-	bc_part_type_east  = 'none',
+	bc_part_type_west  = 'periodic',
+	bc_part_type_east  = 'periodic',
 	bc_part_type_south = 'supp',
 	bc_part_type_north = 'supp'
 )
@@ -220,7 +210,7 @@ PartSource(
 
 )
 
-'''
+
 
 ### The every-time particle source
 PartSource(
@@ -257,4 +247,4 @@ PartSource(
 	loadPos_Yend 	= ny*l0,
 
 )
-'''
+

@@ -260,6 +260,7 @@ void SmileiMPI_Cart2D::exchangeParticles(Species* species, int ispec, PicParams&
     /********************************************************************************/
     indexes_of_particles_to_exchange.clear();
     indexes_of_particles_to_exchange = species->indexes_of_particles_to_exchange;
+    (*species_indexes_of_particles_to_exchange).clear();
 
     sort( indexes_of_particles_to_exchange.begin(), indexes_of_particles_to_exchange.end() );
 
