@@ -20,17 +20,17 @@ from collect import collect
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    def __init__(self, parent=None, dset=None, width=5, height=4, dpi=100):
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
+    def __init__(self, parent=None, data4d=None, title = None):
+        self.fig = Figure()
         self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
         self.axes1 = self.fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
         self.axes1.hold(False)
 
-        self.dset = dset
-        self.time = 0
-        val = self.dset[...]
-        self.compute_initial_figure(self.dset)
+        self.data4d = data4d
+        self.title = title
+  
+        self.compute_initial_figure(self.data4d)
 
         #
         FigureCanvas.__init__(self, self.fig)
@@ -53,17 +53,16 @@ class MyStaticMplCanvas1D(MyMplCanvas):
         nx = self.data2d.shape[1]
         self.x = np.linspace(0,100.0,nx)
 
-        title = "Electric Potential"
-
         self.line1, = self.axes1.plot(self.x, self.data2d[0])
         self.axes1.set_xlabel('x(mm)')
-        self.axes1.set_ylabel(title)
-        self.axes1.set_title(title)
+        self.axes1.set_ylabel(self.title)
+        self.axes1.set_title(self.title)
         self.setLimits()
 
 
     def update_figure(self, itime):
         line1, = self.axes1.plot(self.x, self.data2d[itime,:])
+        self.axes1.set_title(self.title)
         self.setLimits()
         return [line1]
 
@@ -103,7 +102,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
 
         self.axes1.axis([self.x.min(),self.x.max(),self.y.min(),self.y.max()])
         self.axes1.set_yticks(np.arange(0,self.y.max(),100))
-        self.axes1.set_title('rho')
+        self.axes1.set_title(self.title)
         self.axes1.set_xlabel('x(mm)')
         self.axes1.set_ylabel('y(mm)')
 
@@ -125,12 +124,12 @@ class MyStaticMplCanvas2D(MyMplCanvas):
 
         self.axes1.axis([self.x.min(),self.x.max(),self.y.min(),self.y.max()])
         self.axes1.set_yticks(np.arange(0,self.y.max(),100))
-        self.axes1.set_title('rho')
+        self.axes1.set_title(self.title)
         self.axes1.set_xlabel('x(mm)')
         self.axes1.set_ylabel('y(mm)')
 
     def save_animation(self):
-        self.ani = animation.FuncAnimation(self.fig, self.update_figure, frames=self.ntime, blit=False, interval=500, repeat=False)
+        self.ani = animation.FuncAnimation(self.fig, self.update_figure, self.data3d.shape[0], blit=False, interval=500, repeat=False)
         self.ani.save('movie.gif', writer='imagemagick')
 
      
@@ -142,6 +141,7 @@ class PlotWidget(QWidget):
 
         # data4d has four dimensions, the first is time
         self.data4d = collect("/Fields/", "Phi_global_avg")
+        self.dataName = "Phi_global_avg"
 
         sizePolicy = QSizePolicy();
         sizePolicy.setHorizontalPolicy(QSizePolicy.Expanding);
@@ -156,9 +156,9 @@ class PlotWidget(QWidget):
         # matplotlib figure tab
         #self.matplotlib_widget = MatplotlibWidget(self.tab_widget,self.data4d[0,0,:,:])
         if self.data4d.shape[2] == 1:
-            self.sc = MyStaticMplCanvas1D(self, self.data4d, width=10, height=4, dpi=100)
+            self.sc = MyStaticMplCanvas1D(self, self.data4d, title = self.dataName)
         else:
-            self.sc = MyStaticMplCanvas2D(self, self.data4d, width=5, height=4, dpi=100)
+            self.sc = MyStaticMplCanvas2D(self, self.data4d, title = self.dataName)
         self.sc.draw()
         self.tab_widget.addTab(self.sc, "Figures")
         
@@ -203,6 +203,7 @@ class PlotWidget(QWidget):
         self.plotVboxlayout.addWidget(self.save_widget)
 
     def reloadData(self, dataSetFullName):
+        self.dataName = dataSetFullName.rsplit('/')[-1]
         self.data4d = collect(dataSetFullName)
         self.sc.compute_initial_figure(self.data4d)
         self.sc.draw()
