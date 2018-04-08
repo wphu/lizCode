@@ -127,7 +127,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     aw = ApplicationWindow()
-    aw.setWindowTitle("SmileiSE-Draw")
+    aw.setWindowTitle("lizPlot")
     aw.show()
     aw.resize(1000, 600)
     #sys.exit(qApp.exec_())
