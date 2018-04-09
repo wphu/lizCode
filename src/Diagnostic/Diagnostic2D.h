@@ -14,11 +14,17 @@ public :
     virtual ~Diagnostic2D() {};
 
     //! Runs the diag for all patches for local diags.
-    virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime ) {};
+    virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime );
 
-    vector< vector<double> > particleFlux;             // not implemented
-	vector< vector<double> > heatFlux;                 // not implemented
-    vector< vector< vector<double> > > angleDist;      // not implemented
+    std::vector<Field*> particleFlux;
+    std::vector<Field*> heatFlux;
+    std::vector<Field*> averageAngle;
+    std::vector<Field*> psiRate;   //sputteringRate, depositionRate, and so on
+
+    std::vector<Field*> particleFlux_global;
+    std::vector<Field*> heatFlux_global;
+    std::vector<Field*> aveAngle_global;
+    std::vector<Field*> psiRate_global;
 
     // calculate velocity and temperature of each species
     // not implemented

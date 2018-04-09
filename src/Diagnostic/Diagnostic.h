@@ -21,6 +21,16 @@ public :
 
     const unsigned int n_species;
 
+    //! nDim_field (from params)
+    const unsigned int nDim_field;
+
+    //! n_space (from params) always 3D
+    const std::vector<unsigned int> n_space;
+    const std::vector<unsigned int> n_space_global;
+    std::vector<unsigned int> dim_;
+    std::vector<unsigned int> dim_global;
+
+
 protected :
 
     // pi * 0.5

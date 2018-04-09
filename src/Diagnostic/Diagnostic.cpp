@@ -9,6 +9,18 @@ timestep(params.timestep)
 {
 	PI_ov_2 = 0.5 * params.const_pi;
 	const_e = params.const_e;
+	nDim_field = params.nDim_field;
+	n_space = params.n_space;
+	n_space_global = params.n_space_global;
+
+	dim_.resize( nDim_field );
+    dim_global.resize( nDim_field );
+
+    // Dimension of the primal and dual grids
+    for (size_t i=0 ; i<nDim_field ; i++) {
+        dim_[i] = n_space[i] + 1 + 2 * oversize[i];
+        dim_global[i] = n_space_global[i] + 1;
+    }
 
 	double B_magnitude = pow(params.externB[0], 2) + pow(params.externB[1], 2) + pow(params.externB[2], 2);
 	B_magnitude = sqrt(B_magnitude);
