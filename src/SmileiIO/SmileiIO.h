@@ -22,6 +22,7 @@ class ElectroMagn;
 class Field;
 class Species;
 class Diagnostic;
+class Grid;
 
 #include <csignal>
 
@@ -57,10 +58,18 @@ public:
     // store Particles to restart
     virtual void endStoreP(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, int itime );
 
+    // write grid to grid.h5 file
+    virtual void writeGrid(Grid* grid){};
+
+    // read grid from grid.h5 file
+    virtual void readGrid(Grid* grid){};
+
     string data_file_name;
+    string grid_file_name;
 
     // Id of "Fields_global.h5", contains global fields, such as potential, rho ...
     hid_t       data_file_id;
+    hid_t       grid_file_id;
     herr_t      status;
 
     double* data_;

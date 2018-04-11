@@ -11,6 +11,7 @@
 
 #include "SmileiIO.h"
 #include "Diagnostic2D.h"
+#include "Grid2D.h"
 
 //  --------------------------------------------------------------------------------------------------------------------
 //! Class SmileiIO_Cart2D
@@ -34,6 +35,8 @@ public:
     // calculate velocity distribution function
     void calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies);
 
+    // write grid to grid.h5 file
+    virtual void writeGrid(Grid* grid);
 private:
 
 

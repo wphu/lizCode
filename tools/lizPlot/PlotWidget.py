@@ -140,7 +140,8 @@ class PlotWidget(QWidget):
         self.parent = parent
 
         # data4d has four dimensions, the first is time
-        self.data4d = collect("/Fields/", "Phi_global_avg")
+        self.prefix = 'data'
+        self.data4d = collect("/Fields/", "Phi_global_avg", prefix = self.prefix)
         self.dataName = "Phi_global_avg"
 
         sizePolicy = QSizePolicy();
@@ -202,9 +203,11 @@ class PlotWidget(QWidget):
         self.plotVboxlayout.addWidget(self.sp_widget)
         self.plotVboxlayout.addWidget(self.save_widget)
 
-    def reloadData(self, dataSetFullName):
+    def reloadData(self, fileName, dataSetFullName):
+        fileName_temp = fileName.rsplit('/')[-1]
+        self.prefix = fileName_temp.rsplit('.')[0]
         self.dataName = dataSetFullName.rsplit('/')[-1]
-        self.data4d = collect(dataSetFullName)
+        self.data4d = collect(dataSetFullName, prefix=self.prefix)
         self.sc.compute_initial_figure(self.data4d)
         self.sc.draw()
         self.set_data_widget(self.data4d[0,0,:,:])

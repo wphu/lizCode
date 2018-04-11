@@ -13,13 +13,13 @@
 class DiagnosticFactory {
 public:
 
-    static Diagnostic* create(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields) {
+    static Diagnostic* create(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields, vector<PSI*>& vecPSI) {
         Diagnostic* diag = NULL;
         if ( params.geometry == "1d3v" ) {
             diag = new Diagnostic1D(params, smpi, EMfields);
         }
         else if ( params.geometry == "2d3v" ) {
-            diag = new Diagnostic2D(params, smpi, EMfields);
+            diag = new Diagnostic2D(params, smpi, EMfields, vecPSI);
         }
         else {
             ERROR( "Unknwon geometry : " << params.geometry );

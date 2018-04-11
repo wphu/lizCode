@@ -11,6 +11,8 @@
 
 #include "Tools.h"
 #include "PicParams.h"
+#include "Field2D.h"
+
 
 
 //! Class Grid: generic class allowing to define complex geometry and boundary, also used
@@ -36,16 +38,14 @@ public:
     virtual void allocateDims(){};
     virtual void geometry(){};
     virtual void computeNcp(){};
-    virtual void writeGrid(){};
-    virtual void readGrid(){};
 
     //! vector containing the dimensions of the Grid
     //! \todo private/friend/modify SmileiMPI* (JD)
-    std::vector<int> dims_;
-    std::vector<int> globalDims_;
+    std::vector<unsigned int> dims_;
+    std::vector<unsigned int> globalDims_;
 
     //! returns the dimension of the Grid
-    inline std::vector<int> dims () {return dims_;}
+    inline std::vector<unsigned int> dims () {return dims_;}
     //! All arrays may be viewed as a 1D array
     //! Linearized diags
 

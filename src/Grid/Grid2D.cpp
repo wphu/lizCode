@@ -1,4 +1,5 @@
 #include "Grid2D.h"
+#include "Field2D.h"
 
 #include <iostream>
 #include <vector>
@@ -7,8 +8,6 @@
 #include <fstream>
 
 using namespace std;
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Creators for Grid2D
@@ -352,32 +351,32 @@ void Grid2D::geometry_gap( )
         (*normal_z_global)(i, ny_gap_top) = 0.0;
     }
     // set the right surface of the left tile
-    for(int j = bottomWall_thickness + 1; j <= bottomWall_thickness + ny_gapHeight; j++)
+    for(int j = ny_gap_bottom + 1; j <= ny_gap_top; j++)
     {
-        (*normal_x_global)(, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_y_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_z_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
+        (*normal_x_global)(nx_left_tile, j) = 1.0;
+        (*normal_y_global)(nx_left_tile, j) = 0.0;
+        (*normal_z_global)(nx_left_tile, j) = 0.0;
     }
     // set the bottom surface of the gap
-    for(int i = 0; i < 0.5*nx - 0.5*nx_gapWeight; i++)
+    for(int i = nx_left_tile; i < nx_right_tile; i++)
     {
-        (*normal_x_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_y_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_z_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
+        (*normal_x_global)(i, ny_gap_bottom) = 0.0;
+        (*normal_y_global)(i, ny_gap_bottom) = 1.0;
+        (*normal_z_global)(i, ny_gap_bottom) = 0.0;
     }
     // set the left surface of the right tile
-    for(int i = 0; i < 0.5*nx - 0.5*nx_gapWeight; i++)
+    for(int j = ny_gap_bottom; j < ny_gap_top; j++)
     {
-        (*normal_x_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_y_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_z_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
+        (*normal_x_global)(nx_right_tile, j) = -1.0;
+        (*normal_y_global)(nx_right_tile, j) = 0.0;
+        (*normal_z_global)(nx_right_tile, j) = 0.0;
     }
     // set the top surface of the right tile
-    for(int i = 0; i < 0.5*nx - 0.5*nx_gapWeight; i++)
+    for(int i = nx_right_tile; i < nx; i++)
     {
-        (*normal_x_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_y_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
-        (*normal_z_global)(i, bottomWall_thickness + ny_gapHeight - 1 ) = 0.0;
+        (*normal_x_global)(i, ny_gap_top) = 0.0;
+        (*normal_y_global)(i, ny_gap_top) = 1.0;
+        (*normal_z_global)(i, ny_gap_top) = 0.0;
     }
 
 
@@ -405,7 +404,8 @@ void Grid2D::geometry_gap( )
 
 
 
-void Grid2D::computeNcp(){
+void Grid2D::computeNcp()
+{
 
     ncp=0;
     for(int i=0; i<nx; i++)

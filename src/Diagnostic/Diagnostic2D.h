@@ -5,12 +5,14 @@
 #include "PicParams.h"
 #include "SmileiMPI.h"
 
+class Field;
+class PSI;
 
 class Diagnostic2D : public Diagnostic {
 
 public :
 
-    Diagnostic2D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields);
+    Diagnostic2D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields, vector<PSI*>& vecPSI);
     virtual ~Diagnostic2D() {};
 
     //! Runs the diag for all patches for local diags.
@@ -23,7 +25,7 @@ public :
 
     std::vector<Field*> particleFlux_global;
     std::vector<Field*> heatFlux_global;
-    std::vector<Field*> aveAngle_global;
+    std::vector<Field*> averageAngle_global;
     std::vector<Field*> psiRate_global;
 
     // calculate velocity and temperature of each species

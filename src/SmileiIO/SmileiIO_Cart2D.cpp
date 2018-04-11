@@ -251,3 +251,69 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
 
 } // END write
+
+
+void SmileiIO_Cart2D::writeGrid(Grid* grid)
+{
+    hid_t       grid_dataspace_id;
+    hid_t       grid_dataset_id;
+    herr_t      grid_status;
+    string      grid_dataset_name;
+
+    int grid_ndim = 3;
+    hsize_t grid_dims_global[3];
+
+    Grid2D* grid2D = static_cast<Grid2D*>(grid);
+    grid_file_name  = "data/grid.h5";
+    grid_file_id    = H5Fcreate( grid_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+    grid_dims_global[0] = grid2D->globalDims_[0];
+    grid_dims_global[1] = grid2D->globalDims_[0];
+    grid_dims_global[2] = grid2D->globalDims_[1];
+
+
+    // =============write grid============================================
+    grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
+    grid_dataset_name = "isWall";
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->iswall_global_);
+    grid_status = H5Sclose(grid_dataspace_id);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
+    grid_dataset_name = "bndr";
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndr_global_);
+    grid_status = H5Sclose(grid_dataspace_id);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
+    grid_dataset_name = "bndrVal";
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndrVal_global_);
+    grid_status = H5Sclose(grid_dataspace_id);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
+    grid_dataset_name = "normal_x";
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_x_global)->data_);
+    grid_status = H5Sclose(grid_dataspace_id);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
+    grid_dataset_name = "normal_y";
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_y_global)->data_);
+    grid_status = H5Sclose(grid_dataspace_id);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
+    grid_dataset_name = "normal_z";
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_z_global)->data_);
+    grid_status = H5Sclose(grid_dataspace_id);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_status = H5Fclose(grid_file_id);
+}

@@ -133,8 +133,12 @@ int main (int argc, char* argv[])
     vector<ElectroMagnBC*> vecEmBC = ElectroMagnBCFactory::create(params);
     smpi->barrier();
 
+    TITLE("Creating PSI");
+    vector<PSI*> vecPSI = PSIFactory::create(params, input_data, vecSpecies, smpi);
+    smpi->barrier();
+
     TITLE("Creating Diagnostic");
-    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, EMfields);
+    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, EMfields, vecPSI);
     smpi->barrier();
 
 
@@ -153,9 +157,6 @@ int main (int argc, char* argv[])
     vector<Collisions*> vecCollisions = CollisionsFactory::create(params, input_data, vecSpecies, smpi);
     smpi->barrier();
 
-    TITLE("Creating PSI");
-    vector<PSI*> vecPSI = PSIFactory::create(params, input_data, vecSpecies, smpi);
-    smpi->barrier();
 
     TITLE("Creating Interp/Proj");
     // interpolation operator (virtual)
@@ -168,6 +169,10 @@ int main (int argc, char* argv[])
     //Create mpi i/o environment
     TITLE("Creating IO output environment");
     SmileiIO*  sio  = SmileiIOFactory::create(params, smpi, EMfields, vecSpecies, diag);
+    if(smpi->isMaster())
+    {
+        sio->writeGrid(grid);
+    }
     smpi->barrier();
 
     // ------------------------------------------------------------------------

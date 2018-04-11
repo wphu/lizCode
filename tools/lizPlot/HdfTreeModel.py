@@ -112,6 +112,10 @@ class HDFTreeItem(object):
         self.h5node = data
         self.children = []
         self.name = self.h5node.name
+        if isinstance(self.h5node, h5.File):
+            self.fileName = os.path.basename(self.h5node.filename)
+        else:
+            self.fileName = parent.fileName
 
     def child(self, row):
         if isinstance(self.h5node, h5.Group):

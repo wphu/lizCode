@@ -36,6 +36,7 @@ public:
     void geometry();
     void geometry_gap();
     void computeNcp();
+
     int **iswall_2D;
   	int **iswall_global_2D;
     int **bndr_global_2D;
