@@ -40,7 +40,7 @@ Diagnostic1D::~Diagnostic1D()
 
 
 
-void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime )
+void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime )
 {
 	Species *s1;
 	Particles *p1;
@@ -54,7 +54,7 @@ void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMa
 	angle_temp.resize(90);
 
 	// reset diagnostic parameters to zero
-	if( ((itime - 1) % dump_step) == 0 ) {
+	if( ((itime - 1) % step_dump) == 0 ) {
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{
 			for(int iDirection = 0; iDirection < 2; iDirection++)
@@ -70,7 +70,7 @@ void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMa
 	}
 
 	// calculate diagnostic parameters
-	if( (itime % dump_step) > (dump_step - avg_step) || (itime % dump_step) == 0 )
+	if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
 	{
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{
@@ -84,7 +84,7 @@ void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMa
 				//cout<<"particle number:  "<<p1->position(0,iPart)<<endl;
 				v_square = p1->momentum(0,iPart) * p1->momentum(0,iPart) + p1->momentum(1,iPart) * p1->momentum(1,iPart) + p1->momentum(2,iPart) * p1->momentum(2,iPart);
 				v_magnitude = sqrt(v_square);
-				iAngle = 90.0 * acos( abs(p1->momentum(0,iPart)) / v_magnitude ) / PI_ov_2;
+				iAngle = 90.0 * acos( abs(p1->momentum(0,iPart)) / v_magnitude ) / pi_ov_2;
 				if( p1->position(0,iPart) < 0.0 ) {
 					//cout<<"particle number:  "<<p1->position(0,iPart)<<endl;
 					particleFlux[ispec][0]++;
@@ -117,11 +117,11 @@ void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMa
 
 
 	// MPI gather diagnostic parameters to master
-	if( (itime % dump_step) == 0 ) {
+	if( (itime % step_dump) == 0 ) {
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{
 			s1 = vecSpecies[ispec];
-			wlt = s1->species_param.weight / (dx_inv_ * timestep * avg_step);
+			wlt = s1->species_param.weight / (dx_inv_ * timestep * step_ave);
 			particleFlux[ispec][0] *= wlt;
 			particleFlux[ispec][1] *= wlt;
 			heatFlux[ispec][0] 	   *= wlt;
@@ -160,14 +160,14 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 	double m_ov_3e;
 	double m_ov_2;
 	double vx, vy, vz;
-	double avg_step_inv_;
+	double step_ave_inv_;
 	double v_square;
 	vector<int> number_temp;
 	vector<double> energy_temp;
 
 	number_temp.resize(n_species);
 	energy_temp.resize(n_species);
-	avg_step_inv_ = 1.0 / avg_step;
+	step_ave_inv_ = 1.0 / step_ave;
 	for(int iSpec = 0; iSpec < vecSpecies.size(); iSpec++)
 	{
 		s1 = vecSpecies[iSpec];
@@ -185,7 +185,7 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 		Field1D* T1D_s = static_cast<Field1D*>(EMfields->T_s[iSpec]);
 		Field1D* T1D_s_avg = static_cast<Field1D*>(EMfields->T_s_avg[iSpec]);
 
-		if( ((itime - 1) % dump_step) == 0 ) {
+		if( ((itime - 1) % step_dump) == 0 ) {
 			Vx1D_s_avg->put_to(0.0);
 			Vy1D_s_avg->put_to(0.0);
 			Vz1D_s_avg->put_to(0.0);
@@ -194,7 +194,7 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 		}
 
 		// calculate macroscopic velocity (average velocity) and particle number at grid points
-		if( (itime % dump_step) > (dump_step - avg_step) || (itime % dump_step) == 0 )
+		if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
 		{
 			m_ov_3e = s1->species_param.mass / ( const_e * 3.0 );
 			m_ov_2 = s1->species_param.mass / 2.0;
@@ -279,15 +279,15 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 
 
 		// Calculate the average parameters and MPI gather
-		if( (itime % dump_step) == 0 )
+		if( (itime % step_dump) == 0 )
 		{
 			for(int i = 0; i < ptclNum1D->dims_[0]; i++)
 			{
-				(*Vx1D_s_avg)(i) *= avg_step_inv_;
-				(*Vy1D_s_avg)(i) *= avg_step_inv_;
-				(*Vz1D_s_avg)(i) *= avg_step_inv_;
-				(*Vp1D_s_avg)(i) *= avg_step_inv_;
-				(*T1D_s_avg)(i)  *= avg_step_inv_;
+				(*Vx1D_s_avg)(i) *= step_ave_inv_;
+				(*Vy1D_s_avg)(i) *= step_ave_inv_;
+				(*Vz1D_s_avg)(i) *= step_ave_inv_;
+				(*Vp1D_s_avg)(i) *= step_ave_inv_;
+				(*T1D_s_avg)(i)  *= step_ave_inv_;
 			}
 
 			// another way: firstly gather V, T, ptclNum, then calculate V_global, T_global
@@ -302,7 +302,7 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 
 	}
 	// gather particleNumber and kineticEnergy to master process
-	if( (itime % dump_step) == 0 )
+	if( (itime % step_dump) == 0 )
 	{
 		MPI_Allreduce( &particleNumber[0], &number_temp[0], n_species , MPI_INT,MPI_SUM, MPI_COMM_WORLD);
 		particleNumber = number_temp;

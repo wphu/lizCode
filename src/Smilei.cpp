@@ -303,7 +303,7 @@ int main (int argc, char* argv[])
 
             // ================== Run Diagnostic =============================================
             timer[8].restart();
-            diag->run(smpi, vecSpecies, EMfields, itime);
+            diag->run(smpi, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
 
             // ================== Plasma Surface Interacton ==================================
@@ -464,7 +464,7 @@ int main (int argc, char* argv[])
 
             // ================== Run Diagnostic =============================================
             timer[8].restart();
-            diag->run(smpi, vecSpecies, EMfields, itime);
+            diag->run(smpi, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
 
             // ================== Plasma Surface Interacton ==================================

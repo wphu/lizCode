@@ -4,6 +4,7 @@
 #include "Diagnostic.h"
 #include "PicParams.h"
 #include "SmileiMPI.h"
+#include "PSI2D.h"
 
 class Field;
 class PSI;
@@ -16,7 +17,7 @@ public :
     virtual ~Diagnostic2D() {};
 
     //! Runs the diag for all patches for local diags.
-    virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime );
+    virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime );
 
     std::vector<Field*> particleFlux;
     std::vector<Field*> heatFlux;
