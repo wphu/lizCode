@@ -61,9 +61,7 @@ class ApplicationWindow(QMainWindow):
     def reload(self, index):
     	item = self.tree_model.getItem(index)
     	if (item is not None) and item.isDataset():
-            fileName = item.fileName
-            dataSetFullName = item.name
-            self.plot_widget.reloadData(fileName, dataSetFullName)
+            self.plot_widget.reloadData(item.prefix, item.name)
 
     def createActions(self):
         self.openFileReadOnlyAction = QAction('Open file(s) readonly', self,

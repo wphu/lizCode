@@ -28,9 +28,8 @@ class MyMplCanvas(FigureCanvas):
         self.axes1.hold(False)
 
         self.data4d = data4d
-        self.title = title
-  
-        self.compute_initial_figure(self.data4d)
+
+        self.compute_initial_figure(self.data4d, title)
 
         #
         FigureCanvas.__init__(self, self.fig)
@@ -41,14 +40,15 @@ class MyMplCanvas(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-    def compute_initial_figure(self, data = None):
+    def compute_initial_figure(self, data = None, title = None):
         pass
 
 class MyStaticMplCanvas1D(MyMplCanvas):
     """Simple canvas with a sine plot."""
-    def compute_initial_figure(self, data4d = None):
+    def compute_initial_figure(self, data4d = None, title = None):
         # data2d[itime, ix]
         self.data2d = data4d[:,0,0,:]
+        self.title = title
         dx = 1.0
         nx = self.data2d.shape[1]
         self.x = np.linspace(0,100.0,nx)
@@ -78,12 +78,13 @@ class MyStaticMplCanvas1D(MyMplCanvas):
 
 class MyStaticMplCanvas2D(MyMplCanvas):
     """Simple canvas with a sine plot."""
-    def compute_initial_figure(self, data4d = None):
+    def compute_initial_figure(self, data4d = None, title = None):
         self.fig.clear()
         self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
         self.axes1 = self.fig.add_subplot(111)
 
         self.data3d = data4d[:,0,:,:]
+        self.title = title
         nx = self.data3d.shape[1]
         ny = self.data3d.shape[2]
         dx=1.0
@@ -203,12 +204,11 @@ class PlotWidget(QWidget):
         self.plotVboxlayout.addWidget(self.sp_widget)
         self.plotVboxlayout.addWidget(self.save_widget)
 
-    def reloadData(self, fileName, dataSetFullName):
-        fileName_temp = fileName.rsplit('/')[-1]
-        self.prefix = fileName_temp.rsplit('.')[0]
+    def reloadData(self, prefix, dataSetFullName):
+        self.prefix = prefix
         self.dataName = dataSetFullName.rsplit('/')[-1]
         self.data4d = collect(dataSetFullName, prefix=self.prefix)
-        self.sc.compute_initial_figure(self.data4d)
+        self.sc.compute_initial_figure(self.data4d, self.dataName)
         self.sc.draw()
         self.set_data_widget(self.data4d[0,0,:,:])
         self.sp.setValue(0)

@@ -116,6 +116,9 @@ class HDFTreeItem(object):
             self.fileName = os.path.basename(self.h5node.filename)
         else:
             self.fileName = parent.fileName
+        fileName_temp = self.fileName.rsplit('/')[-1]
+        self.prefix = fileName_temp.rsplit('.')[0]
+        self.prefix = self.prefix.rstrip('0123456789')  
 
     def child(self, row):
         if isinstance(self.h5node, h5.Group):
@@ -142,7 +145,8 @@ class HDFTreeItem(object):
             return ''
         if role == QtCore.Qt.DisplayRole:
             if isinstance(self.h5node, h5.File):
-                return os.path.basename(self.h5node.filename)
+                #return os.path.basename(self.h5node.filename)
+                return self.prefix
             return self.h5node.name.rsplit('/')[-1]
         elif role == QtCore.Qt.ToolTipRole:
             if isinstance(self.h5node, h5.File):
