@@ -292,8 +292,8 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->particleFlux_global[iSpec])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
+        diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
 
         // heat flux
@@ -313,9 +313,9 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->heatFlux_global[iSpec])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
+        diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
 
         // average angle
         iDiag++;
@@ -334,9 +334,9 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->averageAngle_global[iSpec])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
+        diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
 
         // psiRate
         iDiag++;
@@ -355,9 +355,9 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->psiRate_global[iPsi])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
+        diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         diagsGroup.status = H5Gclose(diagsGroup.group_id);
 
         /*
