@@ -184,6 +184,8 @@ public:
         std::vector <int> send_cnt_VDF;
 
     virtual void reduceDoubleVector( double* src, double* des, int n);
+    virtual void reduce_sum_field(Field* field_send, Field* field_recv);
+
 
 protected:
     //! Global MPI Communicator

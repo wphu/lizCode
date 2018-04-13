@@ -37,10 +37,12 @@ class ApplicationWindow(QMainWindow):
 
 
         #> the left part: the hdf5 tree view
-        self.filename = "data/data0.h5"
+        self.filename_data = "data/data0.h5"
+        self.filename_grid = "data/grid.h5"
         self.tree_widget = HDFTreeWidget(self.main_widget)
         self.tree_model = HDFTreeModel([])
-        self.tree_model.openFile(self.filename, 'r+')
+        self.tree_model.openFile(self.filename_data, 'r+')
+        self.tree_model.openFile(self.filename_grid, 'r+')
         self.tree_widget.setModel(self.tree_model)
         hSplitter.addWidget(self.tree_widget)
 

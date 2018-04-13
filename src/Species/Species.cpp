@@ -1051,13 +1051,13 @@ void Species::absorb2D(double time_dual, unsigned int ispec, Grid* grid, SmileiM
     j_domain_begin = smpi2D->getCellStartingGlobalIndex(1);
 
 
-    if (time_dual>species_param.time_frozen) { // moving particle
-
+    if (time_dual>species_param.time_frozen) 
+    {
         indexes_of_particles_to_absorb.clear();
-
-        for (int ibin = 0 ; ibin < (unsigned int)bmin.size() ; ibin++) {
-            for (int iPart=(unsigned int)bmin[ibin] ; iPart<(unsigned int)bmax[ibin]; iPart++ ) {
-
+        for (int ibin = 0 ; ibin < (unsigned int)bmin.size() ; ibin++) 
+        {
+            for (int iPart=(unsigned int)bmin[ibin] ; iPart<(unsigned int)bmax[ibin]; iPart++ ) 
+            {
                 //Locate particle on the primal grid & calculate the projection coefficients
                 xpn = particles.position(0, iPart) * dx_inv_;  // normalized distance to the first node
                 ic  = floor(xpn);                   // index of the central node
@@ -1069,12 +1069,11 @@ void Species::absorb2D(double time_dual, unsigned int ispec, Grid* grid, SmileiM
                 int j = jc-j_domain_begin; // index of first point for projection in y
 
                 if( grid2D->iswall_2D[i][j] == 1 && grid2D->iswall_2D[i+1][j] == 1 && grid2D->iswall_2D[i+1][j+1] == 1
-                && grid2D->iswall_2D[i][j+1] == 1 ) {
+                && grid2D->iswall_2D[i][j+1] == 1 ) 
+                {
                     indexes_of_particles_to_absorb.push_back(iPart);
                 }
-
             }//iPart
-
         }// ibin
 
         // copy PSI particles to psi_particles, because after MPi particle exchanging
@@ -1086,9 +1085,10 @@ void Species::absorb2D(double time_dual, unsigned int ispec, Grid* grid, SmileiM
         }
         erase_particles_from_bins(indexes_of_particles_to_absorb);
     }
-    else if (!particles.isTestParticles) { // immobile particle (at the moment only project density)
+    else if (!particles.isTestParticles) 
+    { 
 
-    }//END if time vs. time_frozen
+    }
 
 
 }//END absorb2D

@@ -34,6 +34,8 @@ public :
 	void calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime){};
 
 protected :
+    double dx_inv_, dy_inv_;
+    int i_domain_begin, j_domain_begin;
 
 
 };

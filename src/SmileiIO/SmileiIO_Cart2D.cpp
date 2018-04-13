@@ -123,8 +123,8 @@ void SmileiIO_Cart2D::createDiagsPattern(PicParams& params, Diagnostic2D* diag2D
     diagsGroup.block[2] = 1;
 
     diagsGroup.count[0]  = 1;
-    diagsGroup.count[1]  = 1;
-    diagsGroup.count[2]  = 1;
+    diagsGroup.count[1]  = diag2D->dim_global[0];
+    diagsGroup.count[2]  = diag2D->dim_global[1];
 
 
     // ======= create diagsGroup ================================
@@ -272,12 +272,12 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
         // =============write Diagnostics ============================================
         diagsGroup.group_id = H5Gcreate(data_file_id, "/Diagnostic", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);
-        //particle flux
+        // particle flux
         iDiag = 0;
-        fieldsGroup.dims_global[0] = diag2D->particleFlux_global.size();
-        fieldsGroup.dims_global[1] = diag2D->dim_global[0];
-        fieldsGroup.dims_global[2] = diag2D->dim_global[1];
-        fieldsGroup.dataspace_id = H5Screate_simple(n_dim_data, fieldsGroup.dims_global, NULL);
+        diagsGroup.dims_global[0] = diag2D->particleFlux_global.size();
+        diagsGroup.dims_global[1] = diag2D->dim_global[0];
+        diagsGroup.dims_global[2] = diag2D->dim_global[1];
+        diagsGroup.dataspace_id = H5Screate_simple(n_dim_data, diagsGroup.dims_global, NULL);
         h5_name = diagsGroup.dataset_stringName[iDiag].c_str();
         diagsGroup.dataset_id[iDiag] = H5Dcreate2(diagsGroup.group_id, h5_name, H5T_NATIVE_DOUBLE, diagsGroup.dataspace_id,
                                                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -292,13 +292,13 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->particleFlux_global[iSpec])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
             diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
+        diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
 
         // heat flux
         iDiag++;
-        fieldsGroup.dataspace_id = H5Screate_simple(n_dim_data, fieldsGroup.dims_global, NULL);
+        diagsGroup.dataspace_id = H5Screate_simple(n_dim_data, diagsGroup.dims_global, NULL);
         h5_name = diagsGroup.dataset_stringName[iDiag].c_str();
         diagsGroup.dataset_id[iDiag] = H5Dcreate2(diagsGroup.group_id, h5_name, H5T_NATIVE_DOUBLE, diagsGroup.dataspace_id,
                                                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -313,13 +313,13 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->heatFlux_global[iSpec])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
             diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
+        diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
 
         // average angle
         iDiag++;
-        fieldsGroup.dataspace_id = H5Screate_simple(n_dim_data, fieldsGroup.dims_global, NULL);
+        diagsGroup.dataspace_id = H5Screate_simple(n_dim_data, diagsGroup.dims_global, NULL);
         h5_name = diagsGroup.dataset_stringName[iDiag].c_str();
         diagsGroup.dataset_id[iDiag] = H5Dcreate2(diagsGroup.group_id, h5_name, H5T_NATIVE_DOUBLE, diagsGroup.dataspace_id,
                                                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -334,13 +334,13 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->averageAngle_global[iSpec])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
             diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
+        diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
 
         // psiRate
         iDiag++;
-        fieldsGroup.dataspace_id = H5Screate_simple(n_dim_data, fieldsGroup.dims_global, NULL);
+        diagsGroup.dataspace_id = H5Screate_simple(n_dim_data, diagsGroup.dims_global, NULL);
         h5_name = diagsGroup.dataset_stringName[iDiag].c_str();
         diagsGroup.dataset_id[iDiag] = H5Dcreate2(diagsGroup.group_id, h5_name, H5T_NATIVE_DOUBLE, diagsGroup.dataspace_id,
                                                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -355,9 +355,9 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.status = H5Dwrite(diagsGroup.dataset_id[iDiag], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
                                     diagsGroup.dataspace_id, H5P_DEFAULT, (diag2D->psiRate_global[iPsi])->data_);
             diagsGroup.status = H5Sclose(diagsGroup.memspace_id);
-            diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
             diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         }
+        diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
         diagsGroup.status = H5Gclose(diagsGroup.group_id);
 
         /*
@@ -426,22 +426,22 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
 
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
     grid_dataset_name = "normal_x";
-    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_x_global)->data_);
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_DOUBLE, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_x_global)->data_);
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
     grid_dataset_name = "normal_y";
-    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_y_global)->data_);
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_DOUBLE, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_y_global)->data_);
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
     grid_dataset_name = "normal_z";
-    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_z_global)->data_);
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_DOUBLE, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, (grid2D->normal_z_global)->data_);
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 

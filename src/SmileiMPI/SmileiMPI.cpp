@@ -128,6 +128,18 @@ int SmileiMPI::globalNbrParticles(Species* species) {
     int nParticles(0);
     int locNbrParticles(0);
     locNbrParticles = species->getNbrOfParticles();
-    MPI_Reduce( &locNbrParticles, &nParticles, 1, MPI_INT, MPI_SUM, 0, SMILEI_COMM_WORLD );
+    MPI_Reduce(&locNbrParticles, &nParticles, 1, MPI_INT, MPI_SUM, 0, SMILEI_COMM_WORLD);
     return nParticles;
+}
+
+void SmileiMPI::reduce_sum_field(Field* field_send, Field* field_recv)
+{
+    int count1, count2;
+    count1 = field_send->globalDims_;
+    count2 = field_recv->globalDims_;
+    if(count1 != count2 || (field_send->dims_).size() != (field_recv->dims_).size())
+    {
+        ERROR("reduce_sum_field error in SmileiMPI!!!");
+    }
+    MPI_Reduce(field_send->data_, field_recv->data_, count1, MPI_DOUBLE, MPI_SUM, 0, SMILEI_COMM_WORLD);
 }
