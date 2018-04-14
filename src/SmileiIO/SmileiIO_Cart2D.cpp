@@ -286,6 +286,7 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iSpec;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
+            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -307,6 +308,7 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iSpec;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
+            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -328,6 +330,7 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iSpec;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
+            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -349,6 +352,7 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iPsi;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
+            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
