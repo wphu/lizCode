@@ -286,7 +286,6 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iSpec;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
-            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -308,7 +307,6 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iSpec;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
-            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -330,7 +328,6 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iSpec;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
-            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -352,7 +349,6 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             diagsGroup.offset[0] = iPsi;
             diagsGroup.offset[1] = 0;
             diagsGroup.offset[2] = 0;
-            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[iDiag]);
             diagsGroup.memspace_id = H5Screate_simple(n_dim_data, diagsGroup.count, NULL);
             diagsGroup.status = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
                                                 diagsGroup.stride, diagsGroup.count, diagsGroup.block);
@@ -401,7 +397,7 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     grid_file_name  = "data/grid.h5";
     grid_file_id    = H5Fcreate( grid_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-    grid_dims_global[0] = grid2D->globalDims_[0];
+    grid_dims_global[0] = 1;
     grid_dims_global[1] = grid2D->globalDims_[0];
     grid_dims_global[2] = grid2D->globalDims_[1];
 
@@ -423,8 +419,8 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
 
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
     grid_dataset_name = "bndrVal";
-    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndrVal_global_);
+    grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_DOUBLE, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndrVal_global_);
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 

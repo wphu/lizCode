@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+import os
 import random
 import matplotlib
 import h5py as h5
@@ -42,7 +43,8 @@ class ApplicationWindow(QMainWindow):
         self.tree_widget = HDFTreeWidget(self.main_widget)
         self.tree_model = HDFTreeModel([])
         self.tree_model.openFile(self.filename_data, 'r+')
-        self.tree_model.openFile(self.filename_grid, 'r+')
+        if os.path.exists(self.filename_grid):
+            self.tree_model.openFile(self.filename_grid, 'r+')
         self.tree_widget.setModel(self.tree_model)
         hSplitter.addWidget(self.tree_widget)
 

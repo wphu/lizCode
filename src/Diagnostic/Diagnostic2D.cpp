@@ -88,16 +88,16 @@ void Diagnostic2D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMa
                     ypn = psi_particles->position(1, iPart) * dy_inv_;  // normalized distance to the first node
                     jc   = floor(ypn);                  // index of the central node
 
-                    i = ic-i_domain_begin; // index of first point for projection in x
-                    j = jc-j_domain_begin; // index of first point for projection in y
-
-                    v_square = psi_particles->momentum(0,iPart) * psi_particles->momentum(0,iPart) + psi_particles->momentum(1,iPart) * psi_particles->momentum(1,iPart) + psi_particles->momentum(2,iPart) * psi_particles->momentum(2,iPart);
-                    v_magnitude = sqrt(v_square);
-                    angle = 0.0;
-
-                    (*particleFlux_temp)(i,j) += 1.0;
-                    (*heatFlux_temp)(i,j) += mass_ov_2 * v_square;
-                    (*averageAngle_temp)(i,j) += angle;
+                    if(ic > 0 && ic < dim_global[0] && jc > 0 && jc < dim_global[1])
+                    {
+                        v_square = psi_particles->momentum(0,iPart) * psi_particles->momentum(0,iPart) + psi_particles->momentum(1,iPart) * psi_particles->momentum(1,iPart) + psi_particles->momentum(2,iPart) * psi_particles->momentum(2,iPart);
+                        v_magnitude = sqrt(v_square);
+                        angle = 0.0;
+                        (*particleFlux_temp)(ic,jc) += 1.0;
+                        (*heatFlux_temp)(ic,jc) += mass_ov_2 * v_square;
+                        (*averageAngle_temp)(ic,jc) += angle;
+                    }
+                    
             }
         }
     }
