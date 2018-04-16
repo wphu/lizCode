@@ -89,7 +89,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         ny = self.data3d.shape[2]
         dx=1.0
         dy=1.0
-        self.y,self.x=np.mgrid[slice(dx,dx*(nx+1),dx), slice(dy,dy*(ny+0.5),dy)]
+        self.x,self.y=np.mgrid[slice(dx,dx*(nx+1),dx), slice(dy,dy*(ny+0.5),dy)]
         levels=MaxNLocator(nbins=100).tick_values(self.data3d.min(),self.data3d.max())
 
         if(self.data3d.min() == self.data3d.max()):
