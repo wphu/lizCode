@@ -35,12 +35,26 @@ public:
     void allocateDims();
     void geometry();
     void geometry_gap();
+    void geometry_iter_gap();
     void computeNcp();
 
     int **iswall_2D;
   	int **iswall_global_2D;
     int **bndr_global_2D;
     double **bndrVal_global_2D;
+
+    struct segment
+    {
+        double start_point[2];
+        double end_point[2];
+        double length;
+        int grid_point[2];
+        double normal[3];
+    }
+    
+    // define boundary lines, lines[iLine][iSegment]
+    vector< vector<segment> > lines;
+
     // The number of the current point in the discrete Poisson Eqution left coefficient matrix
     int **numcp_global_2D;
 
@@ -51,10 +65,14 @@ public:
     int nx_gapWeight;
     double potential_wall;
 
+    // ITER divetor gap 
+    double bevel_depth;
+
 
 private:
     // todo{Comment what are these stuffs (MG for JD)}
     // double *data_2D;
+    double dx, dy;
 };
 
 #endif

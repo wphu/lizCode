@@ -402,6 +402,396 @@ void Grid2D::geometry_gap( )
 
 }
 
+// iter divetor gap geometry, with bevel top surface in toroidal direction
+void Grid2D::geometry_iter_gap( )
+{
+    ofstream isWall;
+    ofstream bndr;
+    ofstream bndrVal;
+
+    int bottomWall_thickness = 3;
+    int nx_left_tile = 0.5*nx - 0.5*nx_gapWeight;
+    int nx_right_tile = nx - nx_gapWeight;
+    int ny_gap_bottom = bottomWall_thickness;
+    int ny_gap_top0 = bottomWall_thickness + ny_gapHeight;
+    int ny_gap_top1 = bottomWall_thickness + ny_gapHeight + 0.5 * bevel_depth / dy;
+    int ny_gap_top2 = bottomWall_thickness + ny_gapHeight + bevel_depth / dy;
+    // electric potential at the wall surface
+    double val1 = potential_wall;
+    // electric potential at source region
+    double val1_source = 0.0;
+
+    double x1, x2, y1, y2, a, b;
+    double normal_x, normal_y, normal_z;
+    double y_lower, y_upper;
+    int j_lower, j_upper;
+
+    // iswall_global_2D is for particle moving, if four points of one cell are all 1, then the cell is wall
+    // firstly, set the whole region as Calculation Region:  iswall_global_2D[i][j]=0
+    for(int i=0; i<nx; i++)
+    {
+        for(int j=0; j<ny; j++)
+        {
+            iswall_global_2D[i][j]=0;
+        }
+    }
+
+    // set upper boundary as Wall
+    for(int i=0; i<nx; i++)
+    {
+        iswall_global_2D[i][ny-1]=1;
+    }
+
+    // set lower boundary as Wall, the lower boundary has thickness, two or three cell should be OK, defined by bottomWall_thickness
+    for(int i=0; i<nx; i++)
+    {
+        for(int j = 0; j < bottomWall_thickness + 1; j++)
+        {
+            iswall_global_2D[i][j] = 1;
+        }
+        
+    }
+
+    // set left and right boundary as Wall
+    for(int j=0; j<ny; j++)
+    {
+        iswall_global_2D[0][j]=1;
+        iswall_global_2D[nx-1][j]=1;
+    }
+
+    // set the left tile as Wall
+    x1 = 0.0;
+    y1 = ny_gap_top1 * dy;
+    x2 = nx_left_tile * dx;
+    y2 = ny_gap_top2 * dy;
+    a = (y2-y1)/(x2-x1);
+    b = -x1*(y2-y1)/(x2-x1) + y1;
+    for(int i = 0; i < 0.5*nx - 0.5*nx_gapWeight; i++)
+    {
+        for(int j = 0; j <= ny_gap_top2; j++)
+        {
+            if(j * dy <= a * i * dx + b)
+            {
+                iswall_global_2D[i][j] = 1;
+            }
+        }
+    }
+
+    // set the right tile as Wall
+    x1 = nx_right_tile * dx;
+    y1 = ny_gap_top0 * dy;
+    x2 = nx * dx;
+    y2 = ny_gap_top1 * dy;
+    a = (y2-y1)/(x2-x1);
+    b = -x1*(y2-y1)/(x2-x1) + y1;
+    for(int i =  nx_right_tile; i < nx; i++)
+    {
+        for(int j = 0; j <= ny_gap_top2; j++)
+        {
+            if(j * dy <= a * i * dx + b)
+            {
+                iswall_global_2D[i][j] = 1;
+            }
+        }
+    }
+
+
+    //============== construct boundary condition ===================================
+    // bndr* is for electric potential solving 
+    // 5 is the particle source region or wall region, usually the region has no need to solve the electric potential
+    //      The electric potential in the region can be set to some constant   
+    // 8 is the periodic boundary condition
+    // 1 is the Dirichlet boundary condition
+    // 0 is the Calculation Region  
+    
+    // firstly, set the whole region as Calculation Region
+    for(int i=0; i<nx; i++)
+    {
+        for(int j=0; j<ny; j++)
+        {
+            bndr_global_2D[i][j] = 0;
+        }
+    }
+
+    // set the source region, a rectangle below the upper boundary
+    for(int i=0; i<nx; i++)
+    {
+        for(int j = ny - ny_source; j < ny; j++)
+        {
+            bndr_global_2D[i][j] = 5;
+            bndrVal_global_2D[i][j] = val1_source;
+        }
+    }
+
+    // set the left and right boudary
+    for(int j = 0; j < ny - ny_source; j++){
+      bndr_global_2D[0][j]=8;
+      bndr_global_2D[nx-1][j]=8;
+    }
+
+    // set the source region surface boudary
+    for(int i = 0; i < nx; i++){
+      bndr_global_2D    [i][ny - ny_source -1] = 1;
+      bndrVal_global_2D [i][ny - ny_source -1] = val1_source;
+    }
+
+    // set the wall surface boundary
+    for(int j = 0; j <= ny_gap_top2; j++)
+    {
+        for(int i = 0; i < nx; i++)
+        {
+            // set the boundary corner points of two tiles
+            if( (i == 0 || i == nx - 1) && j == ny_gap_top1 ) 
+            {
+                bndr_global_2D[i][j] = 1;
+                bndrVal_global_2D[i][j] = val1;
+            }
+            // set the left and right boundary of tile surface
+            else if( (i == 0 || i == nx - 1) && j < ny_gap_top1 ) 
+            {
+                bndr_global_2D[i][j] = 5;
+                bndrVal_global_2D[i][j] = val1;
+            }
+            // set the lower boundary, which is never used for field solving, convenient for particle moving
+            else if( j == 0 ) 
+            {
+                bndr_global_2D[i][j] = 5;
+                bndrVal_global_2D[i][j] = val1;
+            }
+            // set tile surface as the Direchlet boundary condition
+            else if( iswall_global_2D[i][j] == 1 && ( iswall_global_2D[i-1][j] == 0 || iswall_global_2D[i][j-1] == 0
+             || iswall_global_2D[i+1][j] == 0 || iswall_global_2D[i][j+1] == 0 ) ) 
+            {
+                bndr_global_2D[i][j] = 1;
+                bndrVal_global_2D[i][j] = val1;
+            }
+            // set the remaining part as Wall Interior Domain
+            else if( iswall_global_2D[i][j] == 1 ) 
+            {
+                bndr_global_2D[i][j] = 5;
+                bndrVal_global_2D[i][j] = val1;
+            }
+        }
+    }
+
+
+    //============== construct boundary lines ===================================
+    lines.resize(5);
+
+    // set the top surface of the left tile
+    x1 = 0.0;
+    y1 = ny_gap_top1 * dy;
+    x2 = nx_left_tile * dx;
+    y2 = ny_gap_top2 * dy;
+    a = (y2-y1)/(x2-x1);
+    b = -x1*(y2-y1)/(x2-x1) + y1;
+    normal_x = ;
+    normal_y = ;
+    normal_z = ;
+    for(int i = 0; i < nx_left_tile; i++)
+    {
+        y_lower = a * i * dx + b;
+        y_upper = a * (i+1) * dx + b;
+        j_lower = y_lower / dy;
+        j_upper = y_upper / dy;
+        if(j_upper == j_lower)
+        {
+            segment seg;
+            seg.start_point[0] = i * dx;
+            seg.start_point[1] = y_lower;
+            seg.end_point[0] = (i+1) * dx;
+            seg.end_point[1] = y_upper;
+            seg.grid_point[0] = i;
+            seg.grid_point[1] = j_lower;
+            seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+            seg.normal[0] = normal_x;
+            seg.normal[1] = normal_y;
+            seg.normal[2] = normal_z;
+            lines[0].push_back(seg);
+        }
+        else
+        {
+            for(int iSegment = 0; iSegment < j_upper - j_lower + 1; iSegment++)
+            {
+                if(iSegment == 0)
+                {
+                    segment seg;
+                    seg.start_point[0] = i * dx;
+                    seg.start_point[1] = y_lower;
+                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a; 
+                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
+                    seg.grid_point[0] = i;
+                    seg.grid_point[1] = j_lower + iSegment;
+                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                    seg.normal[0] = normal_x;
+                    seg.normal[1] = normal_y;
+                    seg.normal[2] = normal_z;
+                    lines[0].push_back(seg);
+                }
+                else if(iSegment == j_upper - j_lower)
+                {
+                    segment seg;
+                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
+                    seg.start_point[1] = (j_lower + iSegment) * dy;
+                    seg.end_point[0] = (i + 1) * dx; 
+                    seg.end_point[1] = a * (i + 1) * dx + b;
+                    seg.grid_point[0] = i;
+                    seg.grid_point[1] = j_lower + iSegment;  
+                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                    seg.normal[0] = normal_x;
+                    seg.normal[1] = normal_y;
+                    seg.normal[2] = normal_z;
+                    lines[0].push_back(seg);
+                }
+                else
+                {
+                    segment seg;
+                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
+                    seg.start_point[1] = (j_lower + iSegment) * dy;
+                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a;
+                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
+                    seg.grid_point[0] = i;
+                    seg.grid_point[1] = j_lower + iSegment;  
+                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                    seg.normal[0] = normal_x;
+                    seg.normal[1] = normal_y;
+                    seg.normal[2] = normal_z;
+                    lines[0].push_back(seg);
+                }
+            }
+        }
+    }
+
+
+
+    // set the right surface of the left tile
+    for(int j = ny_gap_bottom + 1; j <= ny_gap_top; j++)
+    {
+        (*normal_x_global)(nx_left_tile, j) = 1.0;
+        (*normal_y_global)(nx_left_tile, j) = 0.0;
+        (*normal_z_global)(nx_left_tile, j) = 0.0;
+    }
+    // set the bottom surface of the gap
+    for(int i = nx_left_tile; i < nx_right_tile; i++)
+    {
+        (*normal_x_global)(i, ny_gap_bottom) = 0.0;
+        (*normal_y_global)(i, ny_gap_bottom) = 1.0;
+        (*normal_z_global)(i, ny_gap_bottom) = 0.0;
+    }
+    // set the left surface of the right tile
+    for(int j = ny_gap_bottom; j < ny_gap_top; j++)
+    {
+        (*normal_x_global)(nx_right_tile, j) = -1.0;
+        (*normal_y_global)(nx_right_tile, j) = 0.0;
+        (*normal_z_global)(nx_right_tile, j) = 0.0;
+    }
+
+    // set the top surface of the right tile
+    x1 = nx_right_tile * dx;
+    y1 = ny_gap_top0 * dy;
+    x2 = nx * dx;
+    y2 = ny_gap_top1 * dy;
+    a = (y2-y1)/(x2-x1);
+    b = -x1*(y2-y1)/(x2-x1) + y1;
+    normal_x = ;
+    normal_y = ;
+    normal_z = ;
+    for(int i = 0; i < nx_left_tile; i++)
+    {
+        y_lower = a * i * dx + b;
+        y_upper = a * (i+1) * dx + b;
+        j_lower = y_lower / dy;
+        j_upper = y_upper / dy;
+        if(j_upper == j_lower)
+        {
+            segment seg;
+            seg.start_point[0] = i * dx;
+            seg.start_point[1] = y_lower;
+            seg.end_point[0] = (i+1) * dx;
+            seg.end_point[1] = y_upper;
+            seg.grid_point[0] = i;
+            seg.grid_point[1] = j_lower;
+            seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+            seg.normal[0] = normal_x;
+            seg.normal[1] = normal_y;
+            seg.normal[2] = normal_z;
+            lines[0].push_back(seg);
+        }
+        else
+        {
+            for(int iSegment = 0; iSegment < j_upper - j_lower + 1; iSegment++)
+            {
+                if(iSegment == 0)
+                {
+                    segment seg;
+                    seg.start_point[0] = i * dx;
+                    seg.start_point[1] = y_lower;
+                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a; 
+                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
+                    seg.grid_point[0] = i;
+                    seg.grid_point[1] = j_lower + iSegment;
+                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                    seg.normal[0] = normal_x;
+                    seg.normal[1] = normal_y;
+                    seg.normal[2] = normal_z;
+                    lines[0].push_back(seg);
+                }
+                else if(iSegment == j_upper - j_lower)
+                {
+                    segment seg;
+                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
+                    seg.start_point[1] = (j_lower + iSegment) * dy;
+                    seg.end_point[0] = (i + 1) * dx; 
+                    seg.end_point[1] = a * (i + 1) * dx + b;
+                    seg.grid_point[0] = i;
+                    seg.grid_point[1] = j_lower + iSegment;  
+                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                    seg.normal[0] = normal_x;
+                    seg.normal[1] = normal_y;
+                    seg.normal[2] = normal_z;
+                    lines[0].push_back(seg);
+                }
+                else
+                {
+                    segment seg;
+                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
+                    seg.start_point[1] = (j_lower + iSegment) * dy;
+                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a;
+                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
+                    seg.grid_point[0] = i;
+                    seg.grid_point[1] = j_lower + iSegment;  
+                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                    seg.normal[0] = normal_x;
+                    seg.normal[1] = normal_y;
+                    seg.normal[2] = normal_z;
+                    lines[0].push_back(seg);
+                }
+            }
+        }
+    }
+
+
+    // output data grid data
+    isWall.open("isWall.txt");
+    bndr.open("bndr.txt");
+    bndrVal.open("bndrVal.txt");
+    for(int i=0; i<nx; i++)
+    {
+        for(int j = 0; j < ny; j++)
+        {
+            isWall<<iswall_global_2D[i][j];
+            bndr<<bndr_global_2D[i][j];
+            bndrVal<<bndrVal_global_2D[i][j];
+        }
+        isWall<<endl;
+        bndr<<endl;
+        bndrVal<<endl;
+    }
+    isWall.close();
+    bndr.close();
+    bndrVal.close();
+
+}
 
 
 void Grid2D::computeNcp()
