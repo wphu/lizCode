@@ -106,6 +106,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         self.axes1.set_title(self.title)
         self.axes1.set_xlabel('x(mm)')
         self.axes1.set_ylabel('y(mm)')
+        self.axes1.set_aspect('equal', adjustable='box')
 
     def update_figure(self, itime):
         self.fig.clear()
@@ -128,6 +129,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         self.axes1.set_title(self.title)
         self.axes1.set_xlabel('x(mm)')
         self.axes1.set_ylabel('y(mm)')
+        self.axes1.set_aspect('equal', adjustable='box')
 
     def save_animation(self):
         self.ani = animation.FuncAnimation(self.fig, self.update_figure, self.data3d.shape[0], blit=False, interval=500, repeat=False)
