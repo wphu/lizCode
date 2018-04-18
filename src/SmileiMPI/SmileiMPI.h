@@ -159,6 +159,9 @@ public:
     virtual void scatterField( Field* field_global ,Field* field ){};
     virtual void gatherVDF( Array4D* array_global, Array4D* array ){};
 
+    virtual void reduce_sum_double( double* src, double* des, int n);
+    virtual void reduce_sum_field(Field* field_send, Field* field_recv);
+
 
     //! Real (exclunding oversize) global number of cells (res_space x sim_length)
     std::vector<unsigned int> n_space_global;
@@ -182,9 +185,6 @@ public:
     std::vector <int> send_cnt, send_disp;
     std::vector <int> recv_cnt_VDF, recv_disp_VDF, recv_cnt_VDF_temp;
         std::vector <int> send_cnt_VDF;
-
-    virtual void reduceDoubleVector( double* src, double* des, int n);
-    virtual void reduce_sum_field(Field* field_send, Field* field_recv);
 
 
 protected:

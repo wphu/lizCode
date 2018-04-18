@@ -350,8 +350,8 @@ void Diagnostic1D::calTotalEnergy(SmileiMPI* smpi, vector<Species*>& vecSpecies,
 				totalElectricFieldEnergy += (*Ex1D)(i) * (*Ex1D)(i);
 		}
 
-		smpi->reduceDoubleVector(&totalParticleEnergy[0], &totalParticleEnergy_temp[0], n_species);
-		smpi->reduceDoubleVector(&totalElectricFieldEnergy, &totalElectricFieldEnergy_temp, 1);
+		smpi->reduce_sum_double(&totalParticleEnergy[0], &totalParticleEnergy_temp[0], n_species);
+		smpi->reduce_sum_double(&totalElectricFieldEnergy, &totalElectricFieldEnergy_temp, 1);
 		totalParticleEnergy = totalParticleEnergy_temp;
 		totalElectricFieldEnergy = totalElectricFieldEnergy_temp;
 

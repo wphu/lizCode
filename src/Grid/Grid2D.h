@@ -50,7 +50,7 @@ public:
         double length;
         int grid_point[2];
         double normal[3];
-    }
+    };
     
     // define boundary lines, lines[iLine][iSegment]
     vector< vector<segment> > lines;

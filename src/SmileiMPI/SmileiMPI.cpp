@@ -118,7 +118,7 @@ void SmileiMPI::sumRhoJs( ElectroMagn* EMfields, int ispec, bool currents )
 }
 
 
-void SmileiMPI::reduceDoubleVector( double* src, double* des, int n )
+void SmileiMPI::reduce_sum_double( double* src, double* des, int n )
 {
     MPI_Allreduce( src, des, n, MPI_DOUBLE, MPI_SUM, SMILEI_COMM_WORLD );
 }

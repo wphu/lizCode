@@ -269,7 +269,7 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         }
         fieldsGroup.status = H5Gclose(fieldsGroup.group_id);
 
-
+/*
         // =============write Diagnostics ============================================
         diagsGroup.group_id = H5Gcreate(data_file_id, "/Diagnostic", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);
         // particle flux
@@ -359,7 +359,7 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
         diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         diagsGroup.status = H5Gclose(diagsGroup.group_id);
-
+*/
         /*
         // write particle velocity distribution function
         ptclsGroup.group_id = H5Gcreate(data_file_id, "/VDF", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);

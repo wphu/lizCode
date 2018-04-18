@@ -5,6 +5,8 @@
 #include "PicParams.h"
 #include "SmileiMPI.h"
 #include "PSI2D.h"
+#include "Grid2D.h"
+#include "Particles.h"
 
 class Field;
 class PSI;
@@ -13,21 +15,27 @@ class Diagnostic2D : public Diagnostic {
 
 public :
 
-    Diagnostic2D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields, vector<PSI*>& vecPSI);
+    Diagnostic2D(PicParams& params, Grid* grid, SmileiMPI* smpi, ElectroMagn* EMfields, vector<PSI*>& vecPSI);
     virtual ~Diagnostic2D() {};
 
     //! Runs the diag for all patches for local diags.
     virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime );
 
-    std::vector<Field*> particleFlux;
-    std::vector<Field*> heatFlux;
-    std::vector<Field*> averageAngle;
-    std::vector<Field*> psiRate;   //sputteringRate, depositionRate, and so on
+    // find the segment which particle cross
+    bool find_cross_segment(Grid2D* grid2D, Particles *particles, int iPart, int *iLine_cross, int *iSegment_cross);
+    
+    // determine if a particle crosses a segment
+    bool is_cross(double start_point[], double end_point[], double pos_new[], double pos_old);
+    vector< vector< vector<double> > > particleFlux;
+    vector< vector< vector<double> > > heatFlux;
+    vector< vector< vector<double> > > averageAngle;
+    vector< vector< vector<double> > > psiRate;   //sputteringRate, depositionRate, and so on
 
-    std::vector<Field*> particleFlux_global;
-    std::vector<Field*> heatFlux_global;
-    std::vector<Field*> averageAngle_global;
-    std::vector<Field*> psiRate_global;
+    vector< vector< vector<double> > > particleFlux_global;
+    vector< vector< vector<double> > > heatFlux_global;
+    vector< vector< vector<double> > > averageAngle_global;
+    vector< vector< vector<double> > > psiRate_global;
+    
 
     // calculate velocity and temperature of each species
     // not implemented

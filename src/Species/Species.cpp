@@ -1629,7 +1629,7 @@ void Species::calDepCharge(ElectroMagn* EMfields, PicParams& params, SmileiMPI* 
         }
     }
 
-    smpi->reduceDoubleVector( depCharge_temp[0], depCharge[0], 6 );
+    smpi->reduce_sum_double( depCharge_temp[0], depCharge[0], 6 );
     for ( int iDim = 0 ; iDim<(int)params.nDim_particle ; iDim++ )
     {
         EMfields->depCharge[iDim][0] += depCharge[iDim][0];
