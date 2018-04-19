@@ -4,6 +4,7 @@
 #include "PicParams.h"
 #include "SmileiMPI.h"
 #include "PSI.h"
+#include "Grid.h"
 
 #include <iostream>
 #include <vector>
@@ -18,7 +19,7 @@ public :
     virtual ~Diagnostic() {};
 
     //! Runs the diag for all patches for local diags.
-    virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int timestep ) {};
+    virtual void run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int timestep ) {};
 
     const unsigned int n_species;
 

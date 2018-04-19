@@ -6,6 +6,7 @@
 #include "SmileiMPI.h"
 #include "Field1D.h"
 #include "PSI1D.h"
+#include "Grid.h"
 
 class Diagnostic1D : public Diagnostic {
 
@@ -15,7 +16,7 @@ public :
     virtual ~Diagnostic1D();
 
     //! Runs the diag for all patches for local diags.
-    virtual void run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime ) ;
+    virtual void run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime ) ;
     // calculate velocity and temperature of each species
 	 void calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime);
 

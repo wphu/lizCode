@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-Diagnostic2D::Diagnostic2D(PicParams& params, Grid* grid, SmileiMPI* smpi, ElectroMagn* EMfields, vector<PSI*>& vecPSI) :
+Diagnostic2D::Diagnostic2D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI) :
 Diagnostic(params)
 {
     Grid2D* grid2D = static_cast<Grid2D*>(grid);
@@ -17,23 +17,34 @@ Diagnostic(params)
     i_domain_begin = smpi2D->getCellStartingGlobalIndex(0);
     j_domain_begin = smpi2D->getCellStartingGlobalIndex(1);
 
-    // init particleFlux
-    particleFlux.resize(params.species_param.size());
-    heatFlux.resize(params.species_param.size());
-    averageAngle.resize(params.species_param.size());
-    particleFlux_global.resize(params.species_param.size());
-    heatFlux_global.resize(params.species_param.size());
-    averageAngle_global.resize(params.species_param.size());
-    for (unsigned int iSpec=0 ; iSpec<params.species_param.size() ; iSpec++) 
+    n_species = params.species_param.size();
+    n_line = grid2D->lines.size();
+    n_segments.resize(n_line);
+    n_segment_total = 0;
+    for(int iLine = 0; iLine < n_line; iLine++)
     {
-        particleFlux[iSpec].resize(grid2D->lines.size());
-        heatFlux[iSpec].resize(grid2D->lines.size());
-        averageAngle[iSpec].resize(grid2D->lines.size());
+        n_segments[iLine] = grid2D->lines[iLine].size();
+        n_segment_total += n_segments[iLine];
+    }
+
+
+    // init particleFlux
+    particleFlux.resize(n_species);
+    heatFlux.resize(n_species);
+    averageAngle.resize(n_species);
+    particleFlux_global.resize(n_species);
+    heatFlux_global.resize(n_species);
+    averageAngle_global.resize(n_species);
+    for (unsigned int iSpec = 0 ; iSpec < n_species ; iSpec++) 
+    {
+        particleFlux[iSpec].resize(n_line);
+        heatFlux[iSpec].resize(n_line);
+        averageAngle[iSpec].resize(n_line);
         
-        particleFlux_global[iSpec].resize(grid2D->lines.size());
-        heatFlux_global[iSpec].resize(grid2D->lines.size());
-        averageAngle_global[iSpec].resize(grid2D->lines.size());
-        for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+        particleFlux_global[iSpec].resize(n_line);
+        heatFlux_global[iSpec].resize(n_line);
+        averageAngle_global[iSpec].resize(n_line);
+        for(int iLine = 0; iLine < n_line; iLine++)
         {
             particleFlux[iSpec][iLine].resize(grid2D->lines[iLine].size());
             heatFlux[iSpec][iLine].resize(grid2D->lines[iLine].size());
@@ -112,7 +123,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
             {
                 has_find = find_cross_segment(grid2D, p1, iPart, &iLine_cross, &iSegment_cross);
                 if( has_find )
-                {
+                {   cout<<"has find "<<endl;
                     s1->indexes_of_particles_to_absorb.push_back(iPart);
                     if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
                     {
@@ -211,7 +222,7 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
             // determine if the segment cross the particle trajectory
             for(int i = 0; i < vecSegment.size(); i++)
             {
-                if( is_cross( grid2D->lines[iLine][vecSegment[i]].start_point, grid2D->lines[iLine][vecSegment[i]].end_point, pos_new, pos_old )
+                if( is_cross( grid2D->lines[iLine][vecSegment[i]].start_point, grid2D->lines[iLine][vecSegment[i]].end_point, pos_new, pos_old) )
                 {
                     *iLine_cross = iLine;
                     *iSegment_cross = vecSegment[i];
@@ -228,7 +239,7 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
 bool Diagnostic2D::is_cross(double start_point[], double end_point[], double pos_new[], double pos_old[])
 {
     if(!( min(start_point[0],end_point[0]) <= max(pos_new[0],pos_old[0]) && min(pos_new[1],pos_old[1]) <= max(start_point[1],end_point[1])
-       && min(pos_new[0], pos_old[0]) <= max(start_point[0],end_point[0]) && min(start_point[1],end_point[1]) <= max(pos_new[1],pow_old[1]) ))
+       && min(pos_new[0], pos_old[0]) <= max(start_point[0],end_point[0]) && min(start_point[1],end_point[1]) <= max(pos_new[1],pos_old[1]) ))
     {
         return false;
     }

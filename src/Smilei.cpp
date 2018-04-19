@@ -138,7 +138,7 @@ int main (int argc, char* argv[])
     smpi->barrier();
 
     TITLE("Creating Diagnostic");
-    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, EMfields, vecPSI);
+    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI);
     smpi->barrier();
 
 
@@ -283,6 +283,7 @@ int main (int argc, char* argv[])
             timer[4].update();
 
             // ================== Absorb Particle for 2D ====================================
+            /*
             timer[5].restart();
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
             {
@@ -291,6 +292,13 @@ int main (int argc, char* argv[])
                 }
             }
             timer[5].update();
+            */
+
+            // ================== Run Diagnostic =============================================
+            timer[8].restart();
+            diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
+            timer[8].update();
+
 
             // ================== Project Particle =========================================
             timer[6].restart();
@@ -301,10 +309,6 @@ int main (int argc, char* argv[])
             }
             timer[6].update();
 
-            // ================== Run Diagnostic =============================================
-            timer[8].restart();
-            diag->run(smpi, vecSpecies, EMfields, vecPSI, itime);
-            timer[8].update();
 
             // ================== Plasma Surface Interacton ==================================
             timer[7].restart();
@@ -464,7 +468,7 @@ int main (int argc, char* argv[])
 
             // ================== Run Diagnostic =============================================
             timer[8].restart();
-            diag->run(smpi, vecSpecies, EMfields, vecPSI, itime);
+            diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
 
             // ================== Plasma Surface Interacton ==================================

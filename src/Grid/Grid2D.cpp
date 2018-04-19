@@ -447,7 +447,7 @@ void Grid2D::geometry_iter_gap( )
     y2 = ny_gap_top2 * dy;
     a = (y2-y1)/(x2-x1);
     b = -x1*(y2-y1)/(x2-x1) + y1;
-    for(int i = 0; i < 0.5*nx - 0.5*nx_gapWeight; i++)
+    for(int i = 0; i <= nx_left_tile; i++)
     {
         for(int j = 0; j <= ny_gap_top2; j++)
         {
@@ -461,13 +461,13 @@ void Grid2D::geometry_iter_gap( )
     // set the right tile as Wall
     x1 = nx_right_tile * dx;
     y1 = ny_gap_top0 * dy;
-    x2 = nx * dx;
+    x2 = (nx - 1) * dx;
     y2 = ny_gap_top1 * dy;
     a = (y2-y1)/(x2-x1);
     b = -x1*(y2-y1)/(x2-x1) + y1;
     for(int i =  nx_right_tile; i < nx; i++)
     {
-        for(int j = 0; j <= ny_gap_top2; j++)
+        for(int j = 0; j <= ny_gap_top1; j++)
         {
             if(j * dy <= a * i * dx + b)
             {
@@ -521,17 +521,20 @@ void Grid2D::geometry_iter_gap( )
     {
         for(int i = 0; i < nx; i++)
         {
-            // set the boundary corner points of two tiles
-            if( (i == 0 || i == nx - 1) && j == ny_gap_top1 ) 
+            if( i == 0 || i == nx - 1) 
             {
-                bndr_global_2D[i][j] = 1;
-                bndrVal_global_2D[i][j] = val1;
-            }
-            // set the left and right boundary of tile surface
-            else if( (i == 0 || i == nx - 1) && j < ny_gap_top1 ) 
-            {
-                bndr_global_2D[i][j] = 5;
-                bndrVal_global_2D[i][j] = val1;
+                // set the boundary corner points of two tiles
+                if(j == ny_gap_top1)
+                {
+                    bndr_global_2D[i][j] = 1;
+                    bndrVal_global_2D[i][j] = val1;
+                }
+                // set the left and right boundary of tile surface
+                else if(j < ny_gap_top1)
+                {
+                    bndr_global_2D[i][j] = 5;
+                    bndrVal_global_2D[i][j] = val1;
+                }
             }
             // set the lower boundary, which is never used for field solving, convenient for particle moving
             else if( j == 0 ) 
@@ -645,7 +648,6 @@ void Grid2D::geometry_iter_gap( )
             }
         }
     }
-
 
     // set the right surface of the left tile
     normal_x = 1.0;
@@ -775,7 +777,6 @@ void Grid2D::geometry_iter_gap( )
         lines[3].push_back(seg);
     }
 
-
     // set the top surface of the right tile
     normal_x = -bevel_depth * bevel_depth / nx_left_tile;
     normal_y = bevel_depth;
@@ -856,7 +857,6 @@ void Grid2D::geometry_iter_gap( )
             }
         }
     }
-
 }
 
 

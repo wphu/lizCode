@@ -40,7 +40,7 @@ Diagnostic1D::~Diagnostic1D()
 
 
 
-void Diagnostic1D::run( SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime )
+void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime )
 {
 	Species *s1;
 	Particles *p1;
