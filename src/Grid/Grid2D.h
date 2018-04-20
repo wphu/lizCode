@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Grid.h"
+#include "Segment.h"
 
 using namespace std;
 
@@ -43,17 +44,11 @@ public:
     int **bndr_global_2D;
     double **bndrVal_global_2D;
 
-    struct segment
-    {
-        double start_point[2];
-        double end_point[2];
-        double length;
-        int grid_point[2];
-        double normal[3];
-    };
-    
     // define boundary lines, lines[iLine][iSegment]
     vector< vector<segment> > lines;
+    int n_line;
+    int n_segment_total;
+    vector<int> n_segments;
 
     // The number of the current point in the discrete Poisson Eqution left coefficient matrix
     int **numcp_global_2D;

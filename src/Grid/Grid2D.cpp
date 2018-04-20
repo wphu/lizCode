@@ -75,6 +75,15 @@ Grid2D::Grid2D(
         geometry_iter_gap();
     }
     computeNcp();
+
+    n_line = lines.size();
+    n_segments.resize(n_line);
+    n_segment_total = 0;
+    for(int iLine = 0; iLine < n_line; iLine++)
+    {
+        n_segments[iLine] = lines[iLine].size();
+        n_segment_total += n_segments[iLine];
+    }
 }
 
 
@@ -655,7 +664,7 @@ void Grid2D::geometry_iter_gap( )
     normal_z = 0.0;
     if(a * nx_left_tile * dx + b == ny_gap_top2 * dy)
     {
-        nSegment = ny_gap_top2 - bottomWall_thickness - 1;
+        nSegment = ny_gap_top2 - bottomWall_thickness;
         segment seg;
         seg.start_point[0] = nx_left_tile * dx;
         seg.start_point[1] = ny_gap_top2 * dy;
@@ -686,7 +695,7 @@ void Grid2D::geometry_iter_gap( )
     }
     else
     {
-        nSegment = ny_gap_top2 - bottomWall_thickness;
+        nSegment = ny_gap_top2 - bottomWall_thickness + 1;
         segment seg;
         seg.start_point[0] = nx_left_tile * dx;
         seg.start_point[1] = a * nx_left_tile * dx + b;

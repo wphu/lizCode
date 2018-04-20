@@ -19,12 +19,12 @@ number_output = 5
 number_of_procs = [4, 6]
 
 
-#> number of timestep of incrementing averaged electromagnetic fields
-ntime_step_avg = ns
-
 #> Timestep to output some fields into hdf5 file
 dump_step = int( Tsim / number_output )
 timesteps_restore = dump_step
+
+#> number of timestep of incrementing averaged electromagnetic fields
+ntime_step_avg = dump_step
 
 ion_step = 1
 
@@ -97,7 +97,7 @@ gapWidth = 50
 sourceLength=20
 
 Grid(
-	gridType = "gap",
+	gridType = "iter_gap",
 	gapKind = "divertor",
 	ny_source = sourceLength,
 	ny_gapHeight = gapHeight,

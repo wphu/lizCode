@@ -12,6 +12,7 @@
 #include "SmileiIO.h"
 #include "Diagnostic2D.h"
 #include "Grid2D.h"
+#include "Segment.h"
 
 //  --------------------------------------------------------------------------------------------------------------------
 //! Class SmileiIO_Cart2D

@@ -123,7 +123,9 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
             {
                 has_find = find_cross_segment(grid2D, p1, iPart, &iLine_cross, &iSegment_cross);
                 if( has_find )
-                {   cout<<"has find "<<endl;
+                {   
+                    if(iLine_cross != 4) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
+                    //cout<<"has find "<<endl;
                     s1->indexes_of_particles_to_absorb.push_back(iPart);
                     if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
                     {
@@ -194,7 +196,7 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
         ic0 = ic;
         jc0 = jc;
         ic1 = particles->position_old(0, iPart) * dx_inv_;
-        jc1 = particles->position_old(0, iPart) * dy_inv_;
+        jc1 = particles->position_old(1, iPart) * dy_inv_;
         if(ic0 > ic1)
         {
             int ic_temp = ic0;
@@ -211,11 +213,13 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
         for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
         {
             // find segments which the particle crosses
+            vecSegment.clear();
             for(int iSegment = 0; iSegment < grid2D->lines[iLine].size(); iSegment++)
             {
                 if( grid2D->lines[iLine][iSegment].grid_point[0] >= ic0 && grid2D->lines[iLine][iSegment].grid_point[0] <= ic1
                     && grid2D->lines[iLine][iSegment].grid_point[1] >= jc0 && grid2D->lines[iLine][iSegment].grid_point[1] <= jc1 )
                 {
+                    if(iLine_cross == 0) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
                     vecSegment.push_back(iSegment);
                 }
             }
@@ -248,5 +252,5 @@ bool Diagnostic2D::is_cross(double start_point[], double end_point[], double pos
     v = (pos_old[0] - start_point[0]) * (end_point[1] - start_point[1]) - (end_point[0] - start_point[0]) * (pos_old[1] - start_point[1]);
     w = (start_point[0] - pos_new[0]) * (pos_old[1] - pos_new[1])       - (pos_old[0]   - pos_new[0])     * (start_point[1] - pos_new[1]);
     z = (end_point[0] - pos_new[0])   * (pos_old[1] - pos_new[1])       - (pos_old[0]   - pos_new[0])     * (end_point[1] - pos_new[1]);
-    return( u * v <= 0.000000000001 && w * z <= 0.000000000001 );
+    return( u * v <= 0.000000000000001 && w * z <= 0.000000000000001 );
 }

@@ -416,6 +416,12 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     herr_t      grid_status;
     string      grid_dataset_name;
 
+    hsize_t     count[3];              /* size of subset in the file */
+    hsize_t     offset[3];             /* subset offset in the file */
+    hsize_t     stride[3];
+    hsize_t     block[3];
+
+
     int grid_ndim = 3;
     hsize_t grid_dims_global[3];
 
@@ -450,5 +456,81 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 
+
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0; iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            cout<<grid2D->lines[iLine][iSegment].grid_point[0]<<" "<<grid2D->lines[iLine][iSegment].grid_point[1]<<endl;
+            cout<<grid2D->lines[iLine][iSegment].start_point[0]<<" "<<grid2D->lines[iLine][iSegment].start_point[1]<<endl;
+            cout<<grid2D->lines[iLine][iSegment].end_point[0]<<" "<<grid2D->lines[iLine][iSegment].end_point[1]<<endl;
+        }
+        cout<<endl;
+        cout<<"================================"<<endl;
+    }
+    
+
+    // ===================== write boundary lines ======================================
+    hid_t segment_type, memtype, point_type, grid_point_type, normal_type;
+
+    point_type = H5Tcopy(H5T_NATIVE_DOUBLE);
+    H5Tset_size(point_type, 2);
+    
+    grid_point_type = H5Tcopy(H5T_NATIVE_INT);
+    H5Tset_size(grid_point_type, 2);
+
+    normal_type = H5Tcopy(H5T_NATIVE_DOUBLE);
+    H5Tset_size(normal_type, 3);
+
+    memtype = H5Tcreate(H5T_COMPOUND, sizeof(segment));
+    H5Tinsert(memtype, "start_point", HOFFSET(segment, start_point), point_type);
+    H5Tinsert(memtype, "end_point", HOFFSET(segment, end_point), point_type);
+    H5Tinsert(memtype, "length", HOFFSET(segment, length), H5T_NATIVE_DOUBLE);
+    H5Tinsert(memtype, "grid_point", HOFFSET(segment, grid_point), grid_point_type);
+    H5Tinsert(memtype, "normal", HOFFSET(segment, normal), normal_type);
+
+    segment_type = H5Tcreate(H5T_COMPOUND, 9 * sizeof(double) + 2 * sizeof(int));
+    H5Tinsert(segment_type, "start_point", 0, point_type);
+    H5Tinsert(segment_type, "end_point", 2 * sizeof(double), point_type);
+    H5Tinsert(segment_type, "length", 4 * sizeof(double), H5T_NATIVE_DOUBLE);
+    H5Tinsert(segment_type, "grid_point", 5 * sizeof(double), grid_point_type);
+    H5Tinsert(segment_type, "normal", 5 * sizeof(double) + 2 * sizeof(int), normal_type);
+
+    int ndim_segment = 3;
+    hsize_t dim_segment[3];
+    hid_t segment_space_id, segment_dataset_id, segment_memspace_id;
+    
+    dim_segment[0] = 1;
+    dim_segment[1] = 1;
+    dim_segment[2] = grid2D->n_segment_total;
+    stride[0] = 1;
+    stride[1] = 1;
+    stride[2] = 1;
+    block[0] = 1;
+    block[1] = 1;
+    block[2] = 1;
+    segment_space_id = H5Screate_simple(ndim_segment, dim_segment, NULL);
+    segment_dataset_id = H5Dcreate(grid_file_id, "lines", segment_type, segment_space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    
+    int offset_line = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        offset[0] = 0;
+        offset[0] = 0;
+        offset[0] = offset_line;
+        count[0] = 1;
+        count[0] = 1;
+        count[0] = grid2D->n_segments[iLine];
+        segment_memspace_id = H5Screate_simple(ndim_segment, count, NULL);
+        H5Sselect_hyperslab (segment_space_id, H5S_SELECT_SET, offset, stride, count, block);
+        H5Dwrite (segment_dataset_id, memtype, segment_memspace_id, segment_space_id, H5P_DEFAULT, &(grid2D->lines[iLine][0]));
+        H5Sclose (segment_memspace_id);
+        H5Sclose (segment_space_id);
+        offset_line += grid2D->n_segments[iLine];
+    }
+    
+
     grid_status = H5Fclose(grid_file_id);
+
+
 }
