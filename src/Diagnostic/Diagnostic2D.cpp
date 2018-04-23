@@ -124,7 +124,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                 has_find = find_cross_segment(grid2D, p1, iPart, &iLine_cross, &iSegment_cross);
                 if( has_find )
                 {   
-                    if(iLine_cross != 4) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
+                    //if(iLine_cross != 4) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
                     //cout<<"has find "<<endl;
                     s1->indexes_of_particles_to_absorb.push_back(iPart);
                     if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
@@ -155,11 +155,26 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
     if( (itime % step_dump) == 0 ) {
 		for(int iSpec = 0; iSpec < vecSpecies.size(); iSpec++)
 		{
+            s1 = vecSpecies[iSpec];
+			wlt = s1->species_param.weight / (dx_inv_ * timestep * step_ave);
             for(int iLine = 0; iLine < particleFlux[iSpec].size(); iLine++)
             {
                 smpi->reduce_sum_double( &(particleFlux[iSpec][iLine][0]), &(particleFlux_global[iSpec][iLine][0]), particleFlux[iSpec][iLine].size() );
                 smpi->reduce_sum_double( &(heatFlux[iSpec][iLine][0]), &(heatFlux_global[iSpec][iLine][0]), heatFlux[iSpec][iLine].size() );
                 smpi->reduce_sum_double( &(averageAngle[iSpec][iLine][0]), &(averageAngle_global[iSpec][iLine][0]), averageAngle[iSpec][iLine].size() );
+                
+                for(int iSegment = 0; iSegment < particleFlux_global[iSpec][iLine].size(); iSegment++)
+                {
+                    if(grid2D->lines[iLine][iSegment].length == 0.0)
+                    {
+                        cout<<"ERROR: grid2D->lines[iLine][iSegment].length = 0 "<<iLine<<" "<<iSegment<<endl;
+                        continue;
+                    }
+                    wlt /= grid2D->lines[iLine][iSegment].length;
+                    averageAngle_global[iSpec][iLine][iSegment] /= particleFlux_global[iSpec][iLine][iSegment];
+                    particleFlux_global[iSpec][iLine][iSegment] /= wlt;
+                    heatFlux_global[iSpec][iLine][iSegment]     /= wlt;
+                }
             }
 		}
 	}
