@@ -36,6 +36,7 @@ public:
             int ny_source;
             int ny_gapHeight;
             int nx_gapWeight;
+            int ny_bevel_depth;
             double potential_wall;
 
     	    // Loop over each binary Grid group and parse info
@@ -60,10 +61,13 @@ public:
                 nx_gapWeight = 100;
     	        ifile.extract("nx_gapWeight",nx_gapWeight,"Grid",n_Grid);
 
+                nx_gapWeight = 20;
+    	        ifile.extract("ny_bevel_depth",ny_bevel_depth,"Grid",n_Grid);
+
                 potential_wall = 0.0;
     	        ifile.extract("potential_wall",potential_wall,"Grid",n_Grid);
 
-                grid = new Grid2D(params, gridType, gapKind, ny_source, ny_gapHeight, nx_gapWeight, potential_wall);
+                grid = new Grid2D(params, gridType, gapKind, ny_source, ny_gapHeight, nx_gapWeight, ny_bevel_depth, potential_wall);
     	    }
             smpi->scatterGrid(grid);
         }

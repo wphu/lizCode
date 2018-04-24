@@ -28,6 +28,7 @@ Grid2D::Grid2D(
     int ny_source_temp,
     int ny_gapHeight_temp,
     int nx_gapWeight_temp,
+    int ny_bevel_depth_temp,
     double potential_wall_temp):
     Grid(params)
 {
@@ -36,10 +37,13 @@ Grid2D::Grid2D(
     ny_source = ny_source_temp;
     ny_gapHeight = ny_gapHeight_temp;
     nx_gapWeight = nx_gapWeight_temp;
+    ny_bevel_depth = ny_bevel_depth_temp;
     potential_wall = potential_wall_temp;
 
     dx = params.cell_length[0];
     dy = params.cell_length[1];
+
+    bevel_depth = ny_bevel_depth * dy;
 
     // number of nodes of the grid in the x-direction
     dims_.resize(2);
@@ -396,8 +400,6 @@ void Grid2D::geometry_gap( )
 // iter divetor gap geometry, with bevel top surface in toroidal direction
 void Grid2D::geometry_iter_gap( )
 {
-    bevel_depth = 20.0 * dx;
-
     int bottomWall_thickness = 3;
     int nx_left_tile = 0.5*nx - 0.5*nx_gapWeight;
     int nx_right_tile = nx - nx_gapWeight;

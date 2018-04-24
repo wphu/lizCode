@@ -95,6 +95,7 @@ random_seed = 0
 gapHeight = 100
 gapWidth = 50
 sourceLength=20
+bevel_depth = 20 * l0
 
 Grid(
 	gridType = "iter_gap",
@@ -102,6 +103,7 @@ Grid(
 	ny_source = sourceLength,
 	ny_gapHeight = gapHeight,
 	nx_gapWeight = gapWidth,
+	ny_bevel_depth = bevel_depth / l0,
 	potential_wall = -60.0
 )
 

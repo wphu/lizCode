@@ -27,6 +27,7 @@ public:
         int ny_source_temp,
         int ny_gapHeight_temp,
         int nx_gapWeight_temp,
+        int ny_bevel_depth_temp,
         double potential_wall_temp);
 
     // Destructor for Grid2D
@@ -62,6 +63,7 @@ public:
 
     // ITER divetor gap 
     double bevel_depth;
+    int ny_bevel_depth;
 
 
 private:
