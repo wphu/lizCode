@@ -122,11 +122,6 @@ void SmileiIO_Cart2D::createDiagsPattern(PicParams& params, Diagnostic2D* diag2D
     diagsGroup.block[1] = 1;
     diagsGroup.block[2] = 1;
 
-    diagsGroup.count[0]  = 1;
-    diagsGroup.count[1]  = diag2D->dim_global[0];
-    diagsGroup.count[2]  = diag2D->dim_global[1];
-
-
     // ======= create diagsGroup ================================
     diag_name = "particleFlux";
     diagsGroup.dataset_stringName.push_back(diag_name);
@@ -277,8 +272,8 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         diagsGroup.dims_global[0] = 1;
         diagsGroup.dims_global[1] = diag2D->n_species;
         diagsGroup.dims_global[2] = diag2D->n_segment_total;
-        diagsGroup.dataspace_id = H5Screate_simple(n_dim_data, diagsGroup.dims_global, NULL);
         h5_name = diagsGroup.dataset_stringName[iDiag].c_str();
+        diagsGroup.dataspace_id = H5Screate_simple(n_dim_data, diagsGroup.dims_global, NULL);
         diagsGroup.dataset_id[iDiag] = H5Dcreate2(diagsGroup.group_id, h5_name, H5T_NATIVE_DOUBLE, diagsGroup.dataspace_id,
                                                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         for(int iSpec = 0; iSpec < diag2D->n_species; iSpec++)
@@ -301,8 +296,8 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
                 offset_line += diag2D->n_segments[iLine];
             }
         }
-        diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
+        diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
 
         // heat flux
         iDiag++;
@@ -383,8 +378,8 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         }
         diagsGroup.status = H5Sclose(diagsGroup.dataspace_id);
         diagsGroup.status = H5Dclose(diagsGroup.dataset_id[iDiag]);
-        diagsGroup.status = H5Gclose(diagsGroup.group_id);
         */
+        diagsGroup.status = H5Gclose(diagsGroup.group_id);
 
         /*
         // write particle velocity distribution function
@@ -401,6 +396,8 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         }
         ptclsGroup.status = H5Gclose( ptclsGroup.group_id );
         */
+
+
         status = H5Fclose(data_file_id);
     }
 

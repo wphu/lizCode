@@ -168,8 +168,6 @@ class PlotWidget(QWidget):
         
         # data tab
         self.data_widget = QTableWidget(self)
-        self.data_widget.setRowCount(self.data4d.shape[2])
-        self.data_widget.setColumnCount(self.data4d.shape[3])
         self.set_data_widget(self.data4d[0,0,:,:])
         self.tab_widget.addTab(self.data_widget, "data")
 
@@ -224,6 +222,8 @@ class PlotWidget(QWidget):
         self.plainTextEdit.setText(str(self.sp.value()))
 
     def set_data_widget(self, data2d):
+        self.data_widget.setRowCount(data2d.shape[0])
+        self.data_widget.setColumnCount(data2d.shape[1])
         for i in range(0, data2d.shape[0]):
             for j in range(0, data2d.shape[1]):
                 newItem = QTableWidgetItem( str( round(data2d[i,j]) ) )

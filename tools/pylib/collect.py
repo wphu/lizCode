@@ -20,6 +20,7 @@ def collect(groupName, dataSetName = None, itime=None, path="data",prefix="data"
         else:
             data = np.append(data, val, axis = 0)
         i = i + 1
+        f.close()
     return data    
 
 

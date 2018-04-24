@@ -603,6 +603,10 @@ void Grid2D::geometry_iter_gap( )
             seg.normal[0] = normal_x;
             seg.normal[1] = normal_y;
             seg.normal[2] = normal_z;
+            if(seg.length == 0.0)
+            {
+                continue;
+            }
             lines[0].push_back(seg);
         }
         else
@@ -622,6 +626,10 @@ void Grid2D::geometry_iter_gap( )
                     seg.normal[0] = normal_x;
                     seg.normal[1] = normal_y;
                     seg.normal[2] = normal_z;
+                    if(seg.length == 0.0)
+                    {
+                        continue;
+                    }
                     lines[0].push_back(seg);
                 }
                 else if(iSegment == j_upper - j_lower)
@@ -637,6 +645,10 @@ void Grid2D::geometry_iter_gap( )
                     seg.normal[0] = normal_x;
                     seg.normal[1] = normal_y;
                     seg.normal[2] = normal_z;
+                    if(seg.length == 0.0)
+                    {
+                        continue;
+                    }
                     lines[0].push_back(seg);
                 }
                 else
@@ -652,6 +664,10 @@ void Grid2D::geometry_iter_gap( )
                     seg.normal[0] = normal_x;
                     seg.normal[1] = normal_y;
                     seg.normal[2] = normal_z;
+                    if(seg.length == 0.0)
+                    {
+                        continue;
+                    }
                     lines[0].push_back(seg);
                 }
             }
@@ -676,6 +692,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
+        if(seg.length == 0.0)
+        {
+            continue;
+        }
         lines[1].push_back(seg);
         for(int iSegment = 1; iSegment < nSegment; iSegment++)
         {
@@ -690,6 +710,10 @@ void Grid2D::geometry_iter_gap( )
             seg.normal[0] = normal_x;
             seg.normal[1] = normal_y;
             seg.normal[2] = normal_z;
+            if(seg.length == 0.0)
+            {
+                continue;
+            }
             lines[1].push_back(seg);
         }
     }
@@ -707,6 +731,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
+        if(seg.length == 0.0)
+        {
+            continue;
+        }
         lines[1].push_back(seg);
         for(int iSegment = 1; iSegment < nSegment; iSegment++)
         {
@@ -721,6 +749,10 @@ void Grid2D::geometry_iter_gap( )
             seg.normal[0] = normal_x;
             seg.normal[1] = normal_y;
             seg.normal[2] = normal_z;
+            if(seg.length == 0.0)
+            {
+                continue;
+            }
             lines[1].push_back(seg);
         }
     }
@@ -742,6 +774,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
+        if(seg.length == 0.0)
+        {
+            continue;
+        }
         lines[2].push_back(seg);
     }
 
@@ -768,6 +804,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
+        if(seg.length == 0.0)
+        {
+            continue;
+        }
         lines[3].push_back(seg);
     }
     if(a * nx_right_tile * dx + b != ny_gap_top0 * dy)
@@ -783,6 +823,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
+        if(seg.length == 0.0)
+        {
+            continue;
+        }
         lines[3].push_back(seg);
     }
 
@@ -812,6 +856,10 @@ void Grid2D::geometry_iter_gap( )
             seg.normal[0] = normal_x;
             seg.normal[1] = normal_y;
             seg.normal[2] = normal_z;
+            if(seg.length == 0.0)
+            {
+                continue;
+            }
             lines[4].push_back(seg);
         }
         else
@@ -831,6 +879,10 @@ void Grid2D::geometry_iter_gap( )
                     seg.normal[0] = normal_x;
                     seg.normal[1] = normal_y;
                     seg.normal[2] = normal_z;
+                    if(seg.length == 0.0)
+                    {
+                        continue;
+                    }
                     lines[4].push_back(seg);
                 }
                 else if(iSegment == j_upper - j_lower)
@@ -846,6 +898,10 @@ void Grid2D::geometry_iter_gap( )
                     seg.normal[0] = normal_x;
                     seg.normal[1] = normal_y;
                     seg.normal[2] = normal_z;
+                    if(seg.length == 0.0)
+                    {
+                        continue;
+                    }
                     lines[4].push_back(seg);
                 }
                 else
@@ -861,6 +917,10 @@ void Grid2D::geometry_iter_gap( )
                     seg.normal[0] = normal_x;
                     seg.normal[1] = normal_y;
                     seg.normal[2] = normal_z;
+                    if(seg.length == 0.0)
+                    {
+                        continue;
+                    }
                     lines[4].push_back(seg);
                 }
             }
