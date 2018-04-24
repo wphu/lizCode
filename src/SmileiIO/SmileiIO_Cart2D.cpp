@@ -453,7 +453,7 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 
-
+    /*
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0; iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -465,7 +465,7 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
         cout<<endl;
         cout<<"================================"<<endl;
     }
-    
+    */
 
     // ===================== write boundary lines ======================================
     hid_t segment_type, memtype, point_type, grid_point_type, normal_type;
