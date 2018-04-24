@@ -172,12 +172,12 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                         cout<<"ERROR: grid2D->lines[iLine][iSegment].length = 0 "<<iLine<<" "<<iSegment<<endl;
                         continue;
                     }
-                    wlt =wlt0 / grid2D->lines[iLine][iSegment].length;
+                    wlt = wlt0 / grid2D->lines[iLine][iSegment].length;
                     if(particleFlux_global[iSpec][iLine][iSegment] != 0.0)
                     {
                         averageAngle_global[iSpec][iLine][iSegment] /= particleFlux_global[iSpec][iLine][iSegment];
-                        particleFlux_global[iSpec][iLine][iSegment] /= wlt;
-                        heatFlux_global[iSpec][iLine][iSegment]     /= wlt;   
+                        particleFlux_global[iSpec][iLine][iSegment] *= wlt;
+                        heatFlux_global[iSpec][iLine][iSegment]     *= wlt;   
                     }
                 }
             }
