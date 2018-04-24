@@ -692,11 +692,11 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
-        if(seg.length == 0.0)
+        if(seg.length != 0.0)
         {
-            continue;
+            lines[1].push_back(seg);
         }
-        lines[1].push_back(seg);
+        
         for(int iSegment = 1; iSegment < nSegment; iSegment++)
         {
             segment seg;
@@ -731,11 +731,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
-        if(seg.length == 0.0)
+        if(seg.length != 0.0)
         {
-            continue;
+            lines[1].push_back(seg);
         }
-        lines[1].push_back(seg);
         for(int iSegment = 1; iSegment < nSegment; iSegment++)
         {
             segment seg;
@@ -823,11 +822,10 @@ void Grid2D::geometry_iter_gap( )
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
-        if(seg.length == 0.0)
+        if(seg.length != 0.0)
         {
-            continue;
+            lines[3].push_back(seg);
         }
-        lines[3].push_back(seg);
     }
 
     // set the top surface of the right tile
