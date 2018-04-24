@@ -16,7 +16,7 @@ ns = int(1.0e-9 / t0)
 Tsim = 5 * ns			# duration of the simulation
 number_output = 5
 
-number_of_procs = [4, 6]
+number_of_procs = [4, 8]
 
 
 #> Timestep to output some fields into hdf5 file
