@@ -1,6 +1,6 @@
 #PBS -S /bin/bash
 #PBS -N tst2d_gap
-#PBS -l nodes=1:ppn=24
+#PBS -l nodes=1:ppn=32
 #PBS -m b
 #PBS -m e
 #PBS -m a
@@ -17,4 +17,4 @@ echo "end time"; date
 ##do your job
 cd $PBS_O_WORKDIR
 
-mpiexec -n 24 liz data/input.py
+mpiexec -n 32 liz data/input.py

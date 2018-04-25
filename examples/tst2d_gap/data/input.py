@@ -16,7 +16,7 @@ ns = int(1.0e-9 / t0)
 Tsim = 5 * ns			# duration of the simulation
 number_output = 5
 
-number_of_procs = [4, 8]
+number_of_procs = [8, 4]
 
 
 #> Timestep to output some fields into hdf5 file
@@ -94,7 +94,7 @@ random_seed = 0
 
 gapHeight = 100
 gapWidth = 50
-sourceLength=20
+sourceLength=5
 bevel_depth = 20 * l0
 
 Grid(
