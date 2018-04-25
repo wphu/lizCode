@@ -1,6 +1,7 @@
 #include "PSI2D_Sputtering.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
+#include "Diagnostic2D.h"
 
 #include <cmath>
 #include <iomanip>
@@ -31,20 +32,62 @@ PSI2D_Sputtering::~PSI2D_Sputtering()
 
 
 // Calculates the PSI2D for a given Collisions object
-void PSI2D_Sputtering::performPSI(PicParams& params, vector<Species*>& vecSpecies, int itime)
+void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
-
-    unsigned int nbins = vecSpecies[0]->bmin.size(); // number of bins
-    vector<unsigned int> *sg1, *sg2, *sgtmp, bmin1, bmax1, bmin2, bmax2, index1, index2;
-    unsigned int nspec1, nspec2; // numbers of species in each group
-    unsigned int npart1, npart2; // numbers of macro-particles in each group
-    unsigned int npairs; // number of pairs of macro-particles
-    vector<unsigned int> np1, np2; // numbers of macro-particles in each species, in each group
-    double n1, n2, n12, n123, n223; // densities of particles
-    unsigned int i1, i2, ispec1, ispec2;
+    // the angle of particle velocity with the surface normal
+    double theta;
+    // kinetic energy_ion
+    double energy_incident;
+    double v_square, v_magnitude;
+    double momentum[3];
+    // sputtering probability
+    double pSput;
+    int iDim;
+    bool has_find;
+    int iLine_cross, iSegment_cross;
     Species   *s1, *s2;
     Particles *p1, *p2;
 
+    s1 = vecSpecies[species1];
+    s2 = vecSpecies[species2];
+    p1 = &(s1->psi_particles);
+    p2 = &(s2->psi_particles);
 
+    Diagnostic2D *diag2D = static_cast<Diagnostic2D>(diag);
+
+    iDim = 0;
+    nPartEmit = 0;
+    int nPart = p1->size();
+    for(unsigned int iPart = 0; iPart < nPart; iPart++)
+    {
+        has_find = diag2D->find_cross_segment(grid2D, p1, iPart, iLine_cross, iSegment_cross);
+        
+        momentum[0] = p1->momentum(0,iPart);
+        momentum[1] = p1->momentum(1,iPart);
+        momentum[2] = p1->momentum(2,iPart);
+        v_square = pow(momentum[0], 2) + pow(momentum[1], 2) + pow(momentum[2], 2);
+        energy_incident = 0.5 * s1->species_param.mass * v_square;
+        theta = angle_2vectors(momentum, grid2D->lines[iLine_cross][iSegment_cross].normal);
+        theta *= ( 180.0 / params.const_pi );
+        
+        pSput = sputtering->phy_sput_yield(theta, energy_incident / const_e);
+
+        diag2D->psiRate[ipsi][iLine_cross][iSegment_cross] += pSput;
+
+        double ran_p = (double)rand() / RAND_MAX;
+        if( pSput > ran_p ) 
+        {
+            nPartEmit++;
+        }
+
+
+    };
+
+    if( smpi->isWestern() || smpi->isEastern() )
+    {
+        emit(params, vecSpecies);
+        s2->insert_particles_to_bins(new_particles, count_of_particles_to_insert_s2);
+        new_particles.clear();
+    }
 
 }

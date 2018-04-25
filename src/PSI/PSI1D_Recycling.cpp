@@ -39,7 +39,7 @@ PSI1D_Recycling::~PSI1D_Recycling()
 
 
 // Calculates the PSI1D for a given Collisions object
-void PSI1D_Recycling::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, int itime, ElectroMagn* fields)
+void PSI1D_Recycling::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
     // the angle of particle velocity with the surface normal
     double theta;

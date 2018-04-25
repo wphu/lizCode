@@ -1,4 +1,4 @@
-#include "PSI1D_Backscattering.h"
+#include "PSI1D_RefDep.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
 
@@ -12,7 +12,7 @@ using namespace std;
 
 
 // Constructor
-PSI1D_Backscattering::PSI1D_Backscattering(
+PSI1D_RefDep::PSI1D_RefDep(
     PicParams& params,
     SmileiMPI* smpi,
     unsigned int psi_species1,
@@ -46,7 +46,7 @@ PSI1D(params, smpi)
     backscattering = new Backscatterin_EmpiricalFormula(nz1, m1, ne, nz2, nw);
 }
 
-PSI1D_Backscattering::~PSI1D_Backscattering()
+PSI1D_RefDep::~PSI1D_RefDep()
 {
 
 }
@@ -54,7 +54,7 @@ PSI1D_Backscattering::~PSI1D_Backscattering()
 
 
 // Calculates the PSI1D for a given Collisions object
-void PSI1D_Backscattering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, int itime, ElectroMagn* fields)
+void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
     // the angle of particle velocity with the surface normal
     double theta;
@@ -146,7 +146,7 @@ void PSI1D_Backscattering::performPSI(PicParams& params, SmileiMPI* smpi, vector
 }
 
 
-void PSI1D_Backscattering::emit(PicParams& params, vector<Species*>& vecSpecies)
+void PSI1D_RefDep::emit(PicParams& params, vector<Species*>& vecSpecies)
 {
     if(psiPos == "left")
     {

@@ -282,19 +282,8 @@ int main (int argc, char* argv[])
             }
             timer[4].update();
 
-            // ================== Absorb Particle for 2D ====================================
-            /*
-            timer[5].restart();
-            for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
-            {
-                if(params.geometry == "2d3v") {
-                    vecSpecies[ispec]->absorb2D(time_dual, ispec, grid, smpi, params);
-                }
-            }
-            timer[5].update();
-            */
-
             // ================== Run Diagnostic =============================================
+            // absorb particles and calculate particle flux, heat flux, and average angle for 2D and 3D
             timer[8].restart();
             diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
@@ -314,12 +303,12 @@ int main (int argc, char* argv[])
             timer[7].restart();
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
             {
-                vecPSI[ipsi]->performPSI(params,smpi,vecSpecies,itime, EMfields);
+                vecPSI[ipsi]->performPSI(params, smpi, vecSpecies, EMfields, diag, itime);
             }
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
             {
-                (vecSpecies[ispec]->psi_particles).clear(); // clear psi_particles to avoid unnecessary
-                                                            // repeated PSI performs for multiple ion timesteps
+                // clear psi_particles to avoid unnecessary repeated PSI performs for multiple ion timesteps
+                (vecSpecies[ispec]->psi_particles).clear(); 
             }
             timer[7].update();
 

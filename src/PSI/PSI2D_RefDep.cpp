@@ -31,7 +31,7 @@ PSI2D_RefDep::~PSI2D_RefDep()
 
 
 // Calculates the PSI2D for a given Collisions object
-void PSI2D_RefDep::performPSI(PicParams& params, vector<Species*>& vecSpecies, int itime)
+void PSI2D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
 
     unsigned int nbins = vecSpecies[0]->bmin.size(); // number of bins

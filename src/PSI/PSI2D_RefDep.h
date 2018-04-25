@@ -1,3 +1,4 @@
+// PSI class for Reflection and Deposition
 
 #ifndef PSI2D_RELDEP_H
 #define PSI2D_RELDEP_H
@@ -10,7 +11,6 @@
 #include "Species.h"
 #include "PSI2D.h"
 
-// PSI class for Reflection and Deposition
 class PSI2D_RefDep : public PSI2D
 {
 
@@ -22,7 +22,7 @@ public:
 
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    void performPSI(PicParams&,std::vector<Species*>&,int);
+    void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
 
 private:
 

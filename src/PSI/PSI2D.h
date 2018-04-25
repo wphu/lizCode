@@ -20,7 +20,7 @@ public:
 
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    virtual void performPSI(PicParams&,std::vector<Species*>&,int){};
+    virtual void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime){};
 
 
 

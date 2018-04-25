@@ -253,7 +253,7 @@ void PartSource2D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
         s1->insert_particles_to_bins(new_particles, count_of_particles_to_insert);
 
         // re-initialize paritcles in source region
-        for(int ibin=loadBin_start; ibin<=loadBin_end; ibin++)
+        for(int ibin = loadBin_start; ibin <= loadBin_end; ibin++)
         {
             // Because bin is only in x-direction, y-direction has no bin
             // The "Bin" in loadBin_Ystart and loadBin_Yend is just to be consistent with the x-direction

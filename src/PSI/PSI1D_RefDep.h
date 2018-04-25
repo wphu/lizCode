@@ -6,8 +6,8 @@ Ref: Subroutines for some plasma surface interaction processes:
      hpysical sputtering, chemical erosion, radiation enhanced
      sublimation, backscattering and thermal evaporation.
 ================================================================*/
-#ifndef PSI1D_BACKSCATTERING_H
-#define PSI1D_BACKSCATTERING_H
+#ifndef PSI1D_REFDEP_H
+#define PSI1D_REFDEP_H
 
 #include <vector>
 
@@ -18,10 +18,10 @@ Ref: Subroutines for some plasma surface interaction processes:
 #include "PSI1D.h"
 #include "Backscattering.h"
 
-class PSI1D_Backscattering : public PSI1D
+class PSI1D_RefDep : public PSI1D
 {
 public:
-    PSI1D_Backscattering(
+    PSI1D_RefDep(
         PicParams& params,
         SmileiMPI* smpi,
         unsigned int psi_species1,
@@ -30,10 +30,10 @@ public:
         double emitTemperature
     );
 
-    ~PSI1D_Backscattering();
+    ~PSI1D_RefDep();
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    void performPSI(PicParams&, SmileiMPI* smpi, std::vector<Species*>&,int, ElectroMagn*);
+    void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
 
     // emit particles
     void emit(PicParams&, vector<Species*>&);

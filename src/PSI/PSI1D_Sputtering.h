@@ -28,7 +28,7 @@ public:
     ~PSI1D_Sputtering();
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    void performPSI(PicParams&, SmileiMPI* smpi, std::vector<Species*>&,int, ElectroMagn*);
+    void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
 
     // emit particles
     void emit(PicParams&, vector<Species*>&);

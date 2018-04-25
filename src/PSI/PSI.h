@@ -64,10 +64,15 @@ public:
     unsigned int species1, species2;
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    virtual void performPSI(PicParams&, SmileiMPI* smpi, std::vector<Species*>&,int, ElectroMagn* ){};
+    virtual void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime){};
 
     // emit particles
     void emit(PicParams&, vector<Species*>&);
+
+    double angle_2vectors(double v1[], double v2[])
+    {
+
+    };
 
     Particles new_particles;
     vector<int> count_of_particles_to_insert_s1;

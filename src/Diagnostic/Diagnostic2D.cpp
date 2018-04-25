@@ -58,15 +58,20 @@ Diagnostic(params)
         }
     }
 
-    /*
+    
     psiRate.resize(vecPSI.size());
     psiRate_global.resize(vecPSI.size());
     for(unsigned int ipsi=0; ipsi<vecPSI.size(); ipsi++)
     {
-        psiRate[ipsi] = new Field2D(dim_global, "psiRate");
-        psiRate_global[ipsi] = new Field2D(dim_global, "psiRate_global");
+        psiRate[ipsi].resize(n_line);
+        psiRate_global[ipsi].resize(n_line);
+        for(int iLine = 0; iLine < n_line; iLine++)
+        {
+             psiRate[ipsi][iLine].resize(grid2D->lines[iLine].size());
+             psiRate_global[ipsi][iLine].resize(grid2D->lines[iLine].size());
+        }
     }
-    */
+    
 }
 
 
@@ -123,7 +128,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
         {
             for (int iPart=(unsigned int)s1->bmin[ibin] ; iPart<(unsigned int)s1->bmax[ibin]; iPart++ ) 
             {
-                has_find = find_cross_segment(grid2D, p1, iPart, &iLine_cross, &iSegment_cross);
+                has_find = find_cross_segment(grid2D, p1, iPart, iLine_cross, iSegment_cross);
                 if( has_find )
                 {   
                     //if(iLine_cross != 4) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
@@ -187,7 +192,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 }
 
 
-bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int iPart, int *iLine_cross, int *iSegment_cross)
+bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int iPart, int& iLine_cross, int& iSegment_cross)
 {
     bool has_find = false;
     double xpn, ypn;
@@ -248,8 +253,8 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
             {
                 if( is_cross( grid2D->lines[iLine][vecSegment[i]].start_point, grid2D->lines[iLine][vecSegment[i]].end_point, pos_new, pos_old) )
                 {
-                    *iLine_cross = iLine;
-                    *iSegment_cross = vecSegment[i];
+                    iLine_cross = iLine;
+                    iSegment_cross = vecSegment[i];
                     has_find = true;
                     return has_find;
                 }

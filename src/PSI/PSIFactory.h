@@ -3,11 +3,12 @@
 
 #include "PSI1D_SEE.h"
 #include "PSI1D_Sputtering.h"
-#include "PSI1D_Backscattering.h"
+#include "PSI1D_RefDep.h"
 #include "PSI1D_Recycling.h"
 
 #include "PSI2D_SEE.h"
 #include "PSI2D_Sputtering.h"
+#include "PSI2D_RefDep.h"
 
 
 #include <string>
@@ -52,10 +53,11 @@ public:
 
 	    // Loop over each binary PSI group and parse info
 	    unsigned int numPSI=ifile.nComponents("PSI");
-	    for (unsigned int n_PSI = 0; n_PSI < numPSI; n_PSI++) {
-
+	    for (unsigned int n_PSI = 0; n_PSI < numPSI; n_PSI++) 
+		{
 			ifile.extract("PSI_type",PSI_type,"PSI",n_PSI);
-			if(params.geometry == "1d3v" && PSI_type == "sputtering"){
+			if(params.geometry == "1d3v" && PSI_type == "sputtering")
+			{
 		        ifile.extract("species1",sg1,"PSI",n_PSI);
 				ifile.extract("species2",sg2,"PSI",n_PSI);
 		        // Obtain the lists of species numbers from the lists of species names.
@@ -76,7 +78,9 @@ public:
 		        vecPSI.push_back( new PSI1D_Sputtering(params, smpi,vecSpecies, sgroup1[0],sgroup2[0], psiPos, emitTemp) );
 
 			}
-			else if(params.geometry == "1d3v" && PSI_type == "BackScattering"){
+
+			else if(params.geometry == "1d3v" && PSI_type == "RefDep")
+			{
 		        ifile.extract("species1",sg1,"PSI",n_PSI);
 				ifile.extract("species2",sg2,"PSI",n_PSI);
 		        // Obtain the lists of species numbers from the lists of species names.
@@ -94,10 +98,11 @@ public:
 		        emitTemp = 0.0; // default
 		        ifile.extract("emitTemp",emitTemp,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_Backscattering(params, smpi,sgroup1[0],sgroup2[0], psiPos, emitTemp) );
+		        vecPSI.push_back( new PSI1D_RefDep(params, smpi,sgroup1[0],sgroup2[0], psiPos, emitTemp) );
 			}
 
-			else if(params.geometry == "1d3v" && PSI_type == "Recycling"){
+			else if(params.geometry == "1d3v" && PSI_type == "Recycling")
+			{
 		        ifile.extract("species1",sg1,"PSI",n_PSI);
 				ifile.extract("species2",sg2,"PSI",n_PSI);
 		        // Obtain the lists of species numbers from the lists of species names.
@@ -121,7 +126,8 @@ public:
 		        vecPSI.push_back( new PSI1D_Recycling(params, smpi,sgroup1[0], sgroup2[0], psiPos, emitTemp, recycling_factor) );
 			}
 
-			else if(params.geometry == "1d3v" && PSI_type == "SEE"){
+			else if(params.geometry == "1d3v" && PSI_type == "SEE")
+			{
 		        ifile.extract("species1",sg1,"PSI",n_PSI);
 				ifile.extract("species2",sg2,"PSI",n_PSI);
 		        // Obtain the lists of species numbers from the lists of species names.
