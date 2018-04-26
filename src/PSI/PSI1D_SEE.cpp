@@ -38,7 +38,7 @@ PSI1D_SEE::~PSI1D_SEE()
 
 
 // Calculates the PSI1D
-void PSI1D_SEE::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
+void PSI1D_SEE::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
     // the angle of particle velocity with the surface normal
     double theta;

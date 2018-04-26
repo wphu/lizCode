@@ -1,3 +1,6 @@
+/* ================================================================
+now only support SuperLU-4.3 serial version
+==================================================================*/
 #ifndef EF_SOLVER2D_SLU_H
 #define EF_SOLVER2D_SLU_H
 

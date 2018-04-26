@@ -38,10 +38,31 @@ PSI1D_Sputtering::~PSI1D_Sputtering()
 
 }
 
+// initialize
+void PSI1D_Sputtering::init(vector<Species*>& vecSpecies)
+{
+    Species   *s1, *s2;
+    Particles *p1, *p2;
+
+
+    s1 = vecSpecies[species1];
+    s2 = vecSpecies[species2];
+    p1 = &(s1->psi_particles);
+    p2 = &(s2->psi_particles);
+
+    double an1 = s1->species_param.atomic_number;
+    double am1 = s1->species_param.atomic_mass;
+    double an2 = s2->species_param.atomic_number;
+    double am2 = s2->species_param.atomic_mass;
+    double es = s2->species_param.surface_binding_energy;
+    double n = s2->species_param.density_solid;
+
+    sputtering = new PhysicalSputtering_EmpiricalFormula(an1, am1, an2, am2, es, n);
+}
 
 
 // Calculates the PSI1D for a given Collisions object
-void PSI1D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
+void PSI1D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
     // the angle of particle velocity with the surface normal
     double theta;
@@ -88,8 +109,6 @@ void PSI1D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Spe
     }
 
 }
-
-
 
 
 void PSI1D_Sputtering::emit(PicParams& params, vector<Species*>& vecSpecies)
@@ -165,29 +184,3 @@ void PSI1D_Sputtering::emit(PicParams& params, vector<Species*>& vecSpecies)
         ERROR("no such psiPos: " << psiPos);
     }
 }
-
-
-
-// Calculates the PSI1D for a given Collisions object
-void PSI1D_Sputtering::init(vector<Species*>& vecSpecies)
-{
-    Species   *s1, *s2;
-    Particles *p1, *p2;
-
-
-    s1 = vecSpecies[species1];
-    s2 = vecSpecies[species2];
-    p1 = &(s1->psi_particles);
-    p2 = &(s2->psi_particles);
-
-    double an1 = s1->species_param.atomic_number;
-    double am1 = s1->species_param.atomic_mass;
-    double an2 = s2->species_param.atomic_number;
-    double am2 = s2->species_param.atomic_mass;
-    double es = s2->species_param.surface_binding_energy;
-    double n = s2->species_param.density_solid;
-
-    sputtering = new Sputtering(an1, am1, an2, am2, es, n);
-
-}
-

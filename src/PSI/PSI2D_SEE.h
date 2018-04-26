@@ -21,7 +21,7 @@ public:
 
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
+    void performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
 
 private:
 

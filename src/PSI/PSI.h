@@ -14,6 +14,8 @@ PSI class
 #include "Diagnostic.h"
 #include "Grid.h"
 
+class Diagnostic;
+
 using namespace std;
 class PSI
 {
@@ -33,6 +35,21 @@ public:
     };
     virtual ~PSI(){};
 
+    void setRelPsi(PSI* relevantPsi)
+    {
+        relPsi = relevantPsi;
+    }
+
+    //! Method called in the main smilei loop to apply PSI at each timestep
+    virtual void performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime){};
+
+    // emit particles
+    void emit(PicParams&, vector<Species*>&){};
+
+    double angle_2vectors(double v1[], double v2[])
+    {
+
+    };
 
     //! Identification number of the PSI object
     int n_PSI;
@@ -54,27 +71,14 @@ public:
     double emitTemp;
     double weight_const;
 
-    void setRelPsi(PSI* relevantPsi)
-    {
-        relPsi = relevantPsi;
-    }
-
     //! Group of the species numbers that are associated for PSI.
     //> actually, each species gourp only contains one species for PSI
     //> for PSI_Injection, only species1 is used;
     //> for sputtering and secondary electron emission, species1 is the incident particle.
     unsigned int species1, species2;
 
-    //! Method called in the main smilei loop to apply PSI at each timestep
-    virtual void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime){};
-
-    // emit particles
-    void emit(PicParams&, vector<Species*>&);
-
-    double angle_2vectors(double v1[], double v2[])
-    {
-
-    };
+    Species   *s1, *s2;
+    Particles *p1, *p2;
 
     Particles new_particles;
     vector<int> count_of_particles_to_insert_s1;

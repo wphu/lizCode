@@ -303,7 +303,7 @@ int main (int argc, char* argv[])
             timer[7].restart();
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
             {
-                vecPSI[ipsi]->performPSI(params, smpi, vecSpecies, EMfields, diag, itime);
+                vecPSI[ipsi]->performPSI(params, smpi, grid, vecSpecies, EMfields, diag, itime);
             }
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
             {
@@ -464,7 +464,7 @@ int main (int argc, char* argv[])
             timer[7].restart();
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
             {
-                vecPSI[ipsi]->performPSI(params,smpi,vecSpecies,itime, EMfields);
+                vecPSI[ipsi]->performPSI(params, smpi, grid, vecSpecies, EMfields, diag, itime);
             }
             timer[7].update();
 

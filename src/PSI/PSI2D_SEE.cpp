@@ -30,7 +30,7 @@ PSI2D_SEE::~PSI2D_SEE()
 
 
 // Calculates the PSI2D for a given Collisions object
-void PSI2D_SEE::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
+void PSI2D_SEE::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
 
     unsigned int nbins = vecSpecies[0]->bmin.size(); // number of bins

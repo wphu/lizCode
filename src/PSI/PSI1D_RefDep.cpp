@@ -15,6 +15,7 @@ using namespace std;
 PSI1D_RefDep::PSI1D_RefDep(
     PicParams& params,
     SmileiMPI* smpi,
+    vector<Species*>& vecSpecies,
     unsigned int psi_species1,
     unsigned int psi_species2,
     string psiPosition,
@@ -27,11 +28,17 @@ PSI1D(params, smpi)
     psiPos = psiPosition;
     emitTemp = emitTemperature;
     const_e = params.const_e;
+}
 
+PSI1D_RefDep::~PSI1D_RefDep()
+{
+
+}
+
+// initialize
+void PSI1D_RefDep::init(vector<Species*>& vecSpecies)
+{
     // init Backscattering_EmpiricalFormula
-    Species   *s1, *s2;
-    Particles *p1, *p2;
-
     s1 = vecSpecies[species1];
     s2 = vecSpecies[species2];
     p1 = &(s1->psi_particles);
@@ -46,15 +53,8 @@ PSI1D(params, smpi)
     backscattering = new Backscatterin_EmpiricalFormula(nz1, m1, ne, nz2, nw);
 }
 
-PSI1D_RefDep::~PSI1D_RefDep()
-{
-
-}
-
-
-
 // Calculates the PSI1D for a given Collisions object
-void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
+void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
     // the angle of particle velocity with the surface normal
     double theta;
@@ -68,7 +68,7 @@ void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species
     int iDim;
 
     iDim = 0;
-    nPartEmit = 0;
+    int nPartEmit = 0;
     int nPart = p1->size();
     for(unsigned int iPart = 0; iPart < nPart; iPart++)
     {
@@ -144,7 +144,6 @@ void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species
     };
     
 }
-
 
 void PSI1D_RefDep::emit(PicParams& params, vector<Species*>& vecSpecies)
 {

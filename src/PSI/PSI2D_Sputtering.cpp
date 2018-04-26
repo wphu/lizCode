@@ -29,10 +29,30 @@ PSI2D_Sputtering::~PSI2D_Sputtering()
 
 }
 
+// initialize
+void PSI2D_Sputtering::init(vector<Species*>& vecSpecies)
+{
+    Species   *s1, *s2;
+    Particles *p1, *p2;
 
+
+    s1 = vecSpecies[species1];
+    s2 = vecSpecies[species2];
+    p1 = &(s1->psi_particles);
+    p2 = &(s2->psi_particles);
+
+    double an1 = s1->species_param.atomic_number;
+    double am1 = s1->species_param.atomic_mass;
+    double an2 = s2->species_param.atomic_number;
+    double am2 = s2->species_param.atomic_mass;
+    double es = s2->species_param.surface_binding_energy;
+    double n = s2->species_param.density_solid;
+
+    sputtering = new PhysicalSputtering_EmpiricalFormula(an1, am1, an2, am2, es, n);
+}
 
 // Calculates the PSI2D for a given Collisions object
-void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
+void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime)
 {
     // the angle of particle velocity with the surface normal
     double theta;
@@ -53,7 +73,8 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Spe
     p1 = &(s1->psi_particles);
     p2 = &(s2->psi_particles);
 
-    Diagnostic2D *diag2D = static_cast<Diagnostic2D>(diag);
+    Diagnostic2D *diag2D = static_cast<Diagnostic2D*>(diag);
+    Grid2D *grid2D = static_cast<Grid2D*>(grid);
 
     iDim = 0;
     int nPartEmit = 0;
@@ -72,8 +93,9 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Spe
         
         pSput = sputtering->phy_sput_yield(theta, energy_incident / const_e);
 
-        diag2D->psiRate[ipsi][iLine_cross][iSegment_cross] += pSput;
+        diag2D->psiRate[n_PSI][iLine_cross][iSegment_cross] += pSput;
 
+        // add sputtered particle if pSput > ran_p
         double ran_p = (double)rand() / RAND_MAX;
         if( pSput > ran_p ) 
         {
@@ -83,11 +105,6 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Spe
 
     };
 
-    if( smpi->isWestern() || smpi->isEastern() )
-    {
-        emit(params, vecSpecies);
-        s2->insert_particles_to_bins(new_particles, count_of_particles_to_insert_s2);
-        new_particles.clear();
-    }
-
+    s2->insert_particles_to_bins(new_particles, count_of_particles_to_insert_s2);
+    new_particles.clear();
 }

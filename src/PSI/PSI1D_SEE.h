@@ -34,7 +34,7 @@ public:
     Particles new_particles;
 
     //! Method called in the main smilei loop to apply collisions at each timestep
-    void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
+    void performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
 
     void emit(PicParams& params, vector<Species*>& vecSpecies, unsigned int species_emit);
 private:

@@ -75,7 +75,7 @@ public:
 		        emitTemp = 0.0; // default
 		        ifile.extract("emitTemp",emitTemp,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_Sputtering(params, smpi,vecSpecies, sgroup1[0],sgroup2[0], psiPos, emitTemp) );
+		        vecPSI.push_back( new PSI1D_Sputtering(params, smpi, vecSpecies, sgroup1[0],sgroup2[0], psiPos, emitTemp) );
 
 			}
 
@@ -98,7 +98,7 @@ public:
 		        emitTemp = 0.0; // default
 		        ifile.extract("emitTemp",emitTemp,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_RefDep(params, smpi,sgroup1[0],sgroup2[0], psiPos, emitTemp) );
+		        vecPSI.push_back( new PSI1D_RefDep(params, smpi, vecSpecies, sgroup1[0],sgroup2[0], psiPos, emitTemp) );
 			}
 
 			else if(params.geometry == "1d3v" && PSI_type == "Recycling")

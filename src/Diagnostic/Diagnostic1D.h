@@ -7,6 +7,7 @@
 #include "Field1D.h"
 #include "PSI1D.h"
 #include "Grid.h"
+#include "PSI1D.h"
 
 class Diagnostic1D : public Diagnostic {
 

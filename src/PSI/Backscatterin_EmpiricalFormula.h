@@ -9,13 +9,14 @@ Ref: Subroutines for some plasma surface interaction processes:
 #ifndef BACKSCATTERING_EMPIRICALFORMULA_H
 #define BACKSCATTERING_EMPIRICALFORMULA_H
 
+#include "Backscattering.h"
 
 #include <vector>
 #include <math.h>
 
 using namespace std;
 
-class Backscatterin_EmpiricalFormula
+class Backscatterin_EmpiricalFormula : public Backscattering
 {
 public:
     Backscatterin_EmpiricalFormula(

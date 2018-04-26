@@ -16,7 +16,7 @@ Ref: Subroutines for some plasma surface interaction processes:
 #include "InputData.h"
 #include "Species.h"
 #include "PSI1D.h"
-#include "Backscattering.h"
+#include "Backscatterin_EmpiricalFormula.h"
 
 class PSI1D_RefDep : public PSI1D
 {
@@ -24,6 +24,7 @@ public:
     PSI1D_RefDep(
         PicParams& params,
         SmileiMPI* smpi,
+        vector<Species*>& vecSpecies,
         unsigned int psi_species1,
         unsigned int psi_species2,
         string psiPosition,
@@ -33,13 +34,14 @@ public:
     ~PSI1D_RefDep();
 
     //! Method called in the main smilei loop to apply PSI at each timestep
-    void performPSI(PicParams& params, SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
+    void performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* fields, Diagnostic* diag, int itime);
 
     // emit particles
     void emit(PicParams&, vector<Species*>&);
 
+    void init(std::vector<Species*>&);
+    
     Backscattering *backscattering;
-
 
 private:
 
