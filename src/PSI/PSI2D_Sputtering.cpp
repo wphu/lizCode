@@ -56,7 +56,7 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, vector<Spe
     Diagnostic2D *diag2D = static_cast<Diagnostic2D>(diag);
 
     iDim = 0;
-    nPartEmit = 0;
+    int nPartEmit = 0;
     int nPart = p1->size();
     for(unsigned int iPart = 0; iPart < nPart; iPart++)
     {

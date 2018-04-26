@@ -11,6 +11,8 @@ PSI class
 #include "PicParams.h"
 #include "SmileiMPI.h"
 #include "Species.h"
+#include "Diagnostic.h"
+#include "Grid.h"
 
 using namespace std;
 class PSI

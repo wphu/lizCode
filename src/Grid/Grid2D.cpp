@@ -402,7 +402,7 @@ void Grid2D::geometry_iter_gap( )
 {
     int bottomWall_thickness = 3;
     int nx_left_tile = 0.5*nx - 0.5*nx_gapWeight;
-    int nx_right_tile = nx - nx_gapWeight;
+    int nx_right_tile = 0.5*nx + 0.5*nx_gapWeight;
     int ny_gap_bottom = bottomWall_thickness;
     int ny_gap_top0 = bottomWall_thickness + ny_gapHeight;
     int ny_gap_top1 = bottomWall_thickness + ny_gapHeight + 0.5 * bevel_depth / dy;

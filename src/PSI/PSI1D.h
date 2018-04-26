@@ -7,6 +7,7 @@ PSI1D class
 
 #include <vector>
 #include "PSI.h"
+#include "Diagnostic1D.h"
 
 class PSI1D : public PSI
 {

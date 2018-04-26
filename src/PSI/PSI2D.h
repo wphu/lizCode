@@ -7,6 +7,8 @@ PSI2D class
 
 #include <vector>
 #include "PSI.h"
+#include "Diagnostic2D.h"
+#include "Grid2D.h"
 
 class PSI2D : public PSI
 {

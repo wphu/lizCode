@@ -42,7 +42,8 @@ class ApplicationWindow(QMainWindow):
         self.filename_grid = "data/grid.h5"
         self.tree_widget = HDFTreeWidget(self.main_widget)
         self.tree_model = HDFTreeModel([])
-        self.tree_model.openFile(self.filename_data, 'r+')
+        if os.path.exists(self.filename_data):
+            self.tree_model.openFile(self.filename_data, 'r+')
         if os.path.exists(self.filename_grid):
             self.tree_model.openFile(self.filename_grid, 'r+')
         self.tree_widget.setModel(self.tree_model)

@@ -12,6 +12,8 @@ Ref: Subroutines for some plasma surface interaction processes:
 #ifndef PHYSICALSPUTTERING_EMPIRICALFORMULA_H
 #define PHYSICALSPUTTERING_EMPIRICALFORMULA_H
 
+#include "Sputtering.h"
+
 #include <vector>
 
 class PhysicalSputtering_EmpiricalFormula : public Sputtering
