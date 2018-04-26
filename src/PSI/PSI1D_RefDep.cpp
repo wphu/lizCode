@@ -28,6 +28,8 @@ PSI1D(params, smpi)
     psiPos = psiPosition;
     emitTemp = emitTemperature;
     const_e = params.const_e;
+
+    init(vecSpecies);
 }
 
 PSI1D_RefDep::~PSI1D_RefDep()

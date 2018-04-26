@@ -17,7 +17,14 @@ class PSI2D_RefDep : public PSI2D
 
 public:
     //! Constructor
-    PSI2D_RefDep(PicParams& params, SmileiMPI* smpi);
+    PSI2D_RefDep(        
+        PicParams& params,
+        SmileiMPI* smpi,
+        vector<Species*>& vecSpecies,
+        unsigned int psi_species1,
+        unsigned int psi_species2,
+        string psiPosition,
+        double emitTemperature);
     ~PSI2D_RefDep();
 
     //! Method called in the main smilei loop to apply PSI at each timestep

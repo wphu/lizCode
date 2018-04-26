@@ -16,7 +16,14 @@ class PSI2D_Sputtering : public PSI2D
 
 public:
     //! Constructor
-    PSI2D_Sputtering(PicParams& params, SmileiMPI* smpi);
+    PSI2D_Sputtering(       
+        PicParams& params,
+        SmileiMPI* smpi,
+        vector<Species*>& vecSpecies,
+        unsigned int psi_species1,
+        unsigned int psi_species2,
+        string psiPosition,
+        double emitTemperature);
     ~PSI2D_Sputtering();
 
     //! Method called in the main smilei loop to apply PSI at each timestep
