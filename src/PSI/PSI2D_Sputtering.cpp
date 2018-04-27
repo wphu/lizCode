@@ -70,6 +70,8 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
     double energy_incident;
     double v_square, v_magnitude;
     double momentum[3];
+    double position_old[2];
+    double position_new[2];
     // sputtering probability
     double pSput;
     int iDim;
@@ -99,7 +101,6 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
         v_square = pow(momentum[0], 2) + pow(momentum[1], 2) + pow(momentum[2], 2);
         energy_incident = 0.5 * s1->species_param.mass * v_square;
         theta = angle_2vectors(momentum, grid2D->lines[iLine_cross][iSegment_cross].normal);
-        theta *= ( 180.0 / params.const_pi );
         
         pSput = sputtering->phy_sput_yield(theta, energy_incident / const_e);
 
@@ -109,7 +110,12 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
         double ran_p = (double)rand() / RAND_MAX;
         if( pSput > ran_p ) 
         {
+            position_old[0] = p1->position(0, iPart);
+            position_old[1] = p1->position(1, iPart);
+            cal_mirror_reflection(grid2D->lines[iLine_cross][iSegment_cross].start_point, grid2D->lines[iLine_cross][iSegment_cross].end_point, position_old, position_new);
             nPartEmit++;
+            new_particles.create_particle();
+            new_particles.position(0, nPartEmit - 1) = 
         }
 
 

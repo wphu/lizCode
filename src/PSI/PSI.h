@@ -25,6 +25,7 @@ public:
     PSI(PicParams& params, SmileiMPI* smpi)
     {
         const_e = params.const_e;
+        const_pi = params.const_pi;
         count_of_particles_to_insert_s2.resize(params.n_space[0]);
         for(int i = 0; i < count_of_particles_to_insert_s2.size(); i++)
         {
@@ -46,9 +47,18 @@ public:
     // emit particles
     void emit(PicParams&, vector<Species*>&){};
 
+    // calculate angle between two 3D vectors, unit is degree
     double angle_2vectors(double v1[], double v2[])
     {
-
+        double mag1 = sqrt(pow(v1[0], 2) + pow(v1[1], 2) + pow(v1[2], 2));
+        double mag2 = sqrt(pow(v2[0], 2) + pow(v2[1], 2) + pow(v2[2], 2));
+        double dot_product = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+        if(mag1 * mag2 == 0.0)
+        {
+            ERROR("angle_2vectors equal to zero!");
+        }
+        double angle = acos(abs(dot_product) / (mag1 * mag2));
+        return 180.0 * angle / const_pi;
     };
 
     //! Identification number of the PSI object
@@ -84,6 +94,7 @@ public:
     vector<int> count_of_particles_to_insert_s1;
     vector<int> count_of_particles_to_insert_s2;
     double const_e;
+    double const_pi;
 
 
 private:
