@@ -1,9 +1,11 @@
 # dependencies
+export intel_compiler_dir=/home/wphu/opt/intel
 export mpich_dir=/home/wphu/opt/mpich-intel
 export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
 export SuperLU_dir=/home/wphu/opt/SuperLU_4.3-intel
 export anaconda3_dir=/home/wphu/opt/anaconda3
 
+source ${intel_compiler_dir}/bin/compilervars.sh intel64
 export PATH=${mpich_dir}/bin:$PATH
 export PATH=${anaconda3_dir}/bin:$PATH
 export LD_LIBRARY_PATH=${mpich_dir}/lib:$LD_LIBRARY_PATH
