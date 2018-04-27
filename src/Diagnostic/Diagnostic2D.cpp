@@ -244,7 +244,7 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
                 if( grid2D->lines[iLine][iSegment].grid_point[0] >= ic0 && grid2D->lines[iLine][iSegment].grid_point[0] <= ic1
                     && grid2D->lines[iLine][iSegment].grid_point[1] >= jc0 && grid2D->lines[iLine][iSegment].grid_point[1] <= jc1 )
                 {
-                    if(iLine_cross == 0) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
+                    //if(iLine_cross == 0) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
                     vecSegment.push_back(iSegment);
                 }
             }

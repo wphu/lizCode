@@ -61,7 +61,7 @@ public:
                 nx_gapWeight = 100;
     	        ifile.extract("nx_gapWeight",nx_gapWeight,"Grid",n_Grid);
 
-                nx_gapWeight = 20;
+                ny_bevel_depth = 20;
     	        ifile.extract("ny_bevel_depth",ny_bevel_depth,"Grid",n_Grid);
 
                 potential_wall = 0.0;
