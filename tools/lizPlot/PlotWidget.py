@@ -143,9 +143,14 @@ class PlotWidget(QWidget):
         self.parent = parent
 
         # data4d has four dimensions, the first is time
-        self.prefix = 'grid'
-        self.data4d = collect("isWall", prefix = self.prefix)
-        self.dataName = "geometry"
+        try:
+            self.prefix = 'grid'
+            self.data4d = collect("isWall", prefix = self.prefix)
+            self.dataName = "geometry"
+        except:
+            self.prefix = 'data'
+            self.data4d = collect("/Fields/", "Phi_global_avg", prefix = self.prefix)
+            self.dataName = "electric potential"          
 
         sizePolicy = QSizePolicy();
         sizePolicy.setHorizontalPolicy(QSizePolicy.Expanding);
