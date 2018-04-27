@@ -211,7 +211,9 @@ class PlotWidget(QWidget):
         self.sc.compute_initial_figure(self.data4d, self.dataName)
         self.sc.draw()
         self.set_data_widget(self.data4d[0,0,:,:])
+        self.sp.setMaximum(self.data4d.shape[0]-1)
         self.sp.setValue(0)
+
 
 
     def timeChange(self):
