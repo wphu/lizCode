@@ -365,7 +365,7 @@ void SmileiMPI_Cart2D::exchangeParticles(Species* species, int ispec, PicParams&
     /********************************************************************************/
 
     // Number of properties per particles = nDim_Particles + 3 +6 + 1
-    int nbrOfProp = 5;
+    int nbrOfProp = 7;
     if(!isSameWeight)
     {
       // particles->weight(0)
@@ -599,12 +599,12 @@ MPI_Datatype SmileiMPI_Cart2D::createMPIparticles( Particles* particles, int nbr
     MPI_Aint address[nbrOfProp2];
     MPI_Get_address( &(particles->position(0,0)), &(address[0]) );
     MPI_Get_address( &(particles->position(1,0)), &(address[1]) );
-    //MPI_Get_address( &(particles->position_old(0,0)), &(address[2]) );
-    //MPI_Get_address( &(particles->position_old(1,0)), &(address[3]) );
-    MPI_Get_address( &(particles->momentum(0,0)), &(address[2]) );
-    MPI_Get_address( &(particles->momentum(1,0)), &(address[3]) );
-    MPI_Get_address( &(particles->momentum(2,0)), &(address[4]) );
-    iProp = 5;
+    MPI_Get_address( &(particles->position_old(0,0)), &(address[2]) );
+    MPI_Get_address( &(particles->position_old(1,0)), &(address[3]) );
+    MPI_Get_address( &(particles->momentum(0,0)), &(address[4]) );
+    MPI_Get_address( &(particles->momentum(1,0)), &(address[5]) );
+    MPI_Get_address( &(particles->momentum(2,0)), &(address[6]) );
+    iProp = 7;
     if(isImplicit)
     {
       MPI_Get_address( &(particles->al_imp(0,0)), &(address[iProp++]) );
