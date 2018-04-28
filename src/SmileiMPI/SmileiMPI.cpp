@@ -84,9 +84,8 @@ void SmileiMPI::init( PicParams& params )
     {
       isImplicit = true;
     }
-    isImplicit = true;
 
-    isSameWeight = false;
+    isSameWeight = true;
     
 }
 

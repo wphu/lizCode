@@ -1500,6 +1500,47 @@ void Species::insert_particles_to_bins(Particles &insert_Particles, std::vector<
         begin_id += n_part_insert;
     }
 }
+
+void Species::insert_particles(Particles &insert_Particles)
+{
+    int n_part_insert;
+    int begin_id = 0;
+    double limit_min, limit_max;
+    Particles insert_particles_temp;
+    vector<int> count_in_bins;
+    count_in_bins.resize(bmax.size());
+
+    clearExchList();
+    for(int ibin = 0; ibin < bmax.size(); ibin++)
+    {
+        limit_min = min_loc + bin * cell_length[0];
+        limit_max = min_loc + (bin + 1) * cell_length[0];
+        for(int iPart = 0; iPart < insert_particles.size(); iPart++)
+        {
+            if(insert_particles.position(0, iPart) >= limit_min && insert_particles.position(0, iPart) < limit_max)
+            {
+                count_in_bins[ibin]++;
+                insert_particles.cp_particle(iPart, insert_particles_temp);
+            }
+        }
+    }
+    
+    insert_particles_to_bins(insert_particles_temp, count_in_bins);
+
+    // determine if particle is in other MPI region
+    for(int ibin = 0; ibin < bmax.size(); ibin++)
+    {
+        for(int iPart = bmax[ibin] - count_in_bins[ibin]; iPart < bmax[ibin]; iPart++)
+        {
+            if ( !partBoundCond->apply( particles, iPart, params.species_param[ispec], ener_iPart, iDirection ) ) 
+            {
+                addPartInExchList( iPart );
+            }
+
+        }
+    }
+}
+
 void Species::erase_particles_from_bins(std::vector<int> &indexs_to_erase)
 {
     int ii, iPart;

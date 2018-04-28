@@ -183,6 +183,7 @@ public:
 
     // insert and erase particles for bins: mainly used in Collision and PSI
     void insert_particles_to_bins(Particles &insert_Particles, std::vector<int> &count_in_bins);
+    void insert_particles(Particles &insert_Particles);
     void erase_particles_from_bins(std::vector<int> &indexs_to_erase);
 
     std::vector<int> indexes_of_particles_to_absorb;

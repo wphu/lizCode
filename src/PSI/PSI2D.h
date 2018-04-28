@@ -38,6 +38,11 @@ public:
         position_new[1] = position_old[1] + v2[1];
     }
 
+    void cal_velocity(double normal[], double energy_s2, double momentum[])
+    {
+        
+    }
+
 
 
 private:

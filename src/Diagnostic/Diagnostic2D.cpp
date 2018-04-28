@@ -170,6 +170,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                 smpi->reduce_sum_double( &(heatFlux[iSpec][iLine][0]), &(heatFlux_global[iSpec][iLine][0]), heatFlux[iSpec][iLine].size() );
                 smpi->reduce_sum_double( &(averageAngle[iSpec][iLine][0]), &(averageAngle_global[iSpec][iLine][0]), averageAngle[iSpec][iLine].size() );
                 
+                /*
                 for(int iSegment = 0; iSegment < particleFlux_global[iSpec][iLine].size(); iSegment++)
                 {
                     wlt = wlt0 / grid2D->lines[iLine][iSegment].length;
@@ -187,6 +188,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                         heatFlux_global[iSpec][iLine][iSegment]     *= wlt;   
                     }
                 }
+                */
             }
 		}
 	}

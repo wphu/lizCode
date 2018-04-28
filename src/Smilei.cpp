@@ -279,6 +279,7 @@ int main (int argc, char* argv[])
                     vecSpecies[ispec]->sort_part(); // Should we sort test particles ?? (JD)
                     timestep_control[ispec] = 0;
                 }
+                vecSpecies[ispec]->clearExchList();
             }
             timer[4].update();
 
@@ -304,11 +305,18 @@ int main (int argc, char* argv[])
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
             {
                 vecPSI[ipsi]->performPSI(params, smpi, grid, vecSpecies, EMfields, diag, itime);
+                // if new particles are in other MPI region, exchange particles
+                for ( int iDim = 0 ; iDim<(int)params.nDim_particle ; iDim++ )
+                {
+                    smpi->exchangeParticles(vecSpecies[vecPSI[ipsi]->species2], ispec, params, tid, iDim);
+                }
+                vecSpecies[vecPSI[ipsi]->species2]->sort_part(); // Should we sort test particles ?? (JD)
             }
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
             {
                 // clear psi_particles to avoid unnecessary repeated PSI performs for multiple ion timesteps
-                (vecSpecies[ispec]->psi_particles).clear(); 
+                vecSpecies[ispec]->clearPsiList();
+                vecSpecies[ispec]->clearExchList(); 
             }
             timer[7].update();
 
