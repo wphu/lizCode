@@ -18,6 +18,7 @@ PSI1D_RefDep::PSI1D_RefDep(
     vector<Species*>& vecSpecies,
     unsigned int psi_species1,
     unsigned int psi_species2,
+    bool psi_is_self_consistent,
     string psiPosition,
     double emitTemperature
 ):
@@ -28,6 +29,7 @@ PSI1D(params, smpi)
     psiPos = psiPosition;
     emitTemp = emitTemperature;
     const_e = params.const_e;
+    is_self_consistent = psi_is_self_consistent;
 
     init(vecSpecies);
 }

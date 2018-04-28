@@ -170,7 +170,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                 smpi->reduce_sum_double( &(heatFlux[iSpec][iLine][0]), &(heatFlux_global[iSpec][iLine][0]), heatFlux[iSpec][iLine].size() );
                 smpi->reduce_sum_double( &(averageAngle[iSpec][iLine][0]), &(averageAngle_global[iSpec][iLine][0]), averageAngle[iSpec][iLine].size() );
                 
-                /*
+                
                 for(int iSegment = 0; iSegment < particleFlux_global[iSpec][iLine].size(); iSegment++)
                 {
                     wlt = wlt0 / grid2D->lines[iLine][iSegment].length;
@@ -188,7 +188,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                         heatFlux_global[iSpec][iLine][iSegment]     *= wlt;   
                     }
                 }
-                */
+                
             }
 		}
 	}
@@ -232,7 +232,7 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
             ic0 = ic1;
             ic1 = ic_temp;
         }
-        if(jc0 > ic1)
+        if(jc0 > jc1)
         {
             int jc_temp = jc0;
             jc0 = jc1;

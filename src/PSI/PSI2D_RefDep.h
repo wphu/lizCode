@@ -23,6 +23,7 @@ public:
         vector<Species*>& vecSpecies,
         unsigned int psi_species1,
         unsigned int psi_species2,
+        bool psi_is_self_consistent,
         string psiPosition,
         double emitTemperature);
     ~PSI2D_RefDep();

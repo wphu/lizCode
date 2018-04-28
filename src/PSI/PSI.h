@@ -81,6 +81,10 @@ public:
     double emitTemp;
     double weight_const;
 
+    // if is_self_consistent is false, only calculate the psiRate (like sputtering rate or reflection rate)
+    // not create new particles
+    bool is_self_consistent;
+
     //! Group of the species numbers that are associated for PSI.
     //> actually, each species gourp only contains one species for PSI
     //> for PSI_Injection, only species1 is used;

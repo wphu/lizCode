@@ -17,6 +17,7 @@ PSI1D_Recycling::PSI1D_Recycling(
     SmileiMPI* smpi,
     unsigned int psi_species1,
     unsigned int psi_species2,
+    bool psi_is_self_consistent,
     string psiPosition,
     double emitTemperature,
     double recycling_factor_temp
@@ -28,6 +29,7 @@ PSI1D(params, smpi)
     psiPos              = psiPosition;
     emitTemp            = emitTemperature;
     recycling_factor    = recycling_factor_temp;
+    is_self_consistent  = psi_is_self_consistent;
 
 }
 

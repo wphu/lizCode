@@ -17,6 +17,7 @@ PSI1D_SEE::PSI1D_SEE(
     SmileiMPI* smpi,
     unsigned int psi_species1,
     unsigned int psi_species2,
+    bool psi_is_self_consistent,
     string psiPosition,
     double emitTemperature,
     double SEEYield
@@ -28,6 +29,7 @@ SEEYield(SEEYield)
     species2 = psi_species2;
     psiPos = psiPosition;
     emitTemp = emitTemperature;
+    is_self_consistent = psi_is_self_consistent;
 }
 
 PSI1D_SEE::~PSI1D_SEE()

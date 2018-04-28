@@ -20,6 +20,7 @@ public:
         SmileiMPI* smpi,
         unsigned int psi_species1,
         unsigned int psi_species2,
+        bool psi_is_self_consistent,
         string psiPosition,
         double emitTemperature,
         double recycling_factor_temp

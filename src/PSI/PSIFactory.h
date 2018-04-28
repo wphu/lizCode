@@ -43,6 +43,7 @@ public:
 		double emitFlux;
 		unsigned int nPartEmit;
 		double recycling_factor;
+		bool is_self_consistent;
 		string relSpecies;
 
 
@@ -75,7 +76,11 @@ public:
 		        emitTemp = 0.0; // default
 		        ifile.extract("emitTemp",emitTemp,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_Sputtering(params, smpi, vecSpecies, sgroup1[0],sgroup2[0], psiPos, emitTemp) );
+				// is_self_consistent
+				is_self_consistent = false;
+				ifile.extract("is_self_consistent",is_self_consistent,"PSI",n_PSI);
+
+		        vecPSI.push_back( new PSI1D_Sputtering(params, smpi, vecSpecies, sgroup1[0],sgroup2[0],is_self_consistent, psiPos, emitTemp) );
 
 			}
 
@@ -98,7 +103,11 @@ public:
 		        emitTemp = 0.0; // default
 		        ifile.extract("emitTemp",emitTemp,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_RefDep(params, smpi, vecSpecies, sgroup1[0],sgroup2[0], psiPos, emitTemp) );
+				// is_self_consistent
+				is_self_consistent = false;
+				ifile.extract("is_self_consistent",is_self_consistent,"PSI",n_PSI);
+
+		        vecPSI.push_back( new PSI1D_RefDep(params, smpi, vecSpecies, sgroup1[0],sgroup2[0], is_self_consistent, psiPos, emitTemp) );
 			}
 
 			else if(params.geometry == "1d3v" && PSI_type == "Recycling")
@@ -123,7 +132,11 @@ public:
 				recycling_factor = 0.0; // default
 				ifile.extract("recycling_factor",recycling_factor,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_Recycling(params, smpi,sgroup1[0], sgroup2[0], psiPos, emitTemp, recycling_factor) );
+				// is_self_consistent
+				is_self_consistent = false;
+				ifile.extract("is_self_consistent",is_self_consistent,"PSI",n_PSI);
+
+		        vecPSI.push_back( new PSI1D_Recycling(params, smpi,sgroup1[0], sgroup2[0], is_self_consistent, psiPos, emitTemp, recycling_factor) );
 			}
 
 			else if(params.geometry == "1d3v" && PSI_type == "SEE")
@@ -149,7 +162,11 @@ public:
 		        double SEEYield = 0.0; // default
 		        ifile.extract("SEEYield",SEEYield,"PSI",n_PSI);
 
-		        vecPSI.push_back( new PSI1D_SEE(params, smpi,sgroup1[0],sgroup2[0], psiPos, emitTemp, SEEYield) );
+				// is_self_consistent
+				is_self_consistent = false;
+				ifile.extract("is_self_consistent",is_self_consistent,"PSI",n_PSI);
+				
+		        vecPSI.push_back( new PSI1D_SEE(params, smpi,sgroup1[0],sgroup2[0], is_self_consistent, psiPos, emitTemp, SEEYield) );
 
 			}
 

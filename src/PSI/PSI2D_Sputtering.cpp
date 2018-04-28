@@ -19,6 +19,7 @@ PSI2D_Sputtering::PSI2D_Sputtering(
     vector<Species*>& vecSpecies,
     unsigned int psi_species1,
     unsigned int psi_species2,
+    bool psi_is_self_consistent,
     string psiPosition,
     double emitTemperature
     ):
@@ -28,6 +29,8 @@ PSI2D(params, smpi)
     species2 = psi_species2;
     psiPos = psiPosition;
     emitTemp = emitTemperature;
+    is_self_consistent = psi_is_self_consistent;
+
     const_e = params.const_e;
 
     init(vecSpecies);
@@ -107,26 +110,31 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
 
         diag2D->psiRate[n_PSI][iLine_cross][iSegment_cross] += pSput;
 
-        // add sputtered particle if pSput > ran_p
-        double ran_p = (double)rand() / RAND_MAX;
-        if( pSput > ran_p ) 
+        if(is_self_consistent)
         {
-            nPartEmit++;
-            position_old[0] = p1->position(0, iPart);
-            position_old[1] = p1->position(1, iPart);
-            cal_mirror_reflection(grid2D->lines[iLine_cross][iSegment_cross].start_point, grid2D->lines[iLine_cross][iSegment_cross].end_point, position_old, position_new);
-            new_particles.create_particle();
-            new_particles.position(0, nPartEmit - 1) = position_new[0];
-            new_particles.position(1, nPartEmit - 1) = position_new[1];
-            cal_velocity(grid2D->lines[iLine_cross][iSegment_cross].normal, energy_s2, momentum);
-            new_particles.momentum(0, nPartEmit - 1) = momentum[0];
-            new_particles.momentum(1, nPartEmit - 1) = momentum[1];
-            new_particles.momentum(2, nPartEmit - 1) = momentum[2];
+            // add sputtered particle if pSput > ran_p
+            double ran_p = (double)rand() / RAND_MAX;
+            if( pSput > ran_p ) 
+            {
+                nPartEmit++;
+                position_old[0] = p1->position(0, iPart);
+                position_old[1] = p1->position(1, iPart);
+                cal_mirror_reflection(grid2D->lines[iLine_cross][iSegment_cross].start_point, grid2D->lines[iLine_cross][iSegment_cross].end_point, position_old, position_new);
+                new_particles.create_particle();
+                new_particles.position(0, nPartEmit - 1) = position_new[0];
+                new_particles.position(1, nPartEmit - 1) = position_new[1];
+                cal_velocity(grid2D->lines[iLine_cross][iSegment_cross].normal, energy_s2, momentum);
+                new_particles.momentum(0, nPartEmit - 1) = momentum[0];
+                new_particles.momentum(1, nPartEmit - 1) = momentum[1];
+                new_particles.momentum(2, nPartEmit - 1) = momentum[2];
+            }
         }
 
-
     };
+    if(is_self_consistent)
+    {
+        s2->insert_particles(new_particles);
+        new_particles.clear();
+    }
 
-    s2->insert_particles(new_particles);
-    new_particles.clear();
 }

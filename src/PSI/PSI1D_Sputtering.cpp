@@ -18,6 +18,7 @@ PSI1D_Sputtering::PSI1D_Sputtering(
     vector<Species*>& vecSpecies,
     unsigned int psi_species1,
     unsigned int psi_species2,
+    bool psi_is_self_consistent,
     string psiPosition,
     double emitTemperature
 ):
@@ -27,6 +28,7 @@ PSI1D(params, smpi)
     species2 = psi_species2;
     psiPos = psiPosition;
     emitTemp = emitTemperature;
+    is_self_consistent = psi_is_self_consistent;
 
     const_e = params.const_e;
 
