@@ -88,6 +88,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
     double angle;
 	int iAngle;
 	double flux_temp;
+    double length1, length2, length12;
     
     Grid2D* grid2D = static_cast<Grid2D*>(grid);
 
@@ -170,23 +171,25 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                 smpi->reduce_sum_double( &(heatFlux[iSpec][iLine][0]), &(heatFlux_global[iSpec][iLine][0]), heatFlux[iSpec][iLine].size() );
                 smpi->reduce_sum_double( &(averageAngle[iSpec][iLine][0]), &(averageAngle_global[iSpec][iLine][0]), averageAngle[iSpec][iLine].size() );
                 
-                
                 for(int iSegment = 0; iSegment < particleFlux_global[iSpec][iLine].size(); iSegment++)
                 {
                     wlt = wlt0 / grid2D->lines[iLine][iSegment].length;
-                    if(grid2D->lines[iLine][iSegment].length < 0.1 * dx && iSegment > 0)
-                    {
-                        wlt = wlt0 / (grid2D->lines[iLine][iSegment].length + grid2D->lines[iLine][iSegment-1].length);
-                        averageAngle_global[iSpec][iLine][iSegment] += averageAngle_global[iSpec][iLine][iSegment-1];
-                        particleFlux_global[iSpec][iLine][iSegment] += particleFlux_global[iSpec][iLine][iSegment-1];
-                        heatFlux_global[iSpec][iLine][iSegment]     += heatFlux_global[iSpec][iLine][iSegment-1];
-                    }
                     if(particleFlux_global[iSpec][iLine][iSegment] != 0.0)
                     {
                         averageAngle_global[iSpec][iLine][iSegment] /= particleFlux_global[iSpec][iLine][iSegment];
-                        particleFlux_global[iSpec][iLine][iSegment] *= wlt;
-                        heatFlux_global[iSpec][iLine][iSegment]     *= wlt;   
                     }
+                    particleFlux_global[iSpec][iLine][iSegment] *= wlt;
+                    heatFlux_global[iSpec][iLine][iSegment]     *= wlt;
+
+                    // if the segment length is too small, calcluate the average with the prior segment to be smooth
+                    if(grid2D->lines[iLine][iSegment].length < 0.1 * dx && iSegment > 0)
+                    {
+                        length1 = grid2D->lines[iLine][iSegment-1].length;
+                        length2 = grid2D->lines[iLine][iSegment].length;
+                        length12 = length1 + length2;
+                        particleFlux_global[iSpec][iLine][iSegment] = (length1 * particleFlux_global[iSpec][iLine][iSegment-1] + length2 * particleFlux_global[iSpec][iLine][iSegment]) / length12;
+                        heatFlux_global[iSpec][iLine][iSegment] = (length1 * heatFlux_global[iSpec][iLine][iSegment-1] + length2 * heatFlux_global[iSpec][iLine][iSegment]) / length12;
+                    }   
                 }
                 
             }

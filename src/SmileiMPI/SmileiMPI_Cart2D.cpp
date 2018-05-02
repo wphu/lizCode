@@ -391,9 +391,11 @@ void SmileiMPI_Cart2D::exchangeParticles(Species* species, int ispec, PicParams&
                     // Enabled periodicity
                     if ( ( iNeighbor==0 ) &&  (coords_[iDim] == 0 ) &&( cuParticles.position(iDim,buff_index_send[iNeighbor][iPart]) < 0. ) ) {
                         cuParticles.position(iDim,buff_index_send[iNeighbor][iPart])     += x_max;
+                        cuParticles.position_old(iDim,buff_index_send[iNeighbor][iPart])     += x_max;
                     }
                     else if ( ( iNeighbor==1 ) &&  (coords_[iDim] == number_of_procs[iDim]-1 ) && ( cuParticles.position(iDim,buff_index_send[iNeighbor][iPart]) >= x_max ) ) {
                         cuParticles.position(iDim,buff_index_send[iNeighbor][iPart])     -= x_max;
+                        cuParticles.position_old(iDim,buff_index_send[iNeighbor][iPart])     -= x_max;
                     }
                 }
                 cuParticles.cp_particle(buff_index_send[iNeighbor][iPart], partVectorSend[iNeighbor]);
