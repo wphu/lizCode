@@ -174,7 +174,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                 for(int iSegment = 0; iSegment < particleFlux_global[iSpec][iLine].size(); iSegment++)
                 {
                     wlt = wlt0 / grid2D->lines[iLine][iSegment].length;
-                    if(grid2D->lines[iLine][iSegment].length < 0.5 * dx && iSegment > 0)
+                    if(grid2D->lines[iLine][iSegment].length < 0.1 * dx && iSegment > 0)
                     {
                         wlt = wlt0 / (grid2D->lines[iLine][iSegment].length + grid2D->lines[iLine][iSegment-1].length);
                         averageAngle_global[iSpec][iLine][iSegment] += averageAngle_global[iSpec][iLine][iSegment-1];
