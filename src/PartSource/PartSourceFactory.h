@@ -61,6 +61,7 @@ public:
 
 	    bool intra, debye_length_required = false;
 	    int debug_every;
+		int step_update;
 	    ostringstream mystream;
 
 		mean_velocity.resize(3, 0.0);
@@ -224,6 +225,9 @@ public:
 				loadPos_Yend = 0.0; // default
 				ifile.extract("loadPos_Yend",loadPos_Yend,"PartSource",n_PartSource);
 
+				step_update = 1;
+				ifile.extract("step_update",step_update,"PartSource",n_PartSource);
+
 		        // Print PSI parameters
 		        mystream.str(""); // clear
 		        for (unsigned int rs=0 ; rs<sgroup1.size() ; rs++) mystream << " #" << sgroup1[rs];
@@ -232,7 +236,7 @@ public:
 		        // Add new PSI objects to vector
 		        //vecPartSource.push_back( new PartSource1D_Load(params, smpi, sgroup1[0], loadDensity, loadTemperature, loadPos_start, loadPos_end) );
 				vecPartSource.push_back( new PartSource2D_Load(params, smpi, sgroup1[0], mean_velocity, loadKind, loadNumber, everyTime, loadDn,loadDensity,
-				loadTemperature, loadPos_start, loadPos_end, loadPos_Ystart, loadPos_Yend) );
+				loadTemperature, loadPos_start, loadPos_end, loadPos_Ystart, loadPos_Yend, step_update) );
 
 			}
 

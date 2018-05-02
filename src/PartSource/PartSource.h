@@ -68,6 +68,7 @@ public:
     double weight_const;
 
     int everyTime;
+    int step_update;
 
 private:
 

@@ -169,6 +169,7 @@ class PartSource(SmileiComponent):
     loadPos_Yend = 0.0
     loadNumber = 2
     everyTime = 0
+    step_update = 1
 
 
 

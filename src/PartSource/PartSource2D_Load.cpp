@@ -26,7 +26,8 @@ PartSource2D_Load::PartSource2D_Load(
     double load_Pos_start,
     double load_Pos_end,
     double load_Pos_Ystart,
-    double load_Pos_Yend
+    double load_Pos_Yend,
+    int    load_step_update
 ):
 PartSource2D (params, smpi)
 
@@ -44,8 +45,9 @@ PartSource2D (params, smpi)
     loadTemperature = load_temperature;
     loadPos_start   = load_Pos_start;
     loadPos_end     = load_Pos_end;
-    loadPos_Ystart   = load_Pos_Ystart;
-    loadPos_Yend     = load_Pos_Yend;
+    loadPos_Ystart  = load_Pos_Ystart;
+    loadPos_Yend    = load_Pos_Yend;
+    step_update     = load_step_update;
 
     YZArea = 1.0;
 
@@ -193,7 +195,10 @@ PartSource2D (params, smpi)
 
 PartSource2D_Load::~PartSource2D_Load()
 {
-
+    for( int i = 0; i < timer.size(); i++)
+    {
+        TITLE(timer[i].name() << " = " << timer[i].getTime() <<" s");
+    }
 }
 
 
@@ -211,6 +216,7 @@ void PartSource2D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
     double *vel=new double[3];
 
     if(everyTime == 0 && itime > 1) { return; }
+    if(itime % step_update != 0){ return; }
     if(loadKind == "nT" && loadBin_end != loadBin_start && loadBin_Yend != loadBin_Ystart)
     {
         s1 = vecSpecies[species1];
