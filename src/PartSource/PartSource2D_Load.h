@@ -28,7 +28,7 @@ public:
     double load_Pos_start,
     double load_Pos_end,
     double load_Pos_Ystart,
-    double load_Pos_Yend
+    double load_Pos_Yend,
     int    load_step_update);
 
     ~PartSource2D_Load();

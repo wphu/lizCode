@@ -30,7 +30,6 @@ PartSource2D_Load::PartSource2D_Load(
     int    load_step_update
 ):
 PartSource2D (params, smpi)
-
 {
     dt_ov_dx = params.timestep / params.cell_length[0];
     dt = params.timestep;
@@ -195,10 +194,7 @@ PartSource2D (params, smpi)
 
 PartSource2D_Load::~PartSource2D_Load()
 {
-    for( int i = 0; i < timer.size(); i++)
-    {
-        TITLE(timer[i].name() << " = " << timer[i].getTime() <<" s");
-    }
+
 }
 
 

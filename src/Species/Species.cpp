@@ -1501,10 +1501,12 @@ void Species::insert_particles_to_bins(Particles &insert_Particles, std::vector<
     }
 }
 
-void Species::insert_particles(Particles &insert_Particles)
+void Species::insert_particles(Particles &insert_particles)
 {
     int n_part_insert;
     int begin_id = 0;
+    int iDirection = -1;
+    double ener_iPart = 0.0;
     double limit_min, limit_max;
     Particles insert_particles_temp;
     vector<int> count_in_bins;
@@ -1513,8 +1515,8 @@ void Species::insert_particles(Particles &insert_Particles)
     clearExchList();
     for(int ibin = 0; ibin < bmax.size(); ibin++)
     {
-        limit_min = min_loc + bin * cell_length[0];
-        limit_max = min_loc + (bin + 1) * cell_length[0];
+        limit_min = min_loc + ibin * cell_length[0];
+        limit_max = min_loc + (ibin + 1) * cell_length[0];
         for(int iPart = 0; iPart < insert_particles.size(); iPart++)
         {
             if(insert_particles.position(0, iPart) >= limit_min && insert_particles.position(0, iPart) < limit_max)
@@ -1532,7 +1534,7 @@ void Species::insert_particles(Particles &insert_Particles)
     {
         for(int iPart = bmax[ibin] - count_in_bins[ibin]; iPart < bmax[ibin]; iPart++)
         {
-            if ( !partBoundCond->apply( particles, iPart, params.species_param[ispec], ener_iPart, iDirection ) ) 
+            if ( !partBoundCond->apply( particles, iPart, species_param, ener_iPart, iDirection ) ) 
             {
                 addPartInExchList( iPart );
             }

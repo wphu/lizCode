@@ -174,6 +174,13 @@ public:
     inline void clearPsiList(int iDirection) {
 	    indexes_of_particles_to_perform_psi[iDirection].clear();
     }
+    inline void clearPsiList() {
+        for(int iDirection = 0; iDirection < indexes_of_particles_to_perform_psi.size(); iDirection++)
+        {
+            indexes_of_particles_to_perform_psi[iDirection].clear();
+        }
+	    
+    }
     inline void addPartInPsiList(int iDirection, int iPart) {
         indexes_of_particles_to_perform_psi[iDirection].push_back(iPart);
     }
@@ -183,7 +190,7 @@ public:
 
     // insert and erase particles for bins: mainly used in Collision and PSI
     void insert_particles_to_bins(Particles &insert_Particles, std::vector<int> &count_in_bins);
-    void insert_particles(Particles &insert_Particles);
+    void insert_particles(Particles &insert_particles);
     void erase_particles_from_bins(std::vector<int> &indexs_to_erase);
 
     std::vector<int> indexes_of_particles_to_absorb;

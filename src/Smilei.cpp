@@ -308,7 +308,7 @@ int main (int argc, char* argv[])
                 // if new particles are in other MPI region, exchange particles
                 for ( int iDim = 0 ; iDim<(int)params.nDim_particle ; iDim++ )
                 {
-                    smpi->exchangeParticles(vecSpecies[vecPSI[ipsi]->species2], ispec, params, tid, iDim);
+                    smpi->exchangeParticles(vecSpecies[vecPSI[ipsi]->species2], vecPSI[ipsi]->species2, params, tid, iDim);
                 }
                 vecSpecies[vecPSI[ipsi]->species2]->sort_part(); // Should we sort test particles ?? (JD)
             }
