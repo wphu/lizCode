@@ -237,7 +237,7 @@ class PlotWidget(QWidget):
                 self.data_widget.setItem(i, j, newItem)
 
     def save_fig(self):
-        filename = "fig" + str(self.sp.value()) + ".png"
+        filename = "fig" + str(self.sp.value()) + ".pdf"
         self.sc.fig.savefig(filename)
 
     def save_animation(self):
