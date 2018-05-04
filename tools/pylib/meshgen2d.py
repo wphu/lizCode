@@ -10,6 +10,8 @@ class Straight_line:
     def __init__(self, start_point, end_point):
         self.start_point = start_point
         self.end_point = end_point
+    def generate_segments(self):
+        pass
 
 # determine if two straight lines cross
 # ref: https://www.cnblogs.com/wuwangchuxin0924/p/6218494.html
@@ -51,6 +53,12 @@ class Polygon:
         else:
             return True
 
+
+def save_grid(segment_list):
+    pass
+
+
+
 if __name__ == "__main__":
     dx = 1.0e-5
     dy = 1.0e-5
@@ -61,6 +69,11 @@ if __name__ == "__main__":
 
     ny_source = 20
     ny_base = 3
+
+    ny_wall_boundary = 150
+    ny_wall_max = 200
+
+    wall_potential = 60.0
 
     polygon_list = []
 
@@ -102,16 +115,18 @@ if __name__ == "__main__":
     polygon1.add_straight_line(line8)
     polygon_list.append(polygon1)
 
-    is_wall = np.zeros((nx+1, ny+1), dtype = 'int')
+    is_wall     = np.zeros((nx+1, ny+1), dtype = 'int')
+    bndr_type   = np.zeros((nx+1, ny+1), dtype = 'int')
+    bndr_val    = np.zeros((nx+1, ny+1), dtype = 'int')
 
+    # ============================= is_wall ========================
     is_wall[0,:] = 1
     is_wall[nx,:] = 1
     is_wall[:,0] = 1
     is_wall[:,ny] = 1
 
     is_wall[:, 0:ny_base] = 1
-    is_wall[:, ny-ny_source:ny] = 1
-
+    
     for i in np.arange(0, nx+1):
         for j in np.arange(0, ny+1):
             point_temp = Point(i*dx, j*dy)
@@ -122,3 +137,48 @@ if __name__ == "__main__":
             if is_in_polygon:
                 is_wall[i,j] = 1
                 
+    # ============================= bndr_type ========================
+    # lower boundary of source region
+    bndr_type[:, ny-ny_source:ny] = 1
+    bndr_val [:, ny-ny_source:ny] = 0.0
+
+    # left and right boundary between source region and wall
+    bndr_type[0, ny_wall_boundary+1:ny-ny_source-1] = 8
+    bndr_type[nx,ny_wall_boundary+1:ny-ny_source-1] = 8
+
+    # corner points of wall at left and right boudnary
+    bndr_type[0, ny_wall_boundary] = 1
+    bndr_type[nx,ny_wall_boundary] = 1
+    bndr_val [0, ny_wall_boundary] = wall_potential
+    bndr_val [nx,ny_wall_boundary] = wall_potential
+
+    # wall surface
+    for i in np.arange(1, nx):
+        for j in np.arange(1, ny_wall_max):
+            if is_wall[i,j] == 1 and (is_wall[i-1, j] == 0 or is_wall[i+1, j] == 0 or is_wall[i, j-1] == 0 or is_wall[i, j+1] == 0):
+                bndr_type[i,j] = 1
+                bndr_val [i,j] = wall_potential
+    
+    # ============================= boundary lines ========================
+    bndr_line_list = []
+    bndr_line0 = Straight_line(point3, point2)
+    bndr_line1 = Straight_line(point2, point1)
+    bndr_line2 = Straight_line(point1, point4)
+    bndr_line3 = Straight_line(point4, point8)
+    bndr_line4 = Straight_line(point8, point7)
+    bndr_line5 = Straight_line(point7, point6)
+
+    bndr_line_list.append(bndr_line0)
+    bndr_line_list.append(bndr_line1)
+    bndr_line_list.append(bndr_line2)
+    bndr_line_list.append(bndr_line3)
+    bndr_line_list.append(bndr_line4)
+    bndr_line_list.append(bndr_line5)
+
+    segment_list = []
+    for bndr_line_temp in bndr_line_list:
+        segments_temp = bndr_line_temp.generate_segments()
+        for segment_temp in segments_temp:
+            segment_list.append(segment_temp)
+
+    save_grid(segment_list)
