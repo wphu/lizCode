@@ -21,15 +21,15 @@ debye_length        = math.sqrt(const.epsilon_0 * Te *  Ti / ((Te + Ti) * ne * q
 period_plasma       = math.sqrt(const.epsilon_0 * me / (ne * const.e * const.e)) * 2.0 * const.pi
 
 ion_sound_speed     = math.sqrt(Te * const.e / mi)
-thermal_speed_e     = (Te * const.e / me)
-thermal_speed_ion   = (Ti * const.e / mi)
+thermal_speed_e     = math.sqrt(Te * const.e / me)
+thermal_speed_ion   = math.sqrt(Ti * const.e / mi)
 
-rotation_period_e   = 2.0 * const.pi * me / (const.e * B)
-rotation_period_ion = 2.0 * const.pi * mi / (qi * const.e * B)
-rotation_radius_e   = me * thermal_speed_e / (const.e * B)
-rotation_radius_ion = mi * thermal_speed_ion / (qi * const.e * B)
+rotation_period_e   = 2.0 * const.pi * me / (const.e * Bmag)
+rotation_period_ion = 2.0 * const.pi * mi / (qi * const.e * Bmag)
+rotation_radius_e   = me * thermal_speed_e / (const.e * Bmag)
+rotation_radius_ion = mi * thermal_speed_ion / (qi * const.e * Bmag)
 
-particle_flux       = ni * math.sin(Bangle)
+particle_flux       = ni * thermal_speed_ion * math.sin(Bangle)
 
 print("==========================================")
 print("debye_length:        ", debye_length)
