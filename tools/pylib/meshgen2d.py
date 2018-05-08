@@ -161,7 +161,38 @@ class Grid2D:
         self.segment_list = segment_list
 
     def save_grid(self):
-        pass
+        self.start_point = np.zeros((len(self.segment_list), 2), dtype = 'double')
+        self.end_point   = np.zeros((len(self.segment_list), 2), dtype = 'double')
+        self.length      = np.zeros(len(self.segment_list), dtype = 'double')
+        self.normal      = np.zeros((len(self.segment_list), 3), dtype = 'double')
+        self.grid_point0 = np.zeros((len(self.segment_list), 2), dtype = 'int')
+        self.grid_point1 = np.zeros((len(self.segment_list), 2), dtype = 'int')
+        for i in np.arange(0, len(self.segment_list)):
+            self.start_point[i,0] = self.segment_list[i].start_point.x
+            self.start_point[i,1] = self.segment_list[i].start_point.y
+            self.end_point[i,0]   = self.segment_list[i].end_point.x
+            self.end_point[i,1]   = self.segment_list[i].end_point.y
+            self.length[i]        = self.segment_list[i].length
+            self.normal[i,0]      = self.segment_list[i].normal.x
+            self.normal[i,1]      = self.segment_list[i].normal.y
+            self.normal[i,2]      = self.segment_list[i].normal.z
+            self.grid_point0[i,0] = self.segment_list[i].grid_point0.x
+            self.grid_point0[i,1] = self.segment_list[i].grid_point0.y
+            self.grid_point1[i,0] = self.segment_list[i].grid_point1.x
+            self.grid_point1[i,1] = self.segment_list[i].grid_point1.y
+        
+        f = h5.File('grid.h5', 'w')
+        f['is_wall']     = self.is_wall
+        f['bndr_type']   = self.bndr_type
+        f['bndr_val']    = self.bndr_val
+        f['n_segments']  = self.n_segments
+        f['start_point'] = self.start_point
+        f['end_point']   = self.end_point
+        f['length']      = self.length
+        f['normal']      = self.normal
+        f['grid_point0'] = self.grid_point0
+        f['grid_point1'] = self.grid_point1
+        f.close()
 
     def save_fig(self):
         pass
