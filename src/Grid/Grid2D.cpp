@@ -592,88 +592,21 @@ void Grid2D::geometry_iter_gap( )
         y_upper = a * (i+1) * dx + b;
         j_lower = y_lower / dy;
         j_upper = y_upper / dy;
-        if(j_upper == j_lower)
-        {
-            segment seg;
-            seg.start_point[0] = i * dx;
-            seg.start_point[1] = y_lower;
-            seg.end_point[0] = (i+1) * dx;
-            seg.end_point[1] = y_upper;
-            seg.grid_point[0] = i;
-            seg.grid_point[1] = j_lower;
-            seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-            seg.normal[0] = normal_x;
-            seg.normal[1] = normal_y;
-            seg.normal[2] = normal_z;
-            if(seg.length == 0.0)
-            {
-                continue;
-            }
-            lines[0].push_back(seg);
-        }
-        else
-        {
-            for(int iSegment = 0; iSegment < j_upper - j_lower + 1; iSegment++)
-            {
-                if(iSegment == 0)
-                {
-                    segment seg;
-                    seg.start_point[0] = i * dx;
-                    seg.start_point[1] = y_lower;
-                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a; 
-                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
-                    seg.grid_point[0] = i;
-                    seg.grid_point[1] = j_lower + iSegment;
-                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-                    seg.normal[0] = normal_x;
-                    seg.normal[1] = normal_y;
-                    seg.normal[2] = normal_z;
-                    if(seg.length == 0.0)
-                    {
-                        continue;
-                    }
-                    lines[0].push_back(seg);
-                }
-                else if(iSegment == j_upper - j_lower)
-                {
-                    segment seg;
-                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
-                    seg.start_point[1] = (j_lower + iSegment) * dy;
-                    seg.end_point[0] = (i + 1) * dx; 
-                    seg.end_point[1] = a * (i + 1) * dx + b;
-                    seg.grid_point[0] = i;
-                    seg.grid_point[1] = j_lower + iSegment;  
-                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-                    seg.normal[0] = normal_x;
-                    seg.normal[1] = normal_y;
-                    seg.normal[2] = normal_z;
-                    if(seg.length == 0.0)
-                    {
-                        continue;
-                    }
-                    lines[0].push_back(seg);
-                }
-                else
-                {
-                    segment seg;
-                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
-                    seg.start_point[1] = (j_lower + iSegment) * dy;
-                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a;
-                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
-                    seg.grid_point[0] = i;
-                    seg.grid_point[1] = j_lower + iSegment;  
-                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-                    seg.normal[0] = normal_x;
-                    seg.normal[1] = normal_y;
-                    seg.normal[2] = normal_z;
-                    if(seg.length == 0.0)
-                    {
-                        continue;
-                    }
-                    lines[0].push_back(seg);
-                }
-            }
-        }
+
+        segment seg;
+        seg.start_point[0] = i * dx;
+        seg.start_point[1] = y_lower;
+        seg.end_point[0]   = (i + 1) * dx; 
+        seg.end_point[1]   = y_upper;
+        seg.grid_point0[0] = i;
+        seg.grid_point0[1] = j_lower;
+        seg.grid_point1[0] = i;
+        seg.grid_point1[1] = j_upper;
+        seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+        seg.normal[0] = normal_x;
+        seg.normal[1] = normal_y;
+        seg.normal[2] = normal_z;
+        lines[0].push_back(seg);
     }
 
     // set the right surface of the left tile
@@ -683,78 +616,106 @@ void Grid2D::geometry_iter_gap( )
     if(a * nx_left_tile * dx + b == ny_gap_top2 * dy)
     {
         nSegment = ny_gap_top2 - bottomWall_thickness;
-        segment seg;
-        seg.start_point[0] = nx_left_tile * dx;
-        seg.start_point[1] = ny_gap_top2 * dy;
-        seg.end_point[0] = nx_left_tile * dx;
-        seg.end_point[1] = (ny_gap_top2 - 1) * dy;
-        seg.grid_point[0] = nx_left_tile;
-        seg.grid_point[1] = ny_gap_top2 - 1;
-        seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-        seg.normal[0] = normal_x;
-        seg.normal[1] = normal_y;
-        seg.normal[2] = normal_z;
-        if(seg.length != 0.0)
-        {
-            lines[1].push_back(seg);
-        }
-        
-        for(int iSegment = 1; iSegment < nSegment; iSegment++)
+        for(int iSegment = 0; iSegment < nSegment; iSegment++)
         {
             segment seg;
             seg.start_point[0] = nx_left_tile * dx;
             seg.start_point[1] = (ny_gap_top2 - iSegment) * dy;
-            seg.end_point[0] = nx_left_tile * dx;
-            seg.end_point[1] = (ny_gap_top2 - iSegment - 1) * dy;
-            seg.grid_point[0] = nx_left_tile;
-            seg.grid_point[1] = ny_gap_top2 - iSegment - 1;
+            seg.end_point[0]   = nx_left_tile * dx;
+            seg.end_point[1]   = (ny_gap_top2 - iSegment - 1) * dy;
+            seg.grid_point0[0] = nx_left_tile;
+            seg.grid_point0[1] = ny_gap_top2 - iSegment - 1;
+            seg.grid_point1[0] = nx_left_tile;
+            seg.grid_point1[1] = ny_gap_top2 - iSegment - 1;
             seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
             seg.normal[0] = normal_x;
             seg.normal[1] = normal_y;
             seg.normal[2] = normal_z;
-            if(seg.length == 0.0)
-            {
-                continue;
-            }
             lines[1].push_back(seg);
         }
     }
-    else
+    else if(a * nx_left_tile * dx + b > ny_gap_top2 * dy)
     {
         nSegment = ny_gap_top2 - bottomWall_thickness + 1;
-        segment seg;
-        seg.start_point[0] = nx_left_tile * dx;
-        seg.start_point[1] = a * nx_left_tile * dx + b;
-        seg.end_point[0] = nx_left_tile * dx;
-        seg.end_point[1] = (ny_gap_top2) * dy;
-        seg.grid_point[0] = nx_left_tile;
-        seg.grid_point[1] = ny_gap_top2;
-        seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-        seg.normal[0] = normal_x;
-        seg.normal[1] = normal_y;
-        seg.normal[2] = normal_z;
-        if(seg.length != 0.0)
+        for(int iSegment = 0; iSegment < nSegment; iSegment++)
         {
-            lines[1].push_back(seg);
-        }
-        for(int iSegment = 1; iSegment < nSegment; iSegment++)
-        {
-            segment seg;
-            seg.start_point[0] = nx_left_tile * dx;
-            seg.start_point[1] = (ny_gap_top2 - iSegment + 1) * dy;
-            seg.end_point[0] = nx_left_tile * dx;
-            seg.end_point[1] = (ny_gap_top2 - iSegment) * dy;
-            seg.grid_point[0] = nx_left_tile;
-            seg.grid_point[1] = ny_gap_top2 - iSegment;
-            seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-            seg.normal[0] = normal_x;
-            seg.normal[1] = normal_y;
-            seg.normal[2] = normal_z;
-            if(seg.length == 0.0)
+            if(iSegment == 0)
             {
-                continue;
+                segment seg;
+                seg.start_point[0] = nx_left_tile * dx;
+                seg.start_point[1] = a * nx_left_tile * dx + b;
+                seg.end_point[0]   = nx_left_tile * dx;
+                seg.end_point[1]   = (ny_gap_top2 - iSegment) * dy;
+                seg.grid_point0[0] = nx_left_tile;
+                seg.grid_point0[1] = ny_gap_top2 - iSegment;
+                seg.grid_point1[0] = nx_left_tile;
+                seg.grid_point1[1] = ny_gap_top2 - iSegment;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[1].push_back(seg);
             }
-            lines[1].push_back(seg);
+            else
+            {
+                segment seg;
+                seg.start_point[0] = nx_left_tile * dx;
+                seg.start_point[1] = (ny_gap_top2 - iSegment + 1) * dy;
+                seg.end_point[0]   = nx_left_tile * dx;
+                seg.end_point[1]   = (ny_gap_top2 - iSegment) * dy;
+                seg.grid_point0[0] = nx_left_tile;
+                seg.grid_point0[1] = ny_gap_top2 - iSegment;
+                seg.grid_point1[0] = nx_left_tile;
+                seg.grid_point1[1] = ny_gap_top2 - iSegment;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[1].push_back(seg);
+            }
+
+        }
+    }
+    else if(a * nx_left_tile * dx + b < ny_gap_top2 * dy)
+    {
+        nSegment = ny_gap_top2 - bottomWall_thickness;
+        for(int iSegment = 0; iSegment < nSegment; iSegment++)
+        {
+            if(iSegment == 0)
+            {
+                segment seg;
+                seg.start_point[0] = nx_left_tile * dx;
+                seg.start_point[1] = a * nx_left_tile * dx + b;
+                seg.end_point[0]   = nx_left_tile * dx;
+                seg.end_point[1]   = (ny_gap_top2 - iSegment) * dy;
+                seg.grid_point0[0] = nx_left_tile;
+                seg.grid_point0[1] = ny_gap_top2 - iSegment - 1;
+                seg.grid_point1[0] = nx_left_tile;
+                seg.grid_point1[1] = ny_gap_top2 - iSegment - 1;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[1].push_back(seg);
+            }
+            else
+            {
+                segment seg;
+                seg.start_point[0] = nx_left_tile * dx;
+                seg.start_point[1] = (ny_gap_top2 - iSegment) * dy;
+                seg.end_point[0]   = nx_left_tile * dx;
+                seg.end_point[1]   = (ny_gap_top2 - iSegment - 1) * dy;
+                seg.grid_point0[0] = nx_left_tile;
+                seg.grid_point0[1] = ny_gap_top2 - iSegment - 1;
+                seg.grid_point1[0] = nx_left_tile;
+                seg.grid_point1[1] = ny_gap_top2 - iSegment - 1;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[1].push_back(seg);
+            }
+
         }
     }
 
@@ -767,18 +728,16 @@ void Grid2D::geometry_iter_gap( )
         segment seg;
         seg.start_point[0] = i * dx;
         seg.start_point[1] = bottomWall_thickness * dy;
-        seg.end_point[0] = (i + 1) * dx;
-        seg.end_point[1] = bottomWall_thickness * dy;
-        seg.grid_point[0] = i;
-        seg.grid_point[1] = bottomWall_thickness - 1;
+        seg.end_point[0]   = (i + 1) * dx;
+        seg.end_point[1]   = bottomWall_thickness * dy;
+        seg.grid_point0[0] = i;
+        seg.grid_point0[1] = bottomWall_thickness - 1;
+        seg.grid_point1[0] = i;
+        seg.grid_point1[1] = bottomWall_thickness - 1;
         seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
         seg.normal[0] = normal_x;
         seg.normal[1] = normal_y;
         seg.normal[2] = normal_z;
-        if(seg.length == 0.0)
-        {
-            continue;
-        }
         lines[2].push_back(seg);
     }
 
@@ -792,44 +751,108 @@ void Grid2D::geometry_iter_gap( )
     normal_x = -1.0;
     normal_y = 0.0;
     normal_z = 0.0;
-    for(int j = bottomWall_thickness; j < ny_gap_top0; j++)
+    if(a * nx_right_tile * dx + b == ny_gap_top0 * dy)
     {
-        segment seg;
-        seg.start_point[0] = nx_right_tile * dx;
-        seg.start_point[1] = j * dy;
-        seg.end_point[0] = nx_right_tile * dx;
-        seg.end_point[1] = (j + 1) * dy;
-        seg.grid_point[0] = nx_right_tile - 1;
-        seg.grid_point[1] = j;
-        seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-        seg.normal[0] = normal_x;
-        seg.normal[1] = normal_y;
-        seg.normal[2] = normal_z;
-        if(seg.length == 0.0)
+        for(int j = bottomWall_thickness; j < ny_gap_top0; j++)
         {
-            continue;
-        }
-        lines[3].push_back(seg);
-    }
-    if(a * nx_right_tile * dx + b != ny_gap_top0 * dy)
-    {
-        segment seg;
-        seg.start_point[0] = nx_right_tile * dx;
-        seg.start_point[1] = ny_gap_top0 * dy;
-        seg.end_point[0] = nx_right_tile * dx;
-        seg.end_point[1] = a * nx_right_tile * dx + b;
-        seg.grid_point[0] = nx_right_tile - 1;
-        seg.grid_point[1] = ny_gap_top0;
-        seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-        seg.normal[0] = normal_x;
-        seg.normal[1] = normal_y;
-        seg.normal[2] = normal_z;
-        if(seg.length != 0.0)
-        {
+            segment seg;
+            seg.start_point[0] = nx_right_tile * dx;
+            seg.start_point[1] = j * dy;
+            seg.end_point[0]   = nx_right_tile * dx;
+            seg.end_point[1]   = (j + 1) * dy;
+            seg.grid_point0[0] = nx_right_tile - 1;
+            seg.grid_point0[1] = j;
+            seg.grid_point1[0] = nx_right_tile - 1;
+            seg.grid_point1[1] = j;
+            seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+            seg.normal[0] = normal_x;
+            seg.normal[1] = normal_y;
+            seg.normal[2] = normal_z;
             lines[3].push_back(seg);
         }
     }
+    else if(a * nx_right_tile * dx + b > ny_gap_top0 * dy)
+    {
+        for(int j = bottomWall_thickness; j < ny_gap_top0 + 1; j++)
+        {
+            if(j == ny_gap_top0)
+            {
+                segment seg;
+                seg.start_point[0] = nx_right_tile * dx;
+                seg.start_point[1] = j * dy;
+                seg.end_point[0]   = nx_right_tile * dx;
+                seg.end_point[1]   = a * nx_right_tile * dx + b;
+                seg.grid_point0[0] = nx_right_tile - 1;
+                seg.grid_point0[1] = j;
+                seg.grid_point1[0] = nx_right_tile - 1;
+                seg.grid_point1[1] = j;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[3].push_back(seg);
+            }
+            else
+            {
+                segment seg;
+                seg.start_point[0] = nx_right_tile * dx;
+                seg.start_point[1] = j * dy;
+                seg.end_point[0]   = nx_right_tile * dx;
+                seg.end_point[1]   = (j + 1) * dy;
+                seg.grid_point0[0] = nx_right_tile - 1;
+                seg.grid_point0[1] = j;
+                seg.grid_point1[0] = nx_right_tile - 1;
+                seg.grid_point1[1] = j;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[3].push_back(seg);
+            }
 
+        }
+    }
+    else if(a * nx_right_tile * dx + b < ny_gap_top0 * dy)
+    {
+        for(int j = bottomWall_thickness; j < ny_gap_top0; j++)
+        {
+            if(j == ny_gap_top0 - 1)
+            {
+                segment seg;
+                seg.start_point[0] = nx_right_tile * dx;
+                seg.start_point[1] = j * dy;
+                seg.end_point[0]   = nx_right_tile * dx;
+                seg.end_point[1]   = a * nx_right_tile * dx + b;
+                seg.grid_point0[0] = nx_right_tile - 1;
+                seg.grid_point0[1] = j;
+                seg.grid_point1[0] = nx_right_tile - 1;
+                seg.grid_point1[1] = j;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[3].push_back(seg);
+            }
+            else
+            {
+                segment seg;
+                seg.start_point[0] = nx_right_tile * dx;
+                seg.start_point[1] = j * dy;
+                seg.end_point[0]   = nx_right_tile * dx;
+                seg.end_point[1]   = (j + 1) * dy;
+                seg.grid_point0[0] = nx_right_tile - 1;
+                seg.grid_point0[1] = j;
+                seg.grid_point1[0] = nx_right_tile - 1;
+                seg.grid_point1[1] = j;
+                seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+                seg.normal[0] = normal_x;
+                seg.normal[1] = normal_y;
+                seg.normal[2] = normal_z;
+                lines[3].push_back(seg);
+            }
+
+        }
+    }
     // set the top surface of the right tile
     normal_x = -bevel_depth * bevel_depth / nx_left_tile;
     normal_y = bevel_depth;
@@ -843,88 +866,21 @@ void Grid2D::geometry_iter_gap( )
         y_upper = a * (i+1) * dx + b;
         j_lower = y_lower / dy;
         j_upper = y_upper / dy;
-        if(j_upper == j_lower)
-        {
-            segment seg;
-            seg.start_point[0] = i * dx;
-            seg.start_point[1] = y_lower;
-            seg.end_point[0] = (i+1) * dx;
-            seg.end_point[1] = y_upper;
-            seg.grid_point[0] = i;
-            seg.grid_point[1] = j_lower;
-            seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-            seg.normal[0] = normal_x;
-            seg.normal[1] = normal_y;
-            seg.normal[2] = normal_z;
-            if(seg.length == 0.0)
-            {
-                continue;
-            }
-            lines[4].push_back(seg);
-        }
-        else
-        {
-            for(int iSegment = 0; iSegment < j_upper - j_lower + 1; iSegment++)
-            {
-                if(iSegment == 0)
-                {
-                    segment seg;
-                    seg.start_point[0] = i * dx;
-                    seg.start_point[1] = y_lower;
-                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a; 
-                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
-                    seg.grid_point[0] = i;
-                    seg.grid_point[1] = j_lower + iSegment;
-                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-                    seg.normal[0] = normal_x;
-                    seg.normal[1] = normal_y;
-                    seg.normal[2] = normal_z;
-                    if(seg.length == 0.0)
-                    {
-                        continue;
-                    }
-                    lines[4].push_back(seg);
-                }
-                else if(iSegment == j_upper - j_lower)
-                {
-                    segment seg;
-                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
-                    seg.start_point[1] = (j_lower + iSegment) * dy;
-                    seg.end_point[0] = (i + 1) * dx; 
-                    seg.end_point[1] = a * (i + 1) * dx + b;
-                    seg.grid_point[0] = i;
-                    seg.grid_point[1] = j_lower + iSegment;  
-                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-                    seg.normal[0] = normal_x;
-                    seg.normal[1] = normal_y;
-                    seg.normal[2] = normal_z;
-                    if(seg.length == 0.0)
-                    {
-                        continue;
-                    }
-                    lines[4].push_back(seg);
-                }
-                else
-                {
-                    segment seg;
-                    seg.start_point[0] = ((j_lower + iSegment) * dy - b) / a;
-                    seg.start_point[1] = (j_lower + iSegment) * dy;
-                    seg.end_point[0] = ((j_lower + iSegment + 1) * dy - b) / a;
-                    seg.end_point[1] = (j_lower + iSegment + 1) * dy;
-                    seg.grid_point[0] = i;
-                    seg.grid_point[1] = j_lower + iSegment;  
-                    seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
-                    seg.normal[0] = normal_x;
-                    seg.normal[1] = normal_y;
-                    seg.normal[2] = normal_z;
-                    if(seg.length == 0.0)
-                    {
-                        continue;
-                    }
-                    lines[4].push_back(seg);
-                }
-            }
-        }
+
+        segment seg;
+        seg.start_point[0] = i * dx;
+        seg.start_point[1] = y_lower;
+        seg.end_point[0]   = (i + 1) * dx; 
+        seg.end_point[1]   = y_upper;
+        seg.grid_point0[0] = i;
+        seg.grid_point0[1] = j_lower;
+        seg.grid_point1[0] = i;
+        seg.grid_point1[1] = j_upper;
+        seg.length = sqrt( pow((seg.end_point[0] - seg.start_point[0]), 2) + pow((seg.end_point[1] - seg.start_point[1]), 2) );
+        seg.normal[0] = normal_x;
+        seg.normal[1] = normal_y;
+        seg.normal[2] = normal_z;
+        lines[4].push_back(seg);
     }
 }
 

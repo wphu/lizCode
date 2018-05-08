@@ -515,14 +515,26 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
         }
     }
 
-    int *grid_point = new int[grid2D->n_segment_total * 2];
+    int *grid_point0 = new int[grid2D->n_segment_total * 2];
     ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
         {
-            grid_point[ii * 2]     = grid2D->lines[iLine][iSegment].grid_point[0];
-            grid_point[ii * 2 + 1] = grid2D->lines[iLine][iSegment].grid_point[1];
+            grid_point0[ii * 2]     = grid2D->lines[iLine][iSegment].grid_point0[0];
+            grid_point0[ii * 2 + 1] = grid2D->lines[iLine][iSegment].grid_point0[1];
+            ii++;
+        }
+    }
+
+    int *grid_point1 = new int[grid2D->n_segment_total * 2];
+    ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid_point1[ii * 2]     = grid2D->lines[iLine][iSegment].grid_point1[0];
+            grid_point1[ii * 2 + 1] = grid2D->lines[iLine][iSegment].grid_point1[1];
             ii++;
         }
     }
@@ -582,14 +594,25 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     H5Sclose(segment_dataspace_id);
     H5Dclose(segment_dataset_id);
 
-    // write grid_point
+    // write grid_point0
     ndim_segment = 2;
     dim2d_segment[0] = grid2D->n_segment_total;
     dim2d_segment[1] = 2;
     segment_dataspace_id = H5Screate_simple(ndim_segment, dim2d_segment, NULL);
-    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point", H5T_NATIVE_INT, segment_dataspace_id,
+    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point0", H5T_NATIVE_INT, segment_dataspace_id,
                                    H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    H5Dwrite(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point);
+    H5Dwrite(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point0);
+    H5Sclose(segment_dataspace_id);
+    H5Dclose(segment_dataset_id);
+
+    // write grid_point1
+    ndim_segment = 2;
+    dim2d_segment[0] = grid2D->n_segment_total;
+    dim2d_segment[1] = 2;
+    segment_dataspace_id = H5Screate_simple(ndim_segment, dim2d_segment, NULL);
+    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point1", H5T_NATIVE_INT, segment_dataspace_id,
+                                   H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    H5Dwrite(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point1);
     H5Sclose(segment_dataspace_id);
     H5Dclose(segment_dataset_id);
 

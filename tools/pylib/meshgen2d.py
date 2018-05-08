@@ -9,7 +9,7 @@ class Vector:
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
-        self.z - z
+        self.z = z
 
 class Segment:
     def __init__(self):
@@ -19,7 +19,7 @@ class Segment:
         self.grid_point = None
         self.normal = None
 
-    def cal_length():
+    def cal_length(self):
         x_dif = self.end_point.x - self.start_point.x
         y_dif = self.end_point.y - self.start_point.y
         self.length = math.sqrt(math.pow(x_dif, 2) + math.pow(y_dif, 2))
@@ -30,89 +30,84 @@ class Straight_line:
         self.end_point = end_point
     def generate_segments(self, dx, dy):
         self.segment_list = []
-        # calculate a and b for slope-intercept form of a line: y = ax + b
-        a = 
-        b = 
-
-        i_min = int(self.start_point.x / dx)
-        i_max = int(self.end_point.x / dx)
-        j_min = int(self.start_point.y / dy)
-        j_max = int(self.end_point.y / dy)
-        if i_min > i_max:
-            i_temp = i_min
-            i_min = i_max
-            i_max = i_temp
-        if j_min > j_max:
-            j_temp = j_min
-            j_min = j_max
-            j_max = j_temp
         
-        for  i in np.arange(i_min, imax + 1):
-            y0 = a * i * dx + b
-            y1 = a * (i+1) * dx + b
-            j0 = int(y_lower / dy)
-            j1 = int(y_upper / dy)
-            if j0 == j1:
+        # the line is in y direction
+        if self.start_point.x == self.end_point.x:
+            normal_x = 1.0
+            normal_y = 0.0
+            normal_z = 0.0
+
+            i = int(self.start_point.x / dx)
+            j_min = int(self.start_point.y / dy)
+            j_max = int(self.end_point.y / dy)
+            if j_min > j_max:
+                j_temp = j_min
+                j_min = j_max
+                j_max = j_temp
+            for j in np.arange(j_min, j_max + 1):
                 segment_temp = Segment()
-                segment_temp.start_point = Point(i * dx, y0)
-                segment_temp.end_point   = Point((i + 1) * dx, y1)
-                segment_temp.grid_point  = Point(i, j0)
-                segment_temp.normal      = Vector(0.0, 0.0, 0.0)
+                segment_temp.start_point = Point(i * dx, j * dy)
+                segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
+                segment_temp.grid_point  = Point(i, j)
+                segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
                 segment_temp.cal_length()
                 self.segment_list.append(segment_temp)
-            elif j0 < j1:
-                for iSegment in np.arange(0, j1 - j0 + 1):
-                    if iSegment == 0:
-                        segment_temp = Segment()
-                        segment_temp.start_point = Point(i * dx, y0)
-                        segment_temp.end_point   = Point(((j0 + iSegment + 1) * dy - b) / a, (j0 + iSegment + 1) * dy)
-                        segment_temp.grid_point  = Point(i, j0 + iSegment)
-                        segment_temp.normal      = Vector(0.0, 0.0, 0.0)
-                        segment_temp.cal_length()
-                        self.segment_list.append(segment_temp)
-                    elif iSegment == j1 - j0:
-                        segment_temp = Segment()
-                        segment_temp.start_point = Point(i * dx, y0)
-                        segment_temp.end_point   = Point(((j0 + iSegment + 1) * dy - b) / a, (j0 + iSegment + 1) * dy)
-                        segment_temp.grid_point  = Point(i, j0 + iSegment)
-                        segment_temp.normal      = Vector(0.0, 0.0, 0.0)
-                        segment_temp.cal_length()
-                        self.segment_list.append(segment_temp)
-                    else:
-                        segment_temp = Segment()
-                        segment_temp.start_point = Point(i * dx, y0)
-                        segment_temp.end_point   = Point(((j0 + iSegment + 1) * dy - b) / a, (j0 + iSegment + 1) * dy)
-                        segment_temp.grid_point  = Point(i, j0 + iSegment)
-                        segment_temp.normal      = Vector(0.0, 0.0, 0.0)
-                        segment_temp.cal_length()
-                        self.segment_list.append(segment_temp)                        
-            elif j0 > j1:
-                for iSegment in np.arange(0, j1 - j0 + 1):
-                    if iSegment == 0:
-                        segment_temp = Segment()
-                        segment_temp.start_point = Point(i * dx, y0)
-                        segment_temp.end_point   = Point(((j0 + iSegment + 1) * dy - b) / a, (j0 + iSegment + 1) * dy)
-                        segment_temp.grid_point  = Point(i, j0 + iSegment)
-                        segment_temp.normal      = Vector(0.0, 0.0, 0.0)
-                        segment_temp.cal_length()
-                        self.segment_list.append(segment_temp)
-                    elif iSegment == j1 - j0:
-                        segment_temp = Segment()
-                        segment_temp.start_point = Point(i * dx, y0)
-                        segment_temp.end_point   = Point(((j0 + iSegment + 1) * dy - b) / a, (j0 + iSegment + 1) * dy)
-                        segment_temp.grid_point  = Point(i, j0 + iSegment)
-                        segment_temp.normal      = Vector(0.0, 0.0, 0.0)
-                        segment_temp.cal_length()
-                        self.segment_list.append(segment_temp)
-                    else:
-                        segment_temp = Segment()
-                        segment_temp.start_point = Point(i * dx, y0)
-                        segment_temp.end_point   = Point(((j0 + iSegment + 1) * dy - b) / a, (j0 + iSegment + 1) * dy)
-                        segment_temp.grid_point  = Point(i, j0 + iSegment)
-                        segment_temp.normal      = Vector(0.0, 0.0, 0.0)
-                        segment_temp.cal_length()
-                        self.segment_list.append(segment_temp) 
 
+        # calculate a and b for slope-intercept form of a line: y = ax + b
+        else:
+            a = (self.end_point.y - self.start_point.y) / (self.end_point.x - self.start_point.x)
+            b = -self.start_point.x * (self.end_point.y - self.start_point.y) / (self.end_point.x - self.start_point.x) + self.start_point.y
+            normal_x = -a
+            normal_y = 1.0
+            normal_z = 0.0
+            normal_length = math.sqrt(normal_x * normal_x + normal_y * normal_y + normal_z * normal_z)
+            normal_x /= normal_length
+            normal_y /= normal_length
+            normal_z /= normal_length
+
+            i_min = int(self.start_point.x / dx)
+            i_max = int(self.end_point.x / dx)
+            j_min = int(self.start_point.y / dy)
+            j_max = int(self.end_point.y / dy)
+            if i_min > i_max:
+                i_temp = i_min
+                i_min = i_max
+                i_max = i_temp
+            if j_min > j_max:
+                j_temp = j_min
+                j_min = j_max
+                j_max = j_temp
+            if abs(a) <= 1.0:
+                for  i in np.arange(i_min, i_max + 1):
+                    y0 = a * i * dx + b
+                    y1 = a * (i+1) * dx + b
+                    j0 = int(y0 / dy)
+                    j1 = int(y1 / dy)
+
+                    segment_temp = Segment()
+                    segment_temp.start_point = Point(i * dx, y0)
+                    segment_temp.end_point   = Point((i + 1) * dx, y1)
+                    segment_temp.grid_point0 = Point(i, j0)
+                    segment_temp.grid_point1 = Point(i, j1)
+                    segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+                    segment_temp.cal_length()
+                    self.segment_list.append(segment_temp) 
+            else:
+                for  j in np.arange(j_min, j_max + 1):
+                    x0 = (j * dy - b) / a
+                    x1 = ((j + 1) * dy - b) / a
+                    i0 = int(x0 / dx)
+                    i1 = int(x1 / dx)
+
+                    segment_temp = Segment()
+                    segment_temp.start_point = Point(x0, j * dy)
+                    segment_temp.end_point   = Point(x1, (j + 1) * dy)
+                    segment_temp.grid_point0 = Point(i0, j)
+                    segment_temp.grid_point1 = Point(i1, j)
+                    segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+                    segment_temp.cal_length()
+                    self.segment_list.append(segment_temp)
+        return self.segment_list
 
 # determine if two straight lines cross
 # ref: https://www.cnblogs.com/wuwangchuxin0924/p/6218494.html
@@ -155,14 +150,21 @@ class Polygon:
             return True
 
 
+class Grid2D:
+    def __init__(self, dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list):
+        self.dx = dx
+        self.dy = dy
+        self.is_wall = is_wall
+        self.bndr_type = bndr_type
+        self.bndr_val = bndr_val
+        self.n_segments = n_segments
+        self.segment_list = segment_list
 
+    def save_grid(self):
+        pass
 
-
-
-
-def save_grid(segment_list):
-    pass
-
+    def save_fig(self):
+        pass
 
 
 if __name__ == "__main__":
@@ -282,9 +284,14 @@ if __name__ == "__main__":
     bndr_line_list.append(bndr_line5)
 
     segment_list = []
+    n_segments = []
     for bndr_line_temp in bndr_line_list:
-        segments_temp = bndr_line_temp.generate_segments()
-        for segment_temp in segments_temp:
+        segment_list_temp = bndr_line_temp.generate_segments()
+        n_segments.append(len(segment_list_temp))
+        for segment_temp in segment_list_temp:
             segment_list.append(segment_temp)
 
-    save_grid(segment_list)
+    grid2d = Grid2D(dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list)
+    grid2d.save_grid()
+    grid2d.save_fig()
+
