@@ -81,6 +81,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
     Particles *p1;
 	Particles *psi_particles;
     bool has_find;
+    bool is_in_wall;
     int iLine_cross, iSegment_cross;
 	double v_square, v_magnitude, energy;
 	double mass_ov_2;
@@ -129,12 +130,11 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
         {
             for (int iPart=(unsigned int)s1->bmin[ibin] ; iPart<(unsigned int)s1->bmax[ibin]; iPart++ ) 
             {
-                has_find = find_cross_segment(grid2D, p1, iPart, iLine_cross, iSegment_cross);
-                if( has_find )
+                has_find = find_cross_segment(grid2D, p1, iPart, iLine_cross, iSegment_cross, is_in_wall);
+                if(has_find)
                 {   
                     //if(iLine_cross != 4) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
-                    //cout<<"has find "<<endl;
-                    s1->indexes_of_particles_to_absorb.push_back(iPart);
+                    //cout<<"has find "<<endl;                   
                     if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
                     {
                         v_square = pow(p1->momentum(0,iPart), 2) + pow(p1->momentum(1,iPart), 2) + pow(p1->momentum(2,iPart), 2);
@@ -145,6 +145,10 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                         averageAngle[iSpec][iLine_cross][iSegment_cross] += angle;
                     }
 
+                }
+                if(has_find || is_in_wall)
+                {
+                    s1->indexes_of_particles_to_absorb.push_back(iPart);
                 }
             }//iPart
         }// ibin
@@ -199,7 +203,7 @@ void Diagnostic2D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 }
 
 
-bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int iPart, int& iLine_cross, int& iSegment_cross)
+bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int iPart, int& iLine_cross, int& iSegment_cross, bool& is_in_wall)
 {
     bool has_find = false;
     double xpn, ypn;
@@ -208,22 +212,25 @@ bool Diagnostic2D::find_cross_segment(Grid2D *grid2D, Particles *particles, int 
     double pos_old[2];
     vector<int> vecSegment;
 
+    is_in_wall = false;
+
     //Locate particle on the primal grid & calculate the projection coefficients
-    xpn = particles->position(0, iPart) * dx_inv_;  // normalized distance to the first node
-    ic  = floor(xpn);                   // index of the central node
-
-    ypn = particles->position(1, iPart) * dy_inv_;  // normalized distance to the first node
-    jc   = floor(ypn);                  // index of the central node
-
-
-
+    ic = particles->position(0, iPart) * dx_inv_;  // normalized distance to the first node
+    jc = particles->position(1, iPart) * dy_inv_;  // normalized distance to the first node
+    
     pos_new[0] = particles->position(0, iPart);
     pos_new[1] = particles->position(1, iPart);
     pos_old[0] = particles->position_old(0, iPart);
     pos_old[1] = particles->position_old(1, iPart);
 
+    if( grid2D->iswall_global_2D[ic][jc] == 1 && grid2D->iswall_global_2D[ic+1][jc] == 1 && grid2D->iswall_global_2D[ic+1][jc+1] == 1
+     && grid2D->iswall_global_2D[ic][jc+1] == 1 ) 
+    {
+        is_in_wall = true;
+    }
+
     if( grid2D->iswall_global_2D[ic][jc] == 1 || grid2D->iswall_global_2D[ic+1][jc] == 1 || grid2D->iswall_global_2D[ic+1][jc+1] == 1
-        ||grid2D->iswall_global_2D[ic][jc+1] == 1 ) 
+     || grid2D->iswall_global_2D[ic][jc+1] == 1 ) 
     {
         ic0 = ic;
         jc0 = jc;

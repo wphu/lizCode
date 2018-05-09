@@ -109,6 +109,31 @@ class Straight_line:
                     self.segment_list.append(segment_temp)
         return self.segment_list
 
+class Arc_line:
+    def __init__(self, center_point, radius, start_angle, end_angle):
+        self.center_point = center_point
+        self.radius       = radius
+        self.start_angle  = start_angle
+        self.end_angle    = end_angle
+
+    def generate_segments(self, dx, dy):
+        self.segment_list = []
+
+        normal_x = 1.0
+        normal_y = 0.0
+        normal_z = 0.0
+        
+        segment_temp = Segment()
+        segment_temp.start_point = Point(i * dx, j * dy)
+        segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
+        segment_temp.grid_point  = Point(i, j)
+        segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+        segment_temp.cal_length()
+        self.segment_list.append(segment_temp)
+
+        return self.segment_list
+
+
 # determine if two straight lines cross
 # ref: https://www.cnblogs.com/wuwangchuxin0924/p/6218494.html
 def  is_cross(line0, line1):

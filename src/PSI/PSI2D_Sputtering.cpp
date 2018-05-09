@@ -80,6 +80,7 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
     double pSput;
     int iDim;
     bool has_find;
+    bool is_in_wall;
     int iLine_cross, iSegment_cross;
     Species   *s1, *s2;
     Particles *p1, *p2;
@@ -97,7 +98,7 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
     int nPart = p1->size();
     for(unsigned int iPart = 0; iPart < nPart; iPart++)
     {
-        has_find = diag2D->find_cross_segment(grid2D, p1, iPart, iLine_cross, iSegment_cross);
+        has_find = diag2D->find_cross_segment(grid2D, p1, iPart, iLine_cross, iSegment_cross, is_in_wall);
         
         momentum[0] = p1->momentum(0,iPart);
         momentum[1] = p1->momentum(1,iPart);

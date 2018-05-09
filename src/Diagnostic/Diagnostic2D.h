@@ -23,7 +23,7 @@ public :
     virtual void run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime );
 
     // find the segment which particle cross
-    bool find_cross_segment(Grid2D* grid2D, Particles *particles, int iPart, int& iLine_cross, int& iSegment_cross);
+    bool find_cross_segment(Grid2D* grid2D, Particles *particles, int iPart, int& iLine_cross, int& iSegment_cross, bool& is_in_wall);
     
     // determine if a particle crosses a segment
     bool is_cross(double start_point[], double end_point[], double pos_new[], double pos_old[]);
