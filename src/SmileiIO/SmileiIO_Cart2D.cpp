@@ -433,21 +433,21 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
 
     // =============write grid============================================
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
-    grid_dataset_name = "isWall";
+    grid_dataset_name = "is_wall";
     grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->iswall_global_);
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
-    grid_dataset_name = "bndr";
+    grid_dataset_name = "bndr_type";
     grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_INT, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndr_global_);
     grid_status = H5Sclose(grid_dataspace_id);
     grid_status = H5Dclose(grid_dataset_id);
 
     grid_dataspace_id = H5Screate_simple(grid_ndim, grid_dims_global, NULL);
-    grid_dataset_name = "bndrVal";
+    grid_dataset_name = "bndr_val";
     grid_dataset_id = H5Dcreate2(grid_file_id, grid_dataset_name.c_str(), H5T_NATIVE_DOUBLE, grid_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     grid_status = H5Dwrite(grid_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndrVal_global_);
     grid_status = H5Sclose(grid_dataspace_id);

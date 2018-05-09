@@ -1,4 +1,6 @@
 from template import *
+import math
+from scipy import constants as const
 
 class Point:
     def __init__(self, x, y):
@@ -16,7 +18,8 @@ class Segment:
         self.start_point = None
         self.end_point = None
         self.length = None
-        self.grid_point = None
+        self.grid_point0 = None
+        self.grid_point1 = None
         self.normal = None
 
     def cal_length(self):
@@ -48,7 +51,8 @@ class Straight_line:
                 segment_temp = Segment()
                 segment_temp.start_point = Point(i * dx, j * dy)
                 segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
-                segment_temp.grid_point  = Point(i, j)
+                segment_temp.grid_point0  = Point(i, j)
+                segment_temp.grid_point1  = Point(i, j)
                 segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
                 segment_temp.cal_length()
                 self.segment_list.append(segment_temp)
@@ -116,20 +120,174 @@ class Arc_line:
         self.start_angle  = start_angle
         self.end_angle    = end_angle
 
+    def generate_segments_for_circle(self, dx, dy):
+        self.segment_list_for_circle = []
+        self.angle0_list = []
+        self.angle1_list = []
+
+        # generate segment_list_for_circle
+
+        # 0 ~ 0.25pi
+        y0 = self.center_point.y
+        y1 = self.center_point.y + self.radius * math.sin(0.25 * const.pi)
+        j0 = int(y0 / dy)
+        j1 = int(y1 / dy)
+        
+        for j in np.arange(j0, j1 + 1):
+            y0_temp = j * dy
+            y1_temp = (j + 1) * dy
+            alpha0 = math.asin((y0_temp - self.center_point.y) / self.radius)
+            alpha1 = math.asin((y1_temp - self.center_point.y) / self.radius)
+            x0_temp = self.center_point.x + self.radius * math.cos(alpha0)
+            x1_temp = self.center_point.x + self.radius * math.cos(alpha1)
+            i0_temp = int(x0_temp / dx)
+            i1_temp = int(x1_temp / dx)
+            normal_x = 1.0
+            normal_y = 0.0
+            normal_z = 0.0
+
+            segment_temp = Segment()
+            segment_temp.start_point = Point(x0_temp, y0_temp)
+            segment_temp.end_point   = Point(x1_temp, y1_temp)
+            segment_temp.grid_point0  = Point(min(i0_temp, i1_temp), j)
+            segment_temp.grid_point1  = Point(max(i0_temp, i1_temp), j)
+            segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+            segment_temp.cal_length()
+            self.segment_list_for_circle.append(segment_temp)
+            self.angle0_list.append(alpha0)
+            self.angle1_list.append(alpha1)
+
+        # 0.25pi ~ 0.75pi
+        x0 = self.center_point.x + self.radius * math.cos(0.25 * const.pi)
+        x1 = self.center_point.x + self.radius * math.cos(0.75 * const.pi)
+        i0 = int(x0 / dx)
+        i1 = int(x1 / dx)
+        
+        for i in np.arange(i0, i1 - 1, -1):
+            x0_temp = i * dx
+            x1_temp = (i - 1) * dx
+            alpha0 = math.acos((x0_temp - self.center_point.x) / self.radius)
+            alpha1 = math.acos((x1_temp - self.center_point.x) / self.radius)
+            y0_temp = self.center_point.y + self.radius * math.sin(alpha0)
+            y1_temp = self.center_point.y + self.radius * math.sin(alpha1)
+            j0_temp = int(y0_temp / dy)
+            j1_temp = int(y1_temp / dy)
+            normal_x = 1.0
+            normal_y = 0.0
+            normal_z = 0.0
+            
+            segment_temp = Segment()
+            segment_temp.start_point = Point(x0_temp, y0_temp)
+            segment_temp.end_point   = Point(x1_temp, y1_temp)
+            segment_temp.grid_point0  = Point(i, min(j0_temp, j1_temp))
+            segment_temp.grid_point1  = Point(i, max((j0_temp, j1_temp)))
+            segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+            segment_temp.cal_length()
+            self.segment_list_for_circle.append(segment_temp)
+            self.angle0_list.append(alpha0)
+            self.angle1_list.append(alpha1)
+
+        # 0.75pi ~ 1.25pi
+        y0 = self.center_point.y
+        y1 = self.center_point.y + self.radius * math.sin(1.25 * const.pi)
+        j0 = int(y0 / dy)
+        j1 = int(y1 / dy)
+        
+        for j in np.arange(j0, j1 - 1, -1):
+            y0_temp = j * dy
+            y1_temp = (j - 1) * dy
+            alpha0 = const.pi - math.asin((y0_temp - self.center_point.y) / self.radius)
+            alpha1 = const.pi - math.asin((y1_temp - self.center_point.y) / self.radius)
+            x0_temp = self.center_point.x + self.radius * math.cos(alpha0)
+            x1_temp = self.center_point.x + self.radius * math.cos(alpha1)
+            i0_temp = int(x0_temp / dx)
+            i1_temp = int(x1_temp / dx)
+            normal_x = 1.0
+            normal_y = 0.0
+            normal_z = 0.0
+
+            segment_temp = Segment()
+            segment_temp.start_point = Point(x0_temp, y0_temp)
+            segment_temp.end_point   = Point(x1_temp, y1_temp)
+            segment_temp.grid_point0  = Point(i0_temp, j)
+            segment_temp.grid_point1  = Point(i1_temp, j)
+            segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+            segment_temp.cal_length()
+            self.segment_list_for_circle.append(segment_temp)
+            self.angle0_list.append(alpha0)
+            self.angle1_list.append(alpha1)
+
+        # 1.25pi ~ 1.75pi
+        x0 = self.center_point.x + self.radius * math.cos(1.25 * const.pi)
+        x1 = self.center_point.x + self.radius * math.cos(1.75 * const.pi)
+        i0 = int(x0 / dx)
+        i1 = int(x1 / dx)
+        
+        for i in np.arange(i0, i1 + 1):
+            x0_temp = i * dx
+            x1_temp = (i + 1) * dx
+            alpha0 = 2.0 * const.pi - math.acos((x0_temp - self.center_point.x) / self.radius)
+            alpha1 = 2.0 * const.pi - math.acos((x1_temp - self.center_point.x) / self.radius)
+            y0_temp = self.center_point.y + self.radius * math.sin(alpha0)
+            y1_temp = self.center_point.y + self.radius * math.sin(alpha1)
+            j0_temp = int(y0_temp / dy)
+            j1_temp = int(y1_temp / dy)
+            normal_x = 1.0
+            normal_y = 0.0
+            normal_z = 0.0
+            
+            segment_temp = Segment()
+            segment_temp.start_point = Point(x0_temp, y0_temp)
+            segment_temp.end_point   = Point(x1_temp, y1_temp)
+            segment_temp.grid_point0  = Point(i, min(j0_temp, j1_temp))
+            segment_temp.grid_point1  = Point(i, max(j0_temp, j1_temp))
+            segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+            segment_temp.cal_length()
+            self.segment_list_for_circle.append(segment_temp)
+            self.angle0_list.append(alpha0)
+            self.angle1_list.append(alpha1)
+
+        # 1.75 ~ 2.0pi
+        y0 = self.center_point.y + self.radius * math.sin(1.75 * const.pi)
+        y1 = self.center_point.y + self.radius * math.sin(2.0  * const.pi)
+        j0 = int(y0 / dy)
+        j1 = int(y1 / dy)
+        
+        for j in np.arange(j0, j1 + 1):
+            y0_temp = j * dy
+            y1_temp = (j + 1) * dy
+            alpha0 = 2.0 * const.pi + math.asin((y0_temp - self.center_point.y) / self.radius)
+            alpha1 = 2.0 * const.pi + math.asin((y1_temp - self.center_point.y) / self.radius)
+            x0_temp = self.center_point.x + self.radius * math.cos(alpha0)
+            x1_temp = self.center_point.x + self.radius * math.cos(alpha1)
+            i0_temp = int(x0_temp / dx)
+            i1_temp = int(x1_temp / dx)
+            normal_x = 1.0
+            normal_y = 0.0
+            normal_z = 0.0
+
+            segment_temp = Segment()
+            segment_temp.start_point = Point(x0_temp, y0_temp)
+            segment_temp.end_point   = Point(x1_temp, y1_temp)
+            segment_temp.grid_point0  = Point(min(i0_temp, i1_temp), j)
+            segment_temp.grid_point1  = Point(max(i0_temp, i1_temp), j)
+            segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+            segment_temp.cal_length()
+            self.segment_list_for_circle.append(segment_temp)
+            self.angle0_list.append(alpha0)
+            self.angle1_list.append(alpha1)
+
     def generate_segments(self, dx, dy):
         self.segment_list = []
-
-        normal_x = 1.0
-        normal_y = 0.0
-        normal_z = 0.0
-        
-        segment_temp = Segment()
-        segment_temp.start_point = Point(i * dx, j * dy)
-        segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
-        segment_temp.grid_point  = Point(i, j)
-        segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
-        segment_temp.cal_length()
-        self.segment_list.append(segment_temp)
+        i_begin = 0
+        i_end   = 0
+        for i in np.arange(0,len(self.segment_list_for_circle)):
+            if self.start_angle >= self.angle0_list[i] and self.start_angle <= self.angle1_list[i]:
+                i_begin = i
+            if self.end_angle >= self.angle0_list[i] and self.end_angle <= self.angle1_list[i]:
+                i_end   = i
+        for i in np.arange(i_begin, i_end+1):
+            self.segment_list.append(self.segment_list_for_circle[i])
 
         return self.segment_list
 
@@ -179,9 +337,9 @@ class Grid2D:
     def __init__(self, dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list):
         self.dx = dx
         self.dy = dy
-        self.is_wall = is_wall
-        self.bndr_type = bndr_type
-        self.bndr_val = bndr_val
+        self.is_wall = is_wall[np.newaxis,:,:]
+        self.bndr_type = bndr_type[np.newaxis,:,:]
+        self.bndr_val = bndr_val[np.newaxis,:,:]
         self.n_segments = n_segments
         self.segment_list = segment_list
 
@@ -206,7 +364,7 @@ class Grid2D:
             self.grid_point1[i,0] = self.segment_list[i].grid_point1.x
             self.grid_point1[i,1] = self.segment_list[i].grid_point1.y
         
-        f = h5.File('grid.h5', 'w')
+        f = h5.File('data/grid.h5', 'w')
         f['is_wall']     = self.is_wall
         f['bndr_type']   = self.bndr_type
         f['bndr_val']    = self.bndr_val
@@ -234,8 +392,8 @@ if __name__ == "__main__":
     ny_source = 20
     ny_base = 3
 
-    ny_wall_boundary = 150
-    ny_wall_max = 200
+    ny_wall_boundary = 200 + ny_base
+    ny_wall_max = ny - ny_source - 5
 
     wall_potential = 60.0
 
@@ -243,8 +401,8 @@ if __name__ == "__main__":
 
     point0 = Point(0.0,     ny_base*dy)
     point1 = Point(200*dx,  ny_base*dy)
-    point2 = Point(0.0,     (ny_base+200)*dy)
-    point3 = Point(200*dx,  (ny_base+200)*dy)
+    point2 = Point(200*dx,  (ny_base+200)*dy)
+    point3 = Point(0.0,     (ny_base+200)*dy)
 
     line0 = Straight_line(point0, point1)
     line1 = Straight_line(point1, point2)
@@ -289,7 +447,7 @@ if __name__ == "__main__":
     is_wall[:,0] = 1
     is_wall[:,ny] = 1
 
-    is_wall[:, 0:ny_base] = 1
+    is_wall[:, 0:ny_base+1] = 1
     
     for i in np.arange(0, nx+1):
         for j in np.arange(0, ny+1):
@@ -321,6 +479,7 @@ if __name__ == "__main__":
         for j in np.arange(1, ny_wall_max):
             if is_wall[i,j] == 1 and (is_wall[i-1, j] == 0 or is_wall[i+1, j] == 0 or is_wall[i, j-1] == 0 or is_wall[i, j+1] == 0):
                 bndr_type[i,j] = 1
+            if is_wall[i,j] == 1:
                 bndr_val [i,j] = wall_potential
     
     # ============================= boundary lines ========================
@@ -342,7 +501,7 @@ if __name__ == "__main__":
     segment_list = []
     n_segments = []
     for bndr_line_temp in bndr_line_list:
-        segment_list_temp = bndr_line_temp.generate_segments()
+        segment_list_temp = bndr_line_temp.generate_segments(dx, dy)
         n_segments.append(len(segment_list_temp))
         for segment_temp in segment_list_temp:
             segment_list.append(segment_temp)

@@ -145,7 +145,7 @@ class PlotWidget(QWidget):
         # data4d has four dimensions, the first is time
         try:
             self.prefix = 'grid'
-            self.data4d = collect("isWall", prefix = self.prefix)
+            self.data4d = collect("is_wall", prefix = self.prefix)
             self.dataName = "geometry"
         except:
             self.prefix = 'data'
