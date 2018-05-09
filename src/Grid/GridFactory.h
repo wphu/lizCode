@@ -67,8 +67,13 @@ public:
                 potential_wall = 0.0;
     	        ifile.extract("potential_wall",potential_wall,"Grid",n_Grid);
 
-                grid = new Grid2D(params, gridType, gapKind, ny_source, ny_gapHeight, nx_gapWeight, ny_bevel_depth, potential_wall);
-    	    }
+                grid = new Grid2D(params, smpi, gridType, gapKind, ny_source, ny_gapHeight, nx_gapWeight, ny_bevel_depth, potential_wall);
+    	        if(grid->gridType == "from_file")
+                {
+                    smpi->readGrid(grid)
+                }
+                grid->compute();
+            }
             smpi->scatterGrid(grid);
         }
         else {

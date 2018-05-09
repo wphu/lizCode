@@ -23,6 +23,7 @@ Grid2D::Grid2D() : Grid()
 // with the dimensions as input argument
 Grid2D::Grid2D(
     PicParams &params,
+    SmileiMPI *smpi,
     string grid_type,
     string gap_kind,
     int ny_source_temp,
@@ -58,13 +59,6 @@ Grid2D::Grid2D(
     nx=globalDims_[0];
     ny=globalDims_[1];
 
-    normal_x = new Field2D(dims_, "normal_x");
-    normal_y = new Field2D(dims_, "normal_y");
-    normal_z = new Field2D(dims_, "normal_z");
-    normal_x_global = new Field2D(globalDims_, "normal_x_global");
-    normal_y_global = new Field2D(globalDims_, "normal_y_global");
-    normal_z_global = new Field2D(globalDims_, "normal_z_global");
-
     allocateDims();
     if(gridType == "rectangle")
     {
@@ -78,15 +72,10 @@ Grid2D::Grid2D(
     {
         geometry_iter_gap();
     }
-    computeNcp();
-
-    n_line = lines.size();
-    n_segments.resize(n_line);
-    n_segment_total = 0;
-    for(int iLine = 0; iLine < n_line; iLine++)
+    else if(gridType == "from_file")
     {
-        n_segments[iLine] = lines[iLine].size();
-        n_segment_total += n_segments[iLine];
+        SmileiMPI_Cart2D *smpi2D = static_cast<SmileiMPI_Cart2D*>(smpi);
+        smpi2D->readGrid();
     }
 }
 
@@ -99,6 +88,19 @@ Grid2D::~Grid2D()
 
 }
 
+void Grid2D::compute()
+{
+    computeNcp();
+
+    n_line = lines.size();
+    n_segments.resize(n_line);
+    n_segment_total = 0;
+    for(int iLine = 0; iLine < n_line; iLine++)
+    {
+        n_segments[iLine] = lines[iLine].size();
+        n_segment_total += n_segments[iLine];
+    }
+}
 
 void Grid2D::allocateDims( )
 {

@@ -40,6 +40,9 @@ public:
 
     // write grid to grid.h5 file
     virtual void writeGrid(Grid* grid);
+
+    // read grid from grid.h5 file
+    virtual void readGrid(Grid* grid);
 private:
 
 

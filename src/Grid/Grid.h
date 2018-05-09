@@ -38,6 +38,7 @@ public:
     virtual void allocateDims(){};
     virtual void geometry(){};
     virtual void computeNcp(){};
+    virtual void compute();
 
     //! vector containing the dimensions of the Grid
     //! \todo private/friend/modify SmileiMPI* (JD)
@@ -56,14 +57,6 @@ public:
     int* iswall_global_;
     int* bndr_global_;
     double* bndrVal_global_;
-
-    Field* normal_x;      // x component of the surface normal
-    Field* normal_y;      // y component of the surface normal 
-    Field* normal_z;      // z component of the surface normal 
-
-    Field* normal_x_global;
-    Field* normal_y_global;
-    Field* normal_z_global;
 
     //! The number of the current point in the discrete Poisson Eqution left coefficient matrix
     int* numcp_global_;

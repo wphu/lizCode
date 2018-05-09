@@ -22,6 +22,7 @@ public:
     // Constructor for Grid2D: with the vector dimension as input argument
     Grid2D(
         PicParams &params,
+        SmileiMPI *smpi,
         string grid_type,
         string gap_kind,
         int ny_source_temp,
@@ -39,6 +40,7 @@ public:
     void geometry_gap();
     void geometry_iter_gap();
     void computeNcp();
+    void compute();
 
     int **iswall_2D;
   	int **iswall_global_2D;

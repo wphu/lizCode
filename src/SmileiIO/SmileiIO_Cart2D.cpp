@@ -629,5 +629,211 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
 
     grid_status = H5Fclose(grid_file_id);
 
+    delete[] n_segments;
+    delete[] start_point;
+    delete[] end_point;
+    delete[] length;
+    delete[] grid_point0;
+    delete[] grid_point1;
+    delete[] normal;
 
+}
+
+
+void readGrid(Grid* grid)
+{
+    hid_t       grid_dataspace_id;
+    hid_t       grid_dataset_id;
+    herr_t      grid_status;
+    string      grid_dataset_name;
+
+    hsize_t     count[3];              /* size of subset in the file */
+    hsize_t     offset[3];             /* subset offset in the file */
+    hsize_t     stride[3];
+    hsize_t     block[3];
+
+
+    int grid_ndim = 3;
+    hsize_t grid_dims_global[3];
+
+    Grid2D* grid2D = static_cast<Grid2D*>(grid);
+    grid_file_name  = "data/grid.h5";
+    grid_file_id    = H5Fopen( grid_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+    grid_dims_global[0] = 1;
+    grid_dims_global[1] = grid2D->globalDims_[0];
+    grid_dims_global[2] = grid2D->globalDims_[1];
+
+
+    // =============read grid============================================
+    grid_dataset_name = "is_wall";
+    grid_dataset_id = H5Dopen2(grid_file_id, grid_dataset_name.c_str(), H5P_DEFAULT);
+    grid_status = H5Dread(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->iswall_global_);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataset_name = "bndr_type";
+    grid_dataset_id = H5Dopen2(grid_file_id, grid_dataset_name.c_str(), H5P_DEFAULT);    
+    grid_status = H5Dread(grid_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndr_global_);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    grid_dataset_name = "bndr_val";
+    grid_dataset_id = H5Dopen2(grid_file_id, grid_dataset_name.c_str(), H5P_DEFAULT);        
+    grid_status = H5Dread(grid_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid2D->bndrVal_global_);
+    grid_status = H5Dclose(grid_dataset_id);
+
+    /*
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0; iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            cout<<grid2D->lines[iLine][iSegment].grid_point[0]<<" "<<grid2D->lines[iLine][iSegment].grid_point[1]<<endl;
+            cout<<grid2D->lines[iLine][iSegment].start_point[0]<<" "<<grid2D->lines[iLine][iSegment].start_point[1]<<endl;
+            cout<<grid2D->lines[iLine][iSegment].end_point[0]<<" "<<grid2D->lines[iLine][iSegment].end_point[1]<<endl;
+        }
+        cout<<endl;
+        cout<<"================================"<<endl;
+    }
+    */
+
+    // ===================== read boundary lines ======================================
+    hid_t segment_type, memtype, point_type, grid_point_type, normal_type;
+    hid_t segment_dataspace_id, segment_dataset_id;
+    int ndim_segment;
+    hsize_t dim1d_segment[1];
+    hsize_t dim2d_segment[2];
+
+    // read n_segments
+    segment_dataset_id = H5Dopen2(grid_file_id, "n_segments", H5P_DEFAULT);
+    segment_dataspace_id = H5Dget_space(segment_dataset_id);
+    H5Sget_simple_extent_dims(segment_dataspace_id, dim1d_segment, NULL);
+    grid2D->n_line = dim1d_segment[0];
+
+    int *n_segments = new int[grid2D->n_line];
+    H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, n_segments);
+    grid2D->n_segments.resize(grid2D->n_line);
+    grid2D->n_segment_total = 0;
+    for(int i = 0; i < grid2D->n_line; i++)
+    {
+        grid2D->n_segments[i] = n_segments[i];
+        grid2D->n_segment_total += n_segments[i];
+    }
+    H5Sclose(segment_dataspace_id);
+    H5Dclose(segment_dataset_id);
+
+    grid2D->lines.resize(grid2D->n_line);
+    for(int iLine = 0; iLine < grid2D->n_line; iLine++)
+    {
+        grid2D->lines[iLine].resize(grid2D->n_segments[iLine]);
+    }
+
+    // read start_point
+    double *start_point = new double[grid2D->n_segment_total * 2];
+    segment_dataset_id = H5Dcreate2(grid_file_id, "start_point", H5P_DEFAULT);
+    H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, start_point);
+    H5Dclose(segment_dataset_id);
+
+    int ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid2D->lines[iLine][iSegment].start_point[0] = start_point[ii * 2];
+            grid2D->lines[iLine][iSegment].start_point[1] = start_point[ii * 2 + 1];
+            ii++;
+        }
+    }
+
+    // read end_point
+    double *end_point = new double[grid2D->n_segment_total * 2];
+    segment_dataset_id = H5Dcreate2(grid_file_id, "end_point", H5P_DEFAULT);
+    H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, end_point);
+    H5Dclose(segment_dataset_id);
+
+    int ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid2D->lines[iLine][iSegment].end_point[0] = end_point[ii * 2];
+            grid2D->lines[iLine][iSegment].end_point[1] = end_point[ii * 2 + 1];
+            ii++;
+        }
+    }
+
+    // read length
+    double *length = new double[grid2D->n_segment_total];
+    segment_dataset_id = H5Dcreate2(grid_file_id, "length", H5P_DEFAULT);
+    H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, length);
+    H5Dclose(segment_dataset_id);
+
+    int ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid2D->lines[iLine][iSegment].length = length[ii];
+            ii++;
+        }
+    }
+
+    // read grid_point0
+    double *grid_point0 = new int[grid2D->n_segment_total * 2];
+    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point0", H5P_DEFAULT);
+    H5Dread(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point0);
+    H5Dclose(segment_dataset_id);
+
+    int ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid2D->lines[iLine][iSegment].grid_point0[0] = grid_point0[ii * 2];
+            grid2D->lines[iLine][iSegment].grid_point0[1] = grid_point0[ii * 2 + 1];
+            ii++;
+        }
+    }
+
+    // read grid_point1
+    double *grid_point1 = new int[grid2D->n_segment_total * 2];
+    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point1", H5P_DEFAULT);
+    H5Dread(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point1);
+    H5Dclose(segment_dataset_id);
+
+    int ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid2D->lines[iLine][iSegment].grid_point1[0] = grid_point1[ii * 2];
+            grid2D->lines[iLine][iSegment].grid_point1[1] = grid_point1[ii * 2 + 1];
+            ii++;
+        }
+    }
+
+    // read normal
+    double *normal = new double[grid2D->n_segment_total * 3];
+    segment_dataset_id = H5Dcreate2(grid_file_id, "normal", H5P_DEFAULT);
+    H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, normal);
+    H5Dclose(segment_dataset_id);
+
+    int ii = 0;
+    for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
+    {
+        for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
+        {
+            grid2D->lines[iLine][iSegment].normal[0] = normal[ii * 3];
+            grid2D->lines[iLine][iSegment].normal[1] = normal[ii * 3 + 1];
+            grid2D->lines[iLine][iSegment].normal[2] = normal[ii * 3 + 2];
+            ii++;
+        }
+    }
+    grid_status = H5Fclose(grid_file_id);
+
+    delete[] n_segments;
+    delete[] start_point;
+    delete[] end_point;
+    delete[] length;
+    delete[] grid_point0;
+    delete[] grid_point1;
+    delete[] normal;
 }
