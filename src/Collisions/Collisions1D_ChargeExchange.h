@@ -26,7 +26,7 @@ public:
     double cross_section(double ke);
 
     //! Method called in the main smilei loop to apply collisions at each timestep
-    void collide(PicParams&, SmileiMPI* smpi, ElectroMagn* fields, std::vector<Species*>&,int);
+    void collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime);
 
     // get the maximum value of crossSection*velocity
     double maxCV(Species* s1, Species* s2);

@@ -137,11 +137,6 @@ int main (int argc, char* argv[])
     vector<PSI*> vecPSI = PSIFactory::create(params, input_data, vecSpecies, smpi);
     smpi->barrier();
 
-    TITLE("Creating Diagnostic");
-    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI);
-    smpi->barrier();
-
-
     TITLE("Creating Solver");
     Solver* solver = SolverFactory::create(params, input_data, grid, smpi);
 
@@ -157,6 +152,9 @@ int main (int argc, char* argv[])
     vector<Collisions*> vecCollisions = CollisionsFactory::create(params, input_data, vecSpecies, smpi);
     smpi->barrier();
 
+    TITLE("Creating Diagnostic");
+    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
+    smpi->barrier();
 
     TITLE("Creating Interp/Proj");
     // interpolation operator (virtual)

@@ -101,7 +101,7 @@ Collisions1D_DSMC::~Collisions1D_DSMC()
 // Calculates the collisions for a given Collisions1D object
 // Now only support 3 groups, each grous has the approximate mass
 // like [H, D, T] or [S, Cl, Ar]
-void Collisions1D_DSMC::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime)
+void Collisions1D_DSMC::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     if( (itime % params.timesteps_DSMC) == 0 )
     {

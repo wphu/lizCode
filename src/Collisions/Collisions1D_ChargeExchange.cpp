@@ -49,7 +49,7 @@ Collisions1D_ChargeExchange::~Collisions1D_ChargeExchange()
 
 
 // Calculates the collisions for a given Collisions1D object
-void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime)
+void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     unsigned int nbins = vecSpecies[0]->bmin.size(); // number of bins
     vector<unsigned int> *sg1, *sg2;
@@ -73,6 +73,10 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
             ran, P_collision;
     double atomic_mass;
 
+    int iBin_global;
+    double ke_radiative;
+
+    Diagnostic1D *diag1D = static_cast<Diagnostic1D*>(diag);
 
     sg1 = &species_group1;
     sg2 = &species_group2;
@@ -137,11 +141,9 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
         }
         random_shuffle(index2.begin(), index2.end());
 
-
         // Now start the real loop
         // See equations in http://dx.doi.org/10.1063/1.4742167
         // ----------------------------------------------------
-
 
         npairs_double = n1[ibin] * (1 - exp(-density2[ibin] * sigma_cr_max * timesteps_collision * timestep * collision_zoom_factor) );
         npairs = npairs_double;
@@ -170,14 +172,15 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
             i1 = index1[i];
             i2 = index2[i];
 
-            v_square = ( p1->momentum(0,i1) - p2->momentum(0,i2) ) * ( p1->momentum(0,i1) - p2->momentum(0,i2) ) +
-                       ( p1->momentum(1,i1) - p2->momentum(1,i2) ) * ( p1->momentum(1,i1) - p2->momentum(1,i2) ) +
-                       ( p1->momentum(2,i1) - p2->momentum(2,i2) ) * ( p1->momentum(2,i1) - p2->momentum(2,i2) );
+            v_square = (p1->momentum(0,i1) - p2->momentum(0,i2) ) * ( p1->momentum(0,i1) - p2->momentum(0,i2) ) +
+                       (p1->momentum(1,i1) - p2->momentum(1,i2) ) * ( p1->momentum(1,i1) - p2->momentum(1,i2) ) +
+                       (p1->momentum(2,i1) - p2->momentum(2,i2) ) * ( p1->momentum(2,i1) - p2->momentum(2,i2) );
             v_magnitude = sqrt(v_square);
-            //>kinetic energy of species1 (electrons)
-            ke1 = 0.5 * m1 * v_square / atomic_mass;
+            //>kinetic energy of species1 (ion)
+            ke_primary = 0.5 * m1 * v_square / const_e;
+            ke1 =  ke_primary / atomic_mass;
 
-            sigma_cr = v_magnitude * interpCrossSection( ke1 / const_e );
+            sigma_cr = v_magnitude * interpCrossSection(ke1);
             P_collision = sigma_cr / sigma_cr_max;
             // Generate a random number between 0 and 1
             double ran_p = (double)rand() / RAND_MAX;
@@ -203,7 +206,16 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
 
                 totNCollision++;
 
-            }
+                v_square = (p1->momentum(0,i1) - p2->momentum(0,i2) ) * ( p1->momentum(0,i1) - p2->momentum(0,i2) ) +
+                           (p1->momentum(1,i1) - p2->momentum(1,i2) ) * ( p1->momentum(1,i1) - p2->momentum(1,i2) ) +
+                           (p1->momentum(2,i1) - p2->momentum(2,i2) ) * ( p1->momentum(2,i1) - p2->momentum(2,i2) );
+                v_magnitude = sqrt(v_square);
+                //>kinetic energy of new species1 (ion)
+                ke_secondary = 0.5 * m1 * v_square / const_e;
+                ke_radiative = ke_primary - ke_secondary;
+                iBin_global = smpi->getDomainLocalMin(0) / params.cell_length[0] + ibin;
+                diag1D->radiative_energy_collision[n_collisions][iBin_global] += ke_radiative;
+            } // end if
         }
 
 

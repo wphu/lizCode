@@ -13,10 +13,10 @@
 class DiagnosticFactory {
 public:
 
-    static Diagnostic* create(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI) {
+    static Diagnostic* create(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI, vector<Collisions*> &vecCollisions) {
         Diagnostic* diag = NULL;
         if ( params.geometry == "1d3v" ) {
-            diag = new Diagnostic1D(params, smpi, EMfields);
+            diag = new Diagnostic1D(params, smpi, EMfields, vecCollisions);
         }
         else if ( params.geometry == "2d3v" ) {
             diag = new Diagnostic2D(params, smpi, grid, EMfields, vecPSI);

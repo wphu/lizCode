@@ -57,7 +57,7 @@ Collisions1D_Coulomb::~Collisions1D_Coulomb()
 }
 
 
-void Collisions1D_Coulomb::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime)
+void Collisions1D_Coulomb::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     unsigned int i1, i2, iS1, iS2;
     Species   *s1, *s2;

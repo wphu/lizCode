@@ -31,9 +31,6 @@ Collisions1D_Ionization::Collisions1D_Ionization(PicParams& params, vector<Speci
     nbins = vecSpecies[0]->bmin.size();
     totbins = nbins;
 
-    //MPI_Allreduce( smpi->isMaster()?MPI_IN_PLACE:&totbins, &totbins, 1, MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD);
-    //MPI_Reduce( smpi->isMaster()?MPI_IN_PLACE:&totbins, &totbins, 1, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD);
-
     readCrossSection();
     energy_ionization_threshold = crossSection[0][0];
 
@@ -46,7 +43,7 @@ Collisions1D_Ionization::~Collisions1D_Ionization()
 
 
 // Calculates the collisions for a given Collisions1D object
-void Collisions1D_Ionization::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime)
+void Collisions1D_Ionization::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     vector<unsigned int> *sg1, *sg2, *sg3;
 
@@ -69,6 +66,10 @@ void Collisions1D_Ionization::collide(PicParams& params, SmileiMPI* smpi, Electr
             ran, P_collision;
     double  v_square, v_magnitude, v_magnitude_primary, v_magnitude_secondary;
 
+    int iBin_global;
+    double ke_radiative;
+
+    Diagnostic1D *diag1D = static_cast<Diagnostic1D*>(diag);
 
     sg1 = &species_group1;
     sg2 = &species_group2;
@@ -180,7 +181,7 @@ void Collisions1D_Ionization::collide(PicParams& params, SmileiMPI* smpi, Electr
 
             v_square = pow(p1->momentum(0,i1),2) + pow(p1->momentum(1,i1),2) + pow(p1->momentum(2,i1),2);
             v_magnitude = sqrt(v_square);
-            //>kinetic energy of species1 (electrons)
+            //>kinetic energy of species1 (incident electrons)
             ke1 = 0.5 * m1 * v_square;
             ke_primary = ke1 - energy_ionization_threshold * const_e;
 
@@ -238,8 +239,6 @@ void Collisions1D_Ionization::collide(PicParams& params, SmileiMPI* smpi, Electr
                     }
                 );
 
-
-
                 p2->cp_particle(i2, new_particles3);
                 //>create the ionized ion (species3)
                 idNew = new_particles3.size() - 1;
@@ -248,7 +247,10 @@ void Collisions1D_Ionization::collide(PicParams& params, SmileiMPI* smpi, Electr
 
                 indexes_of_particles_to_erase_s2.push_back(i2);
                 totNCollision++;
-            }
+
+                iBin_global = smpi->getDomainLocalMin(0) / params.cell_length[0] + ibin;
+                diag1D->radiative_energy_collision[n_collisions][iBin_global] += energy_ionization_threshold;
+            } // end if
         }
 
     } // end loop on bins

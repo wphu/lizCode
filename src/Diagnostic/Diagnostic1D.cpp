@@ -2,12 +2,13 @@
 #include "Species.h"
 #include "SmileiMPI_Cart1D.h"
 #include "ElectroMagn.h"
+#include "Collisions.h"
 #include <iomanip>
 #include <fstream>
 
 using namespace std;
 
-Diagnostic1D::Diagnostic1D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields) :
+Diagnostic1D::Diagnostic1D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields, vector<Collisions*> &vecCollisions) :
 Diagnostic(params)
 {
 	SmileiMPI_Cart1D* smpi1D = static_cast<SmileiMPI_Cart1D*>(smpi);
@@ -31,6 +32,15 @@ Diagnostic(params)
 		}
 	}
 	ptclNum1D = new Field1D(EMfields->dimPrim, "ptclNum");
+
+	n_collision = vecCollisions.size();
+	radiative_energy_collision.resize(n_collision);
+	radiative_energy_collision_global.resize(n_collision);
+	for(int iCollision = 0; iCollision < n_collision; iCollision++)
+	{
+		radiative_energy_collision[iCollision].resize(n_space_global[0]);
+		radiative_energy_collision_global[iCollision].resize(n_space_global[0]);
+	}
 }
 
 Diagnostic1D::~Diagnostic1D()
@@ -54,7 +64,8 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 	angle_temp.resize(90);
 
 	// reset diagnostic parameters to zero
-	if( ((itime - 1) % step_dump) == 0 ) {
+	if( ((itime - 1) % step_dump) == 0 ) 
+	{
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{
 			for(int iDirection = 0; iDirection < 2; iDirection++)
@@ -66,6 +77,15 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 					angleDist[ispec][iDirection][iA] = 0.0;
 				}
 			}
+		}
+
+		for(int iCollision = 0; iCollision < n_collision; iCollision++)
+		{
+			for(int iBin = 0; iBin < radiative_energy_collision_global[iCollision].size(); iBin++)
+			{
+				radiative_energy_collision[iCollision][iBin] = 0.0;
+			}
+			
 		}
 	}
 
@@ -117,7 +137,8 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 
 
 	// MPI gather diagnostic parameters to master
-	if( (itime % step_dump) == 0 ) {
+	if( (itime % step_dump) == 0 ) 
+	{
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{
 			s1 = vecSpecies[ispec];
@@ -138,6 +159,11 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 				MPI_Allreduce( &angleDist[ispec][iDirection][0], &angle_temp[0], 90, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
 				angleDist[ispec][iDirection] = angle_temp;
 			}
+		}
+
+		for(int iCollision = 0; iCollision < n_collision; iCollision++)
+		{
+			smpi->reduce_sum_double(&radiative_energy_collision[iCollision][0], &radiative_energy_collision_global[iCollision][0], radiative_energy_collision[iCollision].size());
 		}
 	}
 

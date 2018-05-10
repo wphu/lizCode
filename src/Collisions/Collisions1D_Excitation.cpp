@@ -44,7 +44,7 @@ Collisions1D_Excitation::~Collisions1D_Excitation()
 
 
 // Calculates the collisions for a given Collisions1D object
-void Collisions1D_Excitation::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime)
+void Collisions1D_Excitation::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     vector<unsigned int> *sg1, *sg2;
 
@@ -67,6 +67,10 @@ void Collisions1D_Excitation::collide(PicParams& params, SmileiMPI* smpi, Electr
             ran, P_collision;
     double  v_square, v_magnitude, v_magnitude_primary, v_magnitude_secondary;
 
+    int iBin_global;
+    double ke_radiative;
+
+    Diagnostic1D *diag1D = static_cast<Diagnostic1D*>(diag);
 
     sg1 = &species_group1;
     sg2 = &species_group2;
@@ -196,7 +200,10 @@ void Collisions1D_Excitation::collide(PicParams& params, SmileiMPI* smpi, Electr
                 p1->momentum(2,i1) = momentum_temp[2];
 
                 totNCollision++;
-            }
+
+                iBin_global = smpi->getDomainLocalMin(0) / params.cell_length[0] + ibin;
+                diag1D->radiative_energy_collision[n_collisions][iBin_global] += energy_excitation_threshold;
+            } // end if
         }
 
 

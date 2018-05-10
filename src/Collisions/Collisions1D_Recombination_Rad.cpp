@@ -12,7 +12,7 @@ using namespace std;
 
 
 // Constructor
-Collisions1D_Recombination_Rad::Collisions1D_Recombination_Rad( PicParams& params, vector<Species*>& vecSpecies, SmileiMPI* smpi,
+Collisions1D_Recombination_Rad::Collisions1D_Recombination_Rad(PicParams& params, vector<Species*>& vecSpecies, SmileiMPI* smpi,
     unsigned int n_col,
     vector<unsigned int> sg1,
     vector<unsigned int> sg2,
@@ -20,8 +20,12 @@ Collisions1D_Recombination_Rad::Collisions1D_Recombination_Rad( PicParams& param
     string CS_fileName)
     : Collisions1D(params)
 {
-
     n_collisions    = n_col;
+
+    // Raction: e + H+ = H + hv
+    // Species1: e
+    // Species2: H+
+    // Species3: H
     species_group1  = sg1;
     species_group2  = sg2;
     species_group3  = sg3;
@@ -30,10 +34,7 @@ Collisions1D_Recombination_Rad::Collisions1D_Recombination_Rad( PicParams& param
     // Calculate total number of bins
     nbins = vecSpecies[0]->bmin.size();
     totbins = nbins;
-
-    //MPI_Allreduce( smpi->isMaster()?MPI_IN_PLACE:&totbins, &totbins, 1, MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Reduce( smpi->isMaster()?MPI_IN_PLACE:&totbins, &totbins, 1, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD);
-
+    
     readCrossSection();
     energy_ionization_threshold = crossSection[0][0];
 
@@ -46,7 +47,7 @@ Collisions1D_Recombination_Rad::~Collisions1D_Recombination_Rad()
 
 
 // Calculates the collisions for a given Collisions1D object
-void Collisions1D_Recombination_Rad::collide( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime)
+void Collisions1D_Recombination_Rad::collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     vector<unsigned int> *sg1, *sg2, *sg3;
 
@@ -64,15 +65,15 @@ void Collisions1D_Recombination_Rad::collide( PicParams& params, SmileiMPI* smpi
     Particles *p1, *p2, *p3;
     double m1, m2, m3, m12, W1, W2, W3;
 
-    double  sigma_cr, sigma_cr_max, ke1, ke_primary, ke_secondary,
+    double  sigma_cr, sigma_cr_max, ke1, ke2, ke_primary, ke_secondary,
             ran, P_collision;
     double  v_square, v_magnitude, v_magnitude_primary, v_magnitude_secondary;
 
+    int iBin_global;
+    double ke_radiative;
 
-    // Raction: e + H+ = H + hv
-    // Species1: e
-    // Species2: H+
-    // Species3: H
+    Diagnostic1D *diag1D = static_cast<Diagnostic1D*>(diag);
+
     sg1 = &species_group1;
     sg2 = &species_group2;
     sg3 = &species_group3;
@@ -137,43 +138,31 @@ void Collisions1D_Recombination_Rad::collide( PicParams& params, SmileiMPI* smpi
         }
         random_shuffle(index2.begin(), index2.end());
 
-        smpi->barrier();
-        //MESSAGE("nbinsaaaa"<<"  "<<ibin<<"  "<<n1[ibin]<<" "<<n2[ibin]);
-        // Now start the real loop
-        // See equations in http://dx.doi.org/10.1063/1.4742167
-        // ----------------------------------------------------
         npairs = n1[ibin] * (1 - exp(-density2[ibin] * sigma_cr_max * timestep) );
-        //if(npairs > index1.size() || npairs > index2.size()) {ERROR("npairs > index in collisions");}
 
-        smpi->barrier();
-        //MESSAGE("nbins111"<<"  "<<ibin<<"  "<<n1[ibin]<<" "<<n2[ibin]);
         for(int i = 0; i < npairs; i++)
         {
-            //MESSAGE("nparis111"<<"  "<<i);
             i1 = index1[i];
             i2 = index2[i];
 
             v_square = pow(p1->momentum(0,i1),2) + pow(p1->momentum(1,i1),2) + pow(p1->momentum(2,i1),2);
             v_magnitude = sqrt(v_square);
-            //>kinetic energy of species1 (electrons)
-            ke1 = 0.5 * m1 * v_square;
-            ke_primary = ke1 - energy_ionization_threshold * const_e;
+            // kinetic energy of species1 (electron)
+            ke1 = 0.5 * m1 * v_square / const_e;
 
-            //> the energy of the secondary electron
-            ran = (double)rand() / RAND_MAX;
-            ke_secondary = 10.0 * tan(ran * atan(ke_primary / 20.0));
-            //> the energy of the primary electron
-            ke_primary -= ke_secondary;
-            v_magnitude_primary = sqrt( 2.0 * ke_primary / m1 );
-            v_magnitude_secondary = sqrt( 2.0 * ke_secondary / m1 );
-
-            sigma_cr = v_magnitude * interpCrossSection( ke1 / const_e );
+            sigma_cr = v_magnitude * interpCrossSection(ke1);
             P_collision = sigma_cr / sigma_cr_max;
             // Generate a random number between 0 and 1
             double ran_p = (double)rand() / RAND_MAX;
 
             if(ran_p < P_collision){
-                // erase i1 electron and ion
+                v_square = pow(p2->momentum(0,i2),2) + pow(p2->momentum(1,i2),2) + pow(p2->momentum(2,i2),2);
+                v_magnitude = sqrt(v_square);
+                // kinetic energy of species2 (ion)
+                ke2 = 0.5 * m2 * v_square / const_e;
+                ke_radiative = ke1 + ke2;
+
+                // erase electron and ion
                 count_of_particles_to_erase_s1[ibin]++;
                 indexes_of_particles_to_erase_s1.push_back(i1);
                 count_of_particles_to_erase_s2[ibin]++;
@@ -184,18 +173,14 @@ void Collisions1D_Recombination_Rad::collide( PicParams& params, SmileiMPI* smpi
                 count_of_particles_to_insert_s3[ibin]++;
                 idNew = new_particles3.size() - 1;
                 new_particles3.charge(idNew) = s3->species_param.charge;
-
                 totNCollision++;
-            }
-            //MESSAGE("nparis222"<<"  "<<i);
+
+                iBin_global = smpi->getDomainLocalMin(0) / params.cell_length[0] + ibin;
+                diag1D->radiative_energy_collision[n_collisions][iBin_global] += ke_radiative;
+            } // end if
         }
-        smpi->barrier();
-        //MESSAGE("nbins222"<<"  "<<ibin);
 
     } // end loop on bins
-    smpi->barrier();
-    //MESSAGE("aaaa"<<" "<<s1->bmax.back()<<" "<<p1->size());
-    // swap lost particles to the end for ionized neutrals
 
     s1->erase_particles_from_bins(indexes_of_particles_to_erase_s1);
     indexes_of_particles_to_erase_s1.clear();
@@ -205,13 +190,6 @@ void Collisions1D_Recombination_Rad::collide( PicParams& params, SmileiMPI* smpi
 
     s3->insert_particles_to_bins(new_particles3, count_of_particles_to_insert_s3);
     new_particles3.clear();
-
-    //smpi->barrier();
-    ///MESSAGE("totCollison"<<" "<<totNCollision<<" "<<sigma_cr_max<<"  "<<n1[3] * (1 - exp(-density2[3] * sigma_cr_max * timestep)) );
-    //MESSAGE("s1 bmax"<<" "<<s1->bmax.back()-s1->bmin.back()<<" "<<p1->size());
-    //MESSAGE("s2 bmax"<<" "<<s2->bmax.back()-s2->bmin.back()<<" "<<s2->bmax[nbins-2]-s2->bmin[nbins-2]<<" "<<p2->size());
-    //MESSAGE("s3 bmax"<<" "<<s3->bmax.back()-s3->bmin.back()<<" "<<p3->size());
-
 }
 
 double Collisions1D_Recombination_Rad::maxCV(Particles* particles, double eMass){

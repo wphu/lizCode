@@ -29,7 +29,7 @@ public:
 
 
     //! Method called in the main smilei loop to apply collisions at each timestep
-    void collide(PicParams&, SmileiMPI* smpi, ElectroMagn* fields, std::vector<Species*>&,int);
+    void collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime);
 
 private:
     //>the ionization threshold energy

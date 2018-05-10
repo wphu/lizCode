@@ -9,11 +9,13 @@
 #include "Grid.h"
 #include "PSI1D.h"
 
+class Collisions;
+
 class Diagnostic1D : public Diagnostic {
 
 public :
 
-    Diagnostic1D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields);
+    Diagnostic1D(PicParams& params, SmileiMPI* smpi, ElectroMagn* EMfields, vector<Collisions*> &vecCollisions);
     virtual ~Diagnostic1D();
 
     //! Runs the diag for all patches for local diags.
@@ -33,9 +35,12 @@ public :
     vector<double> totalParticleEnergy;
     double totalElectricFieldEnergy;
 
-
+    // radiative_energy_collision[iCollision][iBin]
+    vector< vector<double> > radiative_energy_collision;
+    vector< vector<double> > radiative_energy_collision_global;
 
     Field1D *ptclNum1D;
+    int n_collision;
 
 
 protected :

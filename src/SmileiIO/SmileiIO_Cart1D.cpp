@@ -117,7 +117,9 @@ void SmileiIO_Cart1D::createDiagsPattern( PicParams& params, Diagnostic1D* diag1
     diagName = "kineticEnergy";
     diagsGroup.dataset_stringName.push_back(diagName);
 
-
+    // dataset name
+    diagName = "radiative_energy_collision";
+    diagsGroup.dataset_stringName.push_back(diagName);
 
     if(!is_restart)
     {
@@ -188,6 +190,20 @@ void SmileiIO_Cart1D::createDiagsPattern( PicParams& params, Diagnostic1D* diag1
         // Create dataset for kineticEnergy
         diagsGroup.dims_global[2] = diag1D->n_species;
         diagsGroup.dims_global[1] = 1;
+        diagsGroup.dims_global[0] = 1;
+
+        iDiag++;
+        diagsGroup.dataspace_id = H5Screate_simple(data_dims, diagsGroup.dims_global, NULL);
+        h5_name = diagsGroup.dataset_stringName[iDiag].c_str();
+        dataset_id = H5Dcreate2(diagsGroup.group_id, h5_name, H5T_NATIVE_DOUBLE, diagsGroup.dataspace_id,
+                                      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        diagsGroup.dataset_id.push_back(dataset_id);
+        H5Dclose( diagsGroup.dataset_id[iDiag] );
+        H5Sclose( diagsGroup.dataspace_id );
+
+        // Create dataset for radiative_energy_collision
+        diagsGroup.dims_global[2] = diag1D->radiative_energy_collision_global[0].size();
+        diagsGroup.dims_global[1] = diag1D->radiative_energy_collision_global.size();
         diagsGroup.dims_global[0] = 1;
 
         iDiag++;
@@ -368,7 +384,6 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         }
         fieldsGroup.status = H5Gclose(fieldsGroup.group_id);
 
-
 /*
         // ==============write particle velocity distribution function=========================
         ptclsGroup.group_id = H5Gopen(data_file_id, "/VDF", H5P_DEFAULT);
@@ -402,8 +417,8 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         ptclsGroup.status = H5Gclose( ptclsGroup.group_id );
 */
 
-        // ==============write Diagnostic: particleFlux, heatFlux and angleDist============
-        // ==============particleNumber, kineticEnergy                         ============
+        // ============== write Diagnostic: particleFlux, heatFlux and angleDist ============
+        // ============== particleNumber, kineticEnergy, radiative_energy_collision ============
         createDiagsPattern(params, diag1D);
         diagsGroup.group_id = H5Gopen(data_file_id, "/Diagnostic", H5P_DEFAULT);
         for(int i = 0; i < diagsGroup.dataset_stringName.size(); i++)
@@ -499,7 +514,27 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         diagsGroup.status = H5Sclose (diagsGroup.memspace_id);
         diagsGroup.status = H5Sclose (diagsGroup.dataspace_id);
         
+        // radiative_energy_collision
+        for(int iCollision = 0; iCollision < diag1D->n_collision; iCollision++)
+        {
+            diagsGroup.offset[0] = 0;
+            diagsGroup.offset[1] = iCollision;
+            diagsGroup.offset[2] = 0;
+            diagsGroup.count[0]  = 1;
+            diagsGroup.count[1]  = 1;
+            diagsGroup.count[2]  = diag1D->radiative_energy_collision_global[iCollision].size();
 
+
+            diagsGroup.memspace_id = H5Screate_simple (data_dims, diagsGroup.count, NULL);
+            diagsGroup.dataspace_id = H5Dget_space (diagsGroup.dataset_id[5]);
+            diagsGroup.status = H5Sselect_hyperslab (diagsGroup.dataspace_id, H5S_SELECT_SET, diagsGroup.offset,
+                                                diagsGroup.stride, diagsGroup.count, diagsGroup.block);
+            diagsGroup.status = H5Dwrite (diagsGroup.dataset_id[0], H5T_NATIVE_DOUBLE, diagsGroup.memspace_id,
+                                    diagsGroup.dataspace_id, H5P_DEFAULT, &(diag1D->radiative_energy_collision_global[iCollision][0]) );
+
+            diagsGroup.status = H5Sclose (diagsGroup.memspace_id);
+            diagsGroup.status = H5Sclose (diagsGroup.dataspace_id);
+        }
 
         // close dataset, group, and so on
         for(int i = 0; i < diagsGroup.dataset_stringName.size(); i++)

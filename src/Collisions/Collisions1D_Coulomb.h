@@ -37,7 +37,7 @@ public:
 
     virtual void collide_relativistic(PicParams&, SmileiMPI* smpi, std::vector<Species*>&,int);
     // non-relativistic case
-    virtual void collide(PicParams&, SmileiMPI* smpi, ElectroMagn* fields, std::vector<Species*>&,int);
+    virtual void collide(PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime);
 
 
 private:

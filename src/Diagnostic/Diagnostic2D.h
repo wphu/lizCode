@@ -33,10 +33,12 @@ public :
     int n_segment_total;
     vector<int> n_segments;
 
+    // particleFlux[iSpec][iLine][iSegment]
     vector< vector< vector<double> > > particleFlux;
     vector< vector< vector<double> > > heatFlux;
     vector< vector< vector<double> > > averageAngle;
-    vector< vector< vector<double> > > psiRate;   //sputteringRate, depositionRate, and so on
+    // psiRate can be: sputteringRate, depositionRate, and so on
+    vector< vector< vector<double> > > psiRate;
 
     vector< vector< vector<double> > > particleFlux_global;
     vector< vector< vector<double> > > heatFlux_global;
