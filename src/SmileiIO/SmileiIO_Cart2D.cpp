@@ -16,16 +16,14 @@
 
 using namespace std;
 
-SmileiIO_Cart2D::SmileiIO_Cart2D( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag )
+SmileiIO_Cart2D::SmileiIO_Cart2D( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies)
 : SmileiIO( params, smpi )
 {
-    Diagnostic2D* diag2D = static_cast<Diagnostic2D*>(diag);
     reloadP(params, smpi, vecSpecies);
     if(smpi->isMaster())
     {
         // create data patterns
         createFieldsPattern(params, fields);
-        createDiagsPattern(params, diag2D);
         //createPartsPattern(params, fields, vecSpecies);
     }
 }
@@ -111,6 +109,8 @@ void SmileiIO_Cart2D::createDiagsPattern(PicParams& params, Diagnostic2D* diag2D
     const char* h5_name;
     hid_t dataset_id;
     int n_dim_data = 3;
+
+    diagsGroup.dataset_stringName.resize(0);
 
     // =======set stride and block, and close dataset and group=================
     diagsGroup.stride[0] = 1;
@@ -266,6 +266,8 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
 
         // =============write Diagnostics ============================================
+        createDiagsPattern(params, diag2D);
+
         diagsGroup.group_id = H5Gcreate(data_file_id, "/Diagnostic", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);
         // particle flux
         iDiag = 0;
@@ -418,7 +420,7 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     hsize_t     stride[3];
     hsize_t     block[3];
 
-
+    int ii;
     int grid_ndim = 3;
     hsize_t grid_dims_global[3];
 
@@ -481,7 +483,7 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     }
 
     double *start_point = new double[grid2D->n_segment_total * 2];
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -640,7 +642,7 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
 }
 
 
-void readGrid(Grid* grid)
+void SmileiIO_Cart2D::readGrid(Grid* grid)
 {
     hid_t       grid_dataspace_id;
     hid_t       grid_dataset_id;
@@ -652,7 +654,7 @@ void readGrid(Grid* grid)
     hsize_t     stride[3];
     hsize_t     block[3];
 
-
+    int ii;
     int grid_ndim = 3;
     hsize_t grid_dims_global[3];
 
@@ -728,11 +730,11 @@ void readGrid(Grid* grid)
 
     // read start_point
     double *start_point = new double[grid2D->n_segment_total * 2];
-    segment_dataset_id = H5Dcreate2(grid_file_id, "start_point", H5P_DEFAULT);
+    segment_dataset_id = H5Dopen2(grid_file_id, "start_point", H5P_DEFAULT);
     H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, start_point);
     H5Dclose(segment_dataset_id);
 
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -745,11 +747,11 @@ void readGrid(Grid* grid)
 
     // read end_point
     double *end_point = new double[grid2D->n_segment_total * 2];
-    segment_dataset_id = H5Dcreate2(grid_file_id, "end_point", H5P_DEFAULT);
+    segment_dataset_id = H5Dopen2(grid_file_id, "end_point", H5P_DEFAULT);
     H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, end_point);
     H5Dclose(segment_dataset_id);
 
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -762,11 +764,11 @@ void readGrid(Grid* grid)
 
     // read length
     double *length = new double[grid2D->n_segment_total];
-    segment_dataset_id = H5Dcreate2(grid_file_id, "length", H5P_DEFAULT);
+    segment_dataset_id = H5Dopen2(grid_file_id, "length", H5P_DEFAULT);
     H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, length);
     H5Dclose(segment_dataset_id);
 
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -777,12 +779,12 @@ void readGrid(Grid* grid)
     }
 
     // read grid_point0
-    double *grid_point0 = new int[grid2D->n_segment_total * 2];
-    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point0", H5P_DEFAULT);
+    int *grid_point0 = new int[grid2D->n_segment_total * 2];
+    segment_dataset_id = H5Dopen2(grid_file_id, "grid_point0", H5P_DEFAULT);
     H5Dread(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point0);
     H5Dclose(segment_dataset_id);
 
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -794,12 +796,12 @@ void readGrid(Grid* grid)
     }
 
     // read grid_point1
-    double *grid_point1 = new int[grid2D->n_segment_total * 2];
-    segment_dataset_id = H5Dcreate2(grid_file_id, "grid_point1", H5P_DEFAULT);
+    int *grid_point1 = new int[grid2D->n_segment_total * 2];
+    segment_dataset_id = H5Dopen2(grid_file_id, "grid_point1", H5P_DEFAULT);
     H5Dread(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid_point1);
     H5Dclose(segment_dataset_id);
 
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)
@@ -812,11 +814,11 @@ void readGrid(Grid* grid)
 
     // read normal
     double *normal = new double[grid2D->n_segment_total * 3];
-    segment_dataset_id = H5Dcreate2(grid_file_id, "normal", H5P_DEFAULT);
+    segment_dataset_id = H5Dopen2(grid_file_id, "normal", H5P_DEFAULT);
     H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, normal);
     H5Dclose(segment_dataset_id);
 
-    int ii = 0;
+    ii = 0;
     for(int iLine = 0; iLine < grid2D->lines.size(); iLine++)
     {
         for(int iSegment = 0;  iSegment < grid2D->lines[iLine].size(); iSegment++)

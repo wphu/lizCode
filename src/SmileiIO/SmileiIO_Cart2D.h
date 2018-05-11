@@ -20,7 +20,7 @@
 class SmileiIO_Cart2D : public SmileiIO {
 public:
     //! Create // HDF5 environment
-    SmileiIO_Cart2D( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag );
+    SmileiIO_Cart2D( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies);
     //! Destructor for SmileiIO
     ~SmileiIO_Cart2D();
 
@@ -32,7 +32,7 @@ public:
     void createPartsPattern( PicParams& params, ElectroMagn* fields, vector<Species*>& vecSpecies );
 
     // Create particles h5 file pattern
-    void createDiagsPattern( PicParams& params, Diagnostic2D* diag2D );
+    void createDiagsPattern( PicParams& params, Diagnostic2D* diag2D);
 
     void initVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies );
     // calculate velocity distribution function

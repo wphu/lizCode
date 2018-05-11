@@ -7,6 +7,7 @@
 #include "SmileiMPI_Cart2D.h"
 #include "PicParams.h"
 #include "InputData.h"
+#include "SmileiIO.h"
 
 #include "Tools.h"
 
@@ -24,7 +25,7 @@ public:
     //! \param params : Parameters
     //! \param smpiData : Initial MPI environment (data broadcast)
     //  --------------------------------------------------------------------------------------------------------------------
-    static Grid* create(PicParams& params, InputData &ifile, SmileiMPI* smpi) {
+    static Grid* create(PicParams& params, InputData &ifile, SmileiMPI* smpi, SmileiIO* sio) {
         Grid* grid = NULL;
         MESSAGE(1, "Geometry:" << params.geometry);
         if ( params.geometry == "1d3v" ) {
@@ -70,7 +71,7 @@ public:
                 grid = new Grid2D(params, smpi, gridType, gapKind, ny_source, ny_gapHeight, nx_gapWeight, ny_bevel_depth, potential_wall);
     	        if(grid->gridType == "from_file")
                 {
-                    smpi->readGrid(grid)
+                    sio->readGrid(grid);
                 }
                 grid->compute();
             }

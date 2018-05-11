@@ -68,9 +68,10 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     Particles *p1, *p2, *p3;
     double m1, m2, m3, m12, W1, W2, W3;
 
-    double  sigma_cr, sigma_cr_max, ke11, ke12, ke11_primary, ke_secondary,
-            ran, P_collision;
-    double  v11_square, v11_magnitude, v11_magnitude_primary, v12_square, v12_magnitude;
+    double sigma_cr, sigma_cr_max, ke11, ke12, ke11_primary, ke_secondary,
+           ran, P_collision;
+    double v11_square, v11_magnitude, v11_magnitude_primary, v12_square, v12_magnitude;
+    double ke12_post, v12_post;
 
     int iBin_global;
     double ke_radiative;
@@ -171,9 +172,9 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
             ke12 = 0.5 * m1 * v12_square;
 
             // post-collision energy of i11 electron
-            ke11_primary = ke11 - energy_ionization_threshold * const_e;
+            ke12_post = ke12 - energy_ionization_threshold * const_e;
 
-            v11_magnitude_primary = sqrt( 2.0 * ke11_primary / m1 );
+            v12_post = sqrt( 2.0 * ke12_post / m1 );
 
             P_collision = 1.0 - exp( v11_magnitude * v12_magnitude * cross_section(ke11, ke12)
                           * n1[ibin] * n2[ibin] * timestep );
@@ -191,7 +192,7 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
                 momentum_unit[0] = p1->momentum(0,i12) / v11_magnitude_primary;
                 momentum_unit[1] = p1->momentum(1,i12) / v11_magnitude_primary;
                 momentum_unit[2] = p1->momentum(2,i12) / v11_magnitude_primary;
-                calculate_scatter_velocity(v12_magnitude_primary, m1, m2, momentum_unit, momentum_temp);
+                calculate_scatter_velocity(v12_post, m1, m2, momentum_unit, momentum_temp);
                 p1->momentum(0,i12) = momentum_temp[0];
                 p1->momentum(1,i12) = momentum_temp[1];
                 p1->momentum(2,i12) = momentum_temp[2];

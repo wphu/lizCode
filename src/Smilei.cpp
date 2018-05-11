@@ -93,13 +93,6 @@ int main (int argc, char* argv[])
     smpi->barrier();
 
 
-    //>Initialize Grid
-    TITLE("generate grid");
-    Grid* grid = NULL;
-    grid = GridFactory::create(params, input_data, smpi);
-    smpi->barrier();
-    smpi->scatterGrid(grid);
-
     // -------------------------------------------
     // Declaration of the main objects & operators
     // -------------------------------------------
@@ -137,10 +130,6 @@ int main (int argc, char* argv[])
     vector<PSI*> vecPSI = PSIFactory::create(params, input_data, vecSpecies, smpi);
     smpi->barrier();
 
-    TITLE("Creating Solver");
-    Solver* solver = SolverFactory::create(params, input_data, grid, smpi);
-
-
     TITLE("Creating PartSource");
     vector<PartSource*> vecPartSource = PartSourceFactory::create(params, input_data, vecSpecies, smpi);
     smpi->barrier();
@@ -152,10 +141,6 @@ int main (int argc, char* argv[])
     vector<Collisions*> vecCollisions = CollisionsFactory::create(params, input_data, vecSpecies, smpi);
     smpi->barrier();
 
-    TITLE("Creating Diagnostic");
-    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
-    smpi->barrier();
-
     TITLE("Creating Interp/Proj");
     // interpolation operator (virtual)
     Interpolator* Interp = InterpolatorFactory::create(params, smpi);
@@ -164,14 +149,32 @@ int main (int argc, char* argv[])
     Projector* Proj = ProjectorFactory::create(params, smpi);
     smpi->barrier();
 
+
     //Create mpi i/o environment
     TITLE("Creating IO output environment");
-    SmileiIO*  sio  = SmileiIOFactory::create(params, smpi, EMfields, vecSpecies, diag);
-    if(smpi->isMaster())
+    SmileiIO*  sio  = SmileiIOFactory::create(params, smpi, EMfields, vecSpecies);
+
+    //>Initialize Grid
+    TITLE("generate grid");
+    Grid* grid = NULL;
+    grid = GridFactory::create(params, input_data, smpi, sio);
+    smpi->barrier();
+
+    if(smpi->isMaster() && grid->gridType != "from_file")
     {
         sio->writeGrid(grid);
     }
     smpi->barrier();
+
+    TITLE("Creating Diagnostic");
+    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
+    smpi->barrier();
+
+
+
+    TITLE("Creating Solver");
+    Solver* solver = SolverFactory::create(params, input_data, grid, smpi);
+
 
     // ------------------------------------------------------------------------
     // Initialize the simulation times time_prim at n=0 and time_dual at n=+1/2
@@ -246,7 +249,7 @@ int main (int argc, char* argv[])
             {
                 for (unsigned int icoll=0 ; icoll<vecCollisions.size(); icoll++)
                 {
-                    vecCollisions[icoll]->collide(params, smpi, EMfields, vecSpecies,itime);
+                    vecCollisions[icoll]->collide(params, smpi, EMfields, vecSpecies, diag, itime);
                 }
             }
             timer[2].update();
@@ -370,7 +373,7 @@ int main (int argc, char* argv[])
             {
                 for (unsigned int icoll=0 ; icoll<vecCollisions.size(); icoll++)
                 {
-                    vecCollisions[icoll]->collide(params, smpi, EMfields, vecSpecies,itime);
+                    vecCollisions[icoll]->collide(params, smpi, EMfields, vecSpecies, diag, itime);
                 }
             }
                     timer[2].update();

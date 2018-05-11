@@ -44,7 +44,6 @@ public:
     virtual void createFieldsGroup( ElectroMagn* fields );
     virtual void createPartsGroup( vector<Species*>& vecSpecies );
 
-
     //! Basic write field on its own file (debug)
     virtual void write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime){};
     //virtual void calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies){};

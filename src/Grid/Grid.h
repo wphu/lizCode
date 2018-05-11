@@ -38,7 +38,7 @@ public:
     virtual void allocateDims(){};
     virtual void geometry(){};
     virtual void computeNcp(){};
-    virtual void compute();
+    virtual void compute(){};
 
     //! vector containing the dimensions of the Grid
     //! \todo private/friend/modify SmileiMPI* (JD)

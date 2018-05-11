@@ -1,5 +1,6 @@
 #include "Grid2D.h"
 #include "Field2D.h"
+#include "SmileiMPI_Cart2D.h"
 
 #include <iostream>
 #include <vector>
@@ -72,11 +73,7 @@ Grid2D::Grid2D(
     {
         geometry_iter_gap();
     }
-    else if(gridType == "from_file")
-    {
-        SmileiMPI_Cart2D *smpi2D = static_cast<SmileiMPI_Cart2D*>(smpi);
-        smpi2D->readGrid();
-    }
+
 }
 
 
@@ -362,6 +359,7 @@ void Grid2D::geometry_gap( )
 
     //============== construct the unit vector of tile surface normal ===================================
     // set the top surface of the left tile
+    /*
     for(int i = 0; i < nx_left_tile; i++)
     {
         (*normal_x_global)(i, ny_gap_top) = 0.0;
@@ -396,6 +394,7 @@ void Grid2D::geometry_gap( )
         (*normal_y_global)(i, ny_gap_top) = 1.0;
         (*normal_z_global)(i, ny_gap_top) = 0.0;
     }
+    */
 
 }
 

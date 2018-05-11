@@ -17,10 +17,9 @@
 
 using namespace std;
 
-SmileiIO_Cart1D::SmileiIO_Cart1D( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag  )
+SmileiIO_Cart1D::SmileiIO_Cart1D( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies)
 : SmileiIO( params, smpi )
 {
-    Diagnostic1D* diag1D = static_cast<Diagnostic1D*>(diag);
     initVDF(params, smpi, fields, vecSpecies);
     reloadP(params, smpi, vecSpecies);
 
@@ -74,7 +73,7 @@ void SmileiIO_Cart1D::createFieldsPattern( PicParams& params, ElectroMagn* field
 } // END createPattern
 
 // Create particles h5 file pattern
-void SmileiIO_Cart1D::createDiagsPattern( PicParams& params, Diagnostic1D* diag1D )
+void SmileiIO_Cart1D::createDiagsPattern( PicParams& params, Diagnostic1D* diag1D)
 {
     string diagName;
     const char* h5_name;
