@@ -92,6 +92,23 @@ int main (int argc, char* argv[])
     SmileiMPI* smpi = SmileiMPIFactory::create(params, smpiData);
     smpi->barrier();
 
+    // Count timer
+    vector<Timer> timer(12);
+    timer[0].init(smpi, "Total time");
+    timer[1].init(smpi, "EmitLoad");
+    timer[2].init(smpi, "Collide");
+    timer[3].init(smpi, "Interpolate and Move");
+    timer[4].init(smpi, "MPI Exchange Particle");
+    timer[5].init(smpi, "Absorb paritcle (2D)");
+    timer[6].init(smpi, "Project Particle");
+    timer[7].init(smpi, "PSI");
+    timer[8].init(smpi, "Diagnostic");
+    timer[9].init(smpi, "Fields Solve");
+    timer[10].init(smpi,"Write IO");
+    timer[11].init(smpi,"SuperLU factorize");
+
+    timer[0].restart();
+
 
     // -------------------------------------------
     // Declaration of the main objects & operators
@@ -100,7 +117,6 @@ int main (int argc, char* argv[])
     // ---------------------------
     // Initialize Species & Fields
     // ---------------------------
-
 
     TITLE("Initializing particles");
     // Initialize the vecSpecies object containing all information of the different Species
@@ -149,13 +165,13 @@ int main (int argc, char* argv[])
     Projector* Proj = ProjectorFactory::create(params, smpi);
     smpi->barrier();
 
-
     //Create mpi i/o environment
     TITLE("Creating IO output environment");
     SmileiIO*  sio  = SmileiIOFactory::create(params, smpi, EMfields, vecSpecies);
+    smpi->barrier();
 
     //>Initialize Grid
-    TITLE("generate grid");
+    TITLE("Creating grid");
     Grid* grid = NULL;
     grid = GridFactory::create(params, input_data, smpi, sio);
     smpi->barrier();
@@ -170,11 +186,10 @@ int main (int argc, char* argv[])
     Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
     smpi->barrier();
 
-
-
     TITLE("Creating Solver");
+    timer[11].restart();
     Solver* solver = SolverFactory::create(params, input_data, grid, smpi);
-
+    timer[11].update();
 
     // ------------------------------------------------------------------------
     // Initialize the simulation times time_prim at n=0 and time_dual at n=+1/2
@@ -204,26 +219,11 @@ int main (int argc, char* argv[])
     (*solver)(EMfields, smpi);
     smpi->barrier();
 
-    // Count timer
-    vector<Timer> timer(11);
-    timer[0].init(smpi, "Total time");
-    timer[1].init(smpi, "EmitLoad");
-    timer[2].init(smpi, "Collide");
-    timer[3].init(smpi, "Interpolate and Move");
-    timer[4].init(smpi, "MPI Exchange Particle");
-    timer[5].init(smpi, "Absorb paritcle (2D)");
-    timer[6].init(smpi, "Project Particle");
-    timer[7].init(smpi, "PSI");
-    timer[8].init(smpi, "Diagnostic");
-    timer[9].init(smpi, "Fields Solve");
-    timer[10].init(smpi,"Write IO");
 
     // ------------------------------------------------------------------
     //                     HERE STARTS THE PIC LOOP
     // ------------------------------------------------------------------
     TITLE("Time-Loop is started: number of time-steps n_time = " << params.n_time);
-    smpi->barrier();
-    timer[0].restart();
     if(params.method == "explicit")
     {
         while(itime <= stepStop)

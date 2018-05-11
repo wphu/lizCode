@@ -3,6 +3,7 @@ export intel_compiler_dir=/home/wphu/opt/intel
 export mpich_dir=/home/wphu/opt/mpich-intel
 export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
 export SuperLU_dir=/home/wphu/opt/SuperLU_4.3-intel
+export SuperLU_DIST_dir=/home/wphu/opt/SuperLU_DIST_5.3.0
 export anaconda3_dir=/home/wphu/opt/anaconda3
 
 source ${intel_compiler_dir}/bin/compilervars.sh intel64

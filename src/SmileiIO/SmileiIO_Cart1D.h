@@ -41,7 +41,11 @@ public:
     // calculate velocity distribution function
     void calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime);
 
+    // write grid to grid.h5 file
+    virtual void writeGrid(Grid* grid){};
 
+    // read grid from grid.h5 file
+    virtual void readGrid(Grid* grid){};
 
 private:
 

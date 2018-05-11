@@ -28,10 +28,11 @@ public:
     static Grid* create(PicParams& params, InputData &ifile, SmileiMPI* smpi, SmileiIO* sio) {
         Grid* grid = NULL;
         MESSAGE(1, "Geometry:" << params.geometry);
-        if ( params.geometry == "1d3v" ) {
-
+        if ( params.geometry == "1d3v" ) 
+        {
         }
-        else if ( params.geometry == "2d3v" ) {
+        else if ( params.geometry == "2d3v" ) 
+        {
             string gridType;
     		string gapKind;
             int ny_source;
@@ -77,7 +78,8 @@ public:
             }
             smpi->scatterGrid(grid);
         }
-        else {
+        else 
+        {
             ERROR( "Geometry " << params.geometry << " not implemented" );
         }
         return grid;
