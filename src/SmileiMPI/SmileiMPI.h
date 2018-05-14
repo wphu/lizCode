@@ -155,6 +155,7 @@ public:
     //> gatherField is to gather Fields like Ex, Bx and so on, not need sum guard cell points
     virtual void scatterGrid( Grid* grid ){};
     virtual void gatherRho( Field* field_global ,Field* field  ){};
+    virtual void gather_rho_all( Field* field_global ,Field* field  ){};
     virtual void gatherField( Field* field_global ,Field* field  ){};
     virtual void scatterField( Field* field_global ,Field* field ){};
     virtual void gatherVDF( Array4D* array_global, Array4D* array ){};

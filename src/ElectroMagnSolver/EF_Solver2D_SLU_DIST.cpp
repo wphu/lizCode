@@ -22,13 +22,11 @@ Solver2D(params)
     dy = params.cell_length[1];
     dxy = dx * dy;
 
+    nprow = params.number_of_procs[0];
+    npcol = params.number_of_procs[1];
+
     grid2D = static_cast<Grid2D*>(grid);
-    //grid2D = new Grid2D(params);
-    if(smpi2D->isMaster()){
-        //grid2D = static_cast<Grid2D*>(grid);
-        initSLU();
-    }
-    //initSLU();
+    initSLU();
 }
 
 
@@ -50,7 +48,7 @@ void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field2D* Ex2D = static_cast<Field2D*>(fields->Ex_);
     Field2D* Ey2D = static_cast<Field2D*>(fields->Ey_);
 
-
+cout<<"aaa11"<<endl;
     Field2D* rho2D           = static_cast<Field2D*>(fields->rho_);
     Field2D* rho2D_global    = static_cast<Field2D*>(fields->rho_global);
     Field2D* phi2D_global    = static_cast<Field2D*>(fields->phi_global);
@@ -58,18 +56,11 @@ void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field2D* Ey2D_global    = static_cast<Field2D*>(fields->Ey_global);
 
     smpi2D->barrier();
-    smpi2D->gatherRho(rho2D_global, rho2D);
-
-    if(smpi2D->isMaster()){
-        solve_SLU(rho2D_global, phi2D_global);
-        //phi2D_global->put_to(0.0);
-        solve_Exy(phi2D_global, Ex2D_global, Ey2D_global);
-    }
-
-    //Ex2D_global->put_to(0.0);
-    //Ey2D_global->put_to(0.0);
-
-
+    smpi2D->gather_rho_all(rho2D_global, rho2D);
+cout<<"aaa22"<<endl;
+    solve_SLU(rho2D_global, phi2D_global);
+    solve_Exy(phi2D_global, Ex2D_global, Ey2D_global);
+cout<<"aaa33"<<endl;
     smpi2D->barrier();
     smpi2D->scatterField(Ex2D_global, Ex2D);
     smpi2D->scatterField(Ey2D_global, Ey2D);
@@ -285,19 +276,23 @@ void EF_Solver2D_SLU_DIST::initSLU()
     m = grid2D->ncp;
     n = grid2D->ncp;
     nrhs = 1;
-
+cout<<"bb11"<<endl;
+cout<<"npro222 = "<< nprow<<" npcol = "<<npcol<<endl;
     /* ------------------------------------------------------------
        INITIALIZE THE SUPERLU PROCESS GRID. 
        ------------------------------------------------------------*/
     superlu_gridinit(MPI_COMM_WORLD, nprow, npcol, &grid);
-
+cout<<"bb22"<<endl;
     /* Bail out if I do not belong in the grid. */
     iam = grid.iam;
+cout<<"nprow333 = "<< nprow<<" npcol = "<<npcol<<endl;
     if ( iam >= nprow * npcol )
     {
+        cout<<"iam >= nprow * npcol: "<<iam<<endl;
         return;
     }
-
+cout<<"nprow444 = "<< nprow<<" npcol = "<<npcol<<endl;
+cout<<"bb33"<<endl;
     /* Create compressed column matrix for A. */
     dCreate_CompCol_Matrix_dist(&A, m, n, nnz, a, asub, xa, SLU_NC, SLU_D, SLU_GE);
 
@@ -310,6 +305,9 @@ void EF_Solver2D_SLU_DIST::initSLU()
     ldb = m;
     dGenXtrue_dist(n, nrhs, xtrue, ldx);
     dFillRHS_dist(trans, nrhs, xtrue, ldx, &A, b, ldb);
+cout<<"bb44"<<endl;
+    if ( !(berr = doubleMalloc_dist(nrhs)) )
+	ABORT("Malloc fails for berr[].");
 
     set_default_options_dist(&options);
 
@@ -318,17 +316,17 @@ void EF_Solver2D_SLU_DIST::initSLU()
         print_sp_ienv_dist(&options);
         print_options_dist(&options);
     }
-
+cout<<"bb55"<<endl;
     /* Initialize ScalePermstruct and LUstruct. */
     ScalePermstructInit(m, n, &ScalePermstruct);
     LUstructInit(n, &LUstruct);
 
     /* Initialize the statistics variables. */
     PStatInit(&stat);
-
+cout<<"bb66"<<endl;
     /* Call the linear equation solver: factorize and solve. */
     pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
-
+cout<<"bb77"<<endl;
     /* Check the accuracy of the solution. */
     if ( !iam ) 
     {
@@ -337,11 +335,14 @@ void EF_Solver2D_SLU_DIST::initSLU()
 
     PStatPrint(&options, &stat, &grid);        /* Print the statistics. */
     PStatFree(&stat);
+
+    cout<<"init done!!!"<<endl;
 }
 
 
-void EF_Solver2D_SLU_DIST::solve_SLU(Field* rho, Field* phi){
-
+void EF_Solver2D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
+{
+cout<<"0000"<<endl;
     Field2D* rho2D = static_cast<Field2D*>(rho);
     Field2D* phi2D = static_cast<Field2D*>(phi);
 
@@ -373,7 +374,7 @@ void EF_Solver2D_SLU_DIST::solve_SLU(Field* rho, Field* phi){
       }
     }//>>>end convert
 
-
+cout<<"11111"<<endl;
 
     /* ------------------------------------------------------------
        NOW WE SOLVE THE LINEAR SYSTEM USING THE FACTORED FORM OF A.
@@ -385,7 +386,7 @@ void EF_Solver2D_SLU_DIST::solve_SLU(Field* rho, Field* phi){
     pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
 
     //printf("Triangular solve: dgssvx() returns info %d\n", info);
-
+cout<<"22222"<<endl;
     //>>>convert SuperLU solution X to Field2D phi
     ii=0;
     for ( int i=0; i<nx; i++)

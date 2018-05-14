@@ -24,7 +24,11 @@ Solver2D(params)
 
     grid2D = static_cast<Grid2D*>(grid);
 
-    initSLU();
+    if(smpi2D->isMaster())
+    {
+        initSLU();
+    }
+
 
 }
 
@@ -59,13 +63,8 @@ void EF_Solver2D_SLU::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
 
     if(smpi2D->isMaster()){
         solve_SLU(rho2D_global, phi2D_global);
-        //phi2D_global->put_to(0.0);
         solve_Exy(phi2D_global, Ex2D_global, Ey2D_global);
     }
-
-    //Ex2D_global->put_to(0.0);
-    //Ey2D_global->put_to(0.0);
-
 
     smpi2D->barrier();
     smpi2D->scatterField(Ex2D_global, Ex2D);
@@ -134,7 +133,6 @@ void EF_Solver2D_SLU::initSLU()
     int* row;
     int* col;
 
-
     /* Defaults */
     lwork = 0;
     nrhs  = 1;
@@ -163,7 +161,6 @@ void EF_Solver2D_SLU::initSLU()
     //unique_ptr<int[]> row(new int[grid2D->ncp*5]);
     //unique_ptr<int[]> col(new int[grid2D->ncp*5]);
 
-
     int i,j,k,ii,ll,kk,v,hu,hd,hr,hl,i_ncp,i_nnz,nz_col,i_val;
 
     nnz=0;
@@ -171,7 +168,6 @@ void EF_Solver2D_SLU::initSLU()
     v=0;
     nx=grid2D->nx;
     ny=grid2D->ny;
-
 
     for(i=0; i<nx; i++)
     {
@@ -306,16 +302,10 @@ void EF_Solver2D_SLU::initSLU()
 
     //for(int i=0; i<grid2D->ncp*5;i++) cout<<i<<" "<<val[i]<<endl;
 
-
     //>>>convert the temp "val row col" to A (compressed column format, i.e. Harwell-Boeing format)
-    //a = new double[nnz];
-    //asub = new int[nnz];
-    //xa = new int[grid2D->ncp+1];
     if ( !(a = doubleMalloc(nnz)) ) ABORT("Malloc fails for a[].");
     if ( !(asub = intMalloc(nnz)) ) ABORT("Malloc fails for asub[].");
     if ( !(xa = intMalloc(grid2D->ncp+1)) ) ABORT("Malloc fails for xa[].");
-
-
 
     i_ncp=0;
     i_nnz=0;
@@ -324,34 +314,34 @@ void EF_Solver2D_SLU::initSLU()
 
     //>>>scan colomn (total ncp column)
     for( i_ncp=0; i_ncp<grid2D->ncp; i_ncp++){
-      //>>>is the first not zero element in the current column
-      nz_col=0;
-      for( i_nnz=0; i_nnz<nnz; i_nnz++){
-        if(col[i_nnz] == i_ncp){
-          a[i_val] = val[i_nnz];
-          asub[i_val] = row[i_nnz];
-          if ( nz_col == 0) {
-            xa[i_ncp] = i_val;
-            nz_col = 1;
-          }
-          i_val++;
+        //>>>is the first not zero element in the current column
+        nz_col=0;
+        for( i_nnz=0; i_nnz<nnz; i_nnz++)
+        {
+            if(col[i_nnz] == i_ncp)
+            {
+                a[i_val] = val[i_nnz];
+                asub[i_val] = row[i_nnz];
+                if ( nz_col == 0) 
+                {
+                    xa[i_ncp] = i_val;
+                    nz_col = 1;
+                }
+                i_val++;
+            }
         }
-      }
     }//>>>end scan
-    cout<<"adrrr "<<val[0]<<" "<<val[grid2D->ncp*5-2]<<" "<<val[grid2D->ncp*5-1]<<endl;
+
     delete[] val;
     delete[] b;
     delete[] row;
     delete[] col;
 
     xa[grid2D->ncp]=nnz;
-    cout<<"ncp: "<<grid2D->ncp<<" "<<nnz<<endl;
 
     m = grid2D->ncp;
     n = grid2D->ncp;
     nrhs = 1;
-    //rhsb = new double[m * nrhs];
-    //rhsx = new double[m * nrhs];
     if ( !(rhsb = doubleMalloc(m * nrhs)) ) ABORT("Malloc fails for rhsb[].");
     if ( !(rhsx = doubleMalloc(m * nrhs)) ) ABORT("Malloc fails for rhsx[].");
 
@@ -380,8 +370,6 @@ void EF_Solver2D_SLU::initSLU()
 
     /* ONLY PERFORM THE LU DECOMPOSITION */
     B.ncol = 0;  /* Indicate not to solve the system */
-    cout<<"LU fact "<<endl;
-    //dgssv(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &info);
 
     dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
            &L, &U, work, lwork, &B, &X, &rpg, &rcond, ferr, berr,
@@ -389,8 +377,6 @@ void EF_Solver2D_SLU::initSLU()
 
     printf("LU factorization: dgssvx() returns info %d\n", info);
     StatFree(&stat);
-
-
 }
 
 

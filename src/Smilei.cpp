@@ -176,7 +176,7 @@ int main (int argc, char* argv[])
     grid = GridFactory::create(params, input_data, smpi, sio);
     smpi->barrier();
 
-    if(smpi->isMaster() && grid->gridType != "from_file")
+    if(smpi->isMaster() && grid != NULL && grid->gridType != "from_file")
     {
         sio->writeGrid(grid);
     }
@@ -190,6 +190,7 @@ int main (int argc, char* argv[])
     timer[11].restart();
     Solver* solver = SolverFactory::create(params, input_data, grid, smpi);
     timer[11].update();
+    smpi->barrier();
 
     // ------------------------------------------------------------------------
     // Initialize the simulation times time_prim at n=0 and time_dual at n=+1/2
