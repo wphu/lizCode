@@ -49,7 +49,7 @@ protected:
     LUstruct_t LUstruct;
     gridinfo_t grid;
     double   *berr;
-    double   *a, *b, *b1, *xtrue;
+    double   *a, *b1, *xtrue;
     int_t    *asub, *xa;
     int_t    i, j, m, n, nnz;
     int_t    nprow, npcol;

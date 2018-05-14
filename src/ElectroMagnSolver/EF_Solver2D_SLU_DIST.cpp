@@ -48,7 +48,6 @@ void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field2D* Ex2D = static_cast<Field2D*>(fields->Ex_);
     Field2D* Ey2D = static_cast<Field2D*>(fields->Ey_);
 
-cout<<"aaa11"<<endl;
     Field2D* rho2D           = static_cast<Field2D*>(fields->rho_);
     Field2D* rho2D_global    = static_cast<Field2D*>(fields->rho_global);
     Field2D* phi2D_global    = static_cast<Field2D*>(fields->phi_global);
@@ -264,48 +263,44 @@ void EF_Solver2D_SLU_DIST::initSLU()
         }
       }
     }//>>>end scan
-    cout<<"adrrr "<<val[0]<<" "<<val[grid2D->ncp*5-2]<<" "<<val[grid2D->ncp*5-1]<<endl;
+
     delete[] val;
     delete[] b;
     delete[] row;
     delete[] col;
 
     xa[grid2D->ncp]=nnz;
-    cout<<"ncp: "<<grid2D->ncp<<" "<<nnz<<endl;
 
     m = grid2D->ncp;
     n = grid2D->ncp;
     nrhs = 1;
-cout<<"bb11"<<endl;
-cout<<"npro222 = "<< nprow<<" npcol = "<<npcol<<endl;
+
     /* ------------------------------------------------------------
        INITIALIZE THE SUPERLU PROCESS GRID. 
        ------------------------------------------------------------*/
     superlu_gridinit(MPI_COMM_WORLD, nprow, npcol, &grid);
-cout<<"bb22"<<endl;
+
     /* Bail out if I do not belong in the grid. */
     iam = grid.iam;
-cout<<"nprow333 = "<< nprow<<" npcol = "<<npcol<<endl;
     if ( iam >= nprow * npcol )
     {
         cout<<"iam >= nprow * npcol: "<<iam<<endl;
         return;
     }
-cout<<"nprow444 = "<< nprow<<" npcol = "<<npcol<<endl;
-cout<<"bb33"<<endl;
+
     /* Create compressed column matrix for A. */
     dCreate_CompCol_Matrix_dist(&A, m, n, nnz, a, asub, xa, SLU_NC, SLU_D, SLU_GE);
 
     /* Generate the exact solution and compute the right-hand side. 
-       The right-hand-side B and the result X are both stored in b */
-    if ( !(b = doubleMalloc_dist(m * nrhs)) ) ABORT("Malloc fails for b[]");
+       The right-hand-side B and the result X are both stored in b1 */
+    if ( !(b1 = doubleMalloc_dist(m * nrhs)) ) ABORT("Malloc fails for b1[]");
     if ( !(xtrue = doubleMalloc_dist(n*nrhs)) ) ABORT("Malloc fails for xtrue[]");
     *trans = 'N';
     ldx = n;
     ldb = m;
     dGenXtrue_dist(n, nrhs, xtrue, ldx);
-    dFillRHS_dist(trans, nrhs, xtrue, ldx, &A, b, ldb);
-cout<<"bb44"<<endl;
+    dFillRHS_dist(trans, nrhs, xtrue, ldx, &A, b1, ldb);
+
     if ( !(berr = doubleMalloc_dist(nrhs)) )
 	ABORT("Malloc fails for berr[].");
 
@@ -316,33 +311,32 @@ cout<<"bb44"<<endl;
         print_sp_ienv_dist(&options);
         print_options_dist(&options);
     }
-cout<<"bb55"<<endl;
+
     /* Initialize ScalePermstruct and LUstruct. */
     ScalePermstructInit(m, n, &ScalePermstruct);
     LUstructInit(n, &LUstruct);
 
     /* Initialize the statistics variables. */
     PStatInit(&stat);
-cout<<"bb66"<<endl;
+
     /* Call the linear equation solver: factorize and solve. */
-    pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
-cout<<"bb77"<<endl;
+    pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b1, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
+
     /* Check the accuracy of the solution. */
     if ( !iam ) 
     {
-	    dinf_norm_error_dist(n, nrhs, b, ldb, xtrue, ldx, &grid);
+	    dinf_norm_error_dist(n, nrhs, b1, ldb, xtrue, ldx, &grid);
     }
 
     PStatPrint(&options, &stat, &grid);        /* Print the statistics. */
     PStatFree(&stat);
 
-    cout<<"init done!!!"<<endl;
+    MESSAGE("SuperLU_DIST init done!!!");
 }
 
 
 void EF_Solver2D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
 {
-cout<<"0000"<<endl;
     Field2D* rho2D = static_cast<Field2D*>(rho);
     Field2D* phi2D = static_cast<Field2D*>(phi);
 
@@ -353,19 +347,19 @@ cout<<"0000"<<endl;
     {
       for ( int j=0; j<ny; j++) {
         if ( grid2D->bndr_global_2D[i][j] == 0 ) {
-          b[ii] = - dxy * const_ephi0_inv * (*rho2D)(i,j);
+          b1[ii] = - dxy * const_ephi0_inv * (*rho2D)(i,j);
           ii++;
         }
         else if ( grid2D->bndr_global_2D[i][j] == 1) {
-          b[ii] = grid2D->bndrVal_global_2D[i][j];
+          b1[ii] = grid2D->bndrVal_global_2D[i][j];
           ii++;
         }
         else if ( grid2D->bndr_global_2D[i][j] == 8 && ( j == 0 || i == 0 )) {
-          b[ii] = 0.0;
+          b1[ii] = 0.0;
           ii++;
         }
         else if ( grid2D->bndr_global_2D[i][j] == 8 && ( j == ny-1 || i == nx-1 )) {
-          b[ii] = - dxy * const_ephi0_inv * (*rho2D)(i,j);
+          b1[ii] = - dxy * const_ephi0_inv * (*rho2D)(i,j);
           ii++;
         }
         else {
@@ -374,8 +368,6 @@ cout<<"0000"<<endl;
       }
     }//>>>end convert
 
-cout<<"11111"<<endl;
-
     /* ------------------------------------------------------------
        NOW WE SOLVE THE LINEAR SYSTEM USING THE FACTORED FORM OF A.
        The right-hand-side B and the result X are both stored in b
@@ -383,10 +375,10 @@ cout<<"11111"<<endl;
     options.Fact = FACTORED; /* Indicate the factored form of A is supplied. */
     PStatInit(&stat); /* Initialize the statistics variables. */
 
-    pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
+    pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b1, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
 
     //printf("Triangular solve: dgssvx() returns info %d\n", info);
-cout<<"22222"<<endl;
+
     //>>>convert SuperLU solution X to Field2D phi
     ii=0;
     for ( int i=0; i<nx; i++)
@@ -395,7 +387,7 @@ cout<<"22222"<<endl;
         {
           if ( grid2D->bndr_global_2D[i][j] == 0 || grid2D->bndr_global_2D[i][j] == 1
           || grid2D->bndr_global_2D[i][j] == 2 || grid2D->bndr_global_2D[i][j] == 8) {
-            (*phi2D)(i,j) = b[ii];
+            (*phi2D)(i,j) = b1[ii];
             ii++;
           }
 
@@ -406,15 +398,18 @@ cout<<"22222"<<endl;
         }//>>>end convert
     }
 
-   /* Check the accuracy of the solution. */
+    /* Check the accuracy of the solution. */
+    /*
     if ( !iam ) 
     {
 	    printf("Solve the system with a different B.\n");
-	    dinf_norm_error_dist(n, nrhs, b, ldb, xtrue, ldx, &grid);
+	    dinf_norm_error_dist(n, nrhs, b1, ldb, xtrue, ldx, &grid);
     }
+    */
 
     /* Print the statistics. */
-    PStatPrint(&options, &stat, &grid);
+    //PStatPrint(&options, &stat, &grid);
+
 }
 
 
@@ -464,7 +459,6 @@ void EF_Solver2D_SLU_DIST::finishSLU()
     Destroy_LU(n, &grid, &LUstruct);
     ScalePermstructFree(&ScalePermstruct);
     LUstructFree(&LUstruct);
-    SUPERLU_FREE(b);
     SUPERLU_FREE(b1);
     SUPERLU_FREE(xtrue);
     SUPERLU_FREE(berr);
