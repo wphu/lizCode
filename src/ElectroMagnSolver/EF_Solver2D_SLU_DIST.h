@@ -1,6 +1,8 @@
 /* ================================================================
 MPI parallel SuperLU version: now only SuperLU_DIST-5.3.0 is used
 ==================================================================*/
+#ifdef SuperLU_mpi
+
 #ifndef EF_SOLVER2D_SLU_DIST_H
 #define EF_SOLVER2D_SLU_DIST_H
 
@@ -66,3 +68,5 @@ protected:
 };//END class
 
 #endif
+
+#endif // for SuperLU_mpi

@@ -1,6 +1,8 @@
 /* ================================================================
 now only support SuperLU-4.3 serial version
 ==================================================================*/
+#ifdef SuperLU_serial
+
 #ifndef EF_SOLVER2D_SLU_H
 #define EF_SOLVER2D_SLU_H
 
@@ -73,3 +75,5 @@ protected:
 };//END class
 
 #endif
+
+#endif // for SuperLU_serial

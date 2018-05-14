@@ -1,3 +1,5 @@
+export SuperLU_type=mpi
+
 # dependencies
 export intel_compiler_dir=/home/wphu/opt/intel
 export mpich_dir=/home/wphu/opt/mpich-intel

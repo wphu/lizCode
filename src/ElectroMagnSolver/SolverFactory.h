@@ -8,6 +8,7 @@
 #include "MF_Solver2D_Yee.h"
 #include "MF_Solver2D_Cowan.h"
 #include "EF_Solver2D_SLU.h"
+#include "EF_Solver2D_SLU_DIST.h"
 #include "InputData.h"
 #include "PicParams.h"
 
@@ -40,9 +41,14 @@ public:
 
         }
         else if ( params.geometry == "2d3v" ) {
+            #ifdef SuperLU_serial
+            solver = new EF_Solver2D_SLU(params, grid, smpi);
+            #else
+            solver = new EF_Solver2D_SLU_DIST(params, grid, smpi);
+            #endif
+
 	    //if ()
             //solver = new MF_Solver2D_Yee(params);
-            solver = new EF_Solver2D_SLU(params, grid, smpi);
 	    //elseif()
 	    //solver = new MF_Solver1D_Cowan(params);
         }

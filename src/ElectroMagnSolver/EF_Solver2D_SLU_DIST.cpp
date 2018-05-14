@@ -1,3 +1,5 @@
+#ifdef SuperLU_mpi
+
 #include "EF_Solver2D_SLU_DIST.h"
 
 #include "ElectroMagn.h"
@@ -476,3 +478,5 @@ void EF_Solver2D_SLU_DIST::finishSLU()
        ------------------------------------------------------------*/
     MPI_Finalize();
 }
+
+#endif // for SuperLU_mpi

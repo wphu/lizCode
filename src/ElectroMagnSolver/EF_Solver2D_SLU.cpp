@@ -1,3 +1,4 @@
+#ifdef SuperLU_serial
 
 #include "EF_Solver2D_SLU.h"
 
@@ -526,3 +527,5 @@ void EF_Solver2D_SLU::finishSLU()
     }
 
 }
+
+#endif // for SuperLU_type == serial
