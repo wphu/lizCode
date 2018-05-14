@@ -449,7 +449,7 @@ void EF_Solver2D_SLU::solve_SLU(Field* rho, Field* phi)
         }//>>>end convert
     }
 
-
+    StatPrint(&stat);
     StatFree(&stat);
 
 

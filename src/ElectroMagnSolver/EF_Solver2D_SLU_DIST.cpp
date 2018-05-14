@@ -56,10 +56,10 @@ void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
 
     smpi2D->barrier();
     smpi2D->gather_rho_all(rho2D_global, rho2D);
-cout<<"aaa22"<<endl;
+
     solve_SLU(rho2D_global, phi2D_global);
     solve_Exy(phi2D_global, Ex2D_global, Ey2D_global);
-cout<<"aaa33"<<endl;
+
     smpi2D->barrier();
     smpi2D->scatterField(Ex2D_global, Ex2D);
     smpi2D->scatterField(Ey2D_global, Ey2D);
