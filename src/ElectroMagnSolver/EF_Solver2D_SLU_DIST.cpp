@@ -25,6 +25,13 @@ Solver2D(params)
     nprow = params.number_of_procs[0];
     npcol = params.number_of_procs[1];
 
+    // Now ensure that one compute node is used to solve SuperLU
+    if(nprow * npcol > 20)
+    {
+        nprow = 4;
+        npcol = 5;
+    }
+
     grid2D = static_cast<Grid2D*>(grid);
     initSLU();
 }
@@ -260,7 +267,7 @@ void EF_Solver2D_SLU_DIST::initSLU()
     iam = grid.iam;
     if ( iam >= nprow * npcol )
     {
-        cout<<"iam >= nprow * npcol: "<<iam<<endl;
+        //cout<<"iam >= nprow * npcol: "<<iam<<endl;
         return;
     }
 
@@ -317,6 +324,12 @@ void EF_Solver2D_SLU_DIST::initSLU()
 
 void EF_Solver2D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
 {
+    if ( iam >= nprow * npcol )
+    {
+        //cout<<"iam >= nprow * npcol: "<<iam<<endl;
+        return;
+    }
+
     Field2D* rho2D = static_cast<Field2D*>(rho);
     Field2D* phi2D = static_cast<Field2D*>(phi);
 
