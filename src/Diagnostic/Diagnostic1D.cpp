@@ -161,9 +161,15 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 			}
 		}
 
+		s1 = vecSpecies[0];
+		wlt = s1->species_param.weight / (dx_inv_ * timestep * step_ave);
 		for(int iCollision = 0; iCollision < n_collision; iCollision++)
 		{
 			smpi->reduce_sum_double(&radiative_energy_collision[iCollision][0], &radiative_energy_collision_global[iCollision][0], radiative_energy_collision[iCollision].size());
+			for(int iBin = 0; iBin < radiative_energy_collision_global[iCollision].size(); iBin++)
+			{
+				radiative_energy_collision_global[iCollision][iBin] *= wlt;
+			}
 		}
 	}
 

@@ -288,6 +288,7 @@ void EF_Solver2D_SLU_DIST::initSLU()
 	ABORT("Malloc fails for berr[].");
 
     set_default_options_dist(&options);
+    //options.IterRefine = NO;
 
     if (!iam) 
     {
