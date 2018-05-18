@@ -176,9 +176,17 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
                        (p1->momentum(1,i1) - p2->momentum(1,i2) ) * ( p1->momentum(1,i1) - p2->momentum(1,i2) ) +
                        (p1->momentum(2,i1) - p2->momentum(2,i2) ) * ( p1->momentum(2,i1) - p2->momentum(2,i2) );
             v_magnitude = sqrt(v_square);
-            //>kinetic energy of species1 (ion)
+            // kinetic energy of species1 (ion)
             ke_primary = 0.5 * m1 * v_square / const_e;
             ke1 =  ke_primary / atomic_mass;
+
+            v_square = p1->momentum(0,i1) * p1->momentum(0,i1) +
+                       p1->momentum(1,i1) * p1->momentum(1,i1) +
+                       p1->momentum(2,i1) * p1->momentum(2,i1);
+            v_magnitude = sqrt(v_square);
+            // kinetic energy of species1 (ion)
+            ke_primary = 0.5 * m1 * v_square / const_e;
+
 
             sigma_cr = v_magnitude * interpCrossSection(ke1);
             P_collision = sigma_cr / sigma_cr_max;
@@ -206,11 +214,11 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
 
                 totNCollision++;
 
-                v_square = (p1->momentum(0,i1) - p2->momentum(0,i2) ) * ( p1->momentum(0,i1) - p2->momentum(0,i2) ) +
-                           (p1->momentum(1,i1) - p2->momentum(1,i2) ) * ( p1->momentum(1,i1) - p2->momentum(1,i2) ) +
-                           (p1->momentum(2,i1) - p2->momentum(2,i2) ) * ( p1->momentum(2,i1) - p2->momentum(2,i2) );
+                v_square = p1->momentum(0,i1) * p1->momentum(0,i1) +
+                           p1->momentum(1,i1) * p1->momentum(1,i1) +
+                           p1->momentum(2,i1) * p1->momentum(2,i1);
                 v_magnitude = sqrt(v_square);
-                //>kinetic energy of new species1 (ion)
+                // kinetic energy of new species1 (ion)
                 ke_secondary = 0.5 * m1 * v_square / const_e;
                 ke_radiative = ke_primary - ke_secondary;
                 iBin_global = smpi->getDomainLocalMin(0) / params.cell_length[0] + ibin;

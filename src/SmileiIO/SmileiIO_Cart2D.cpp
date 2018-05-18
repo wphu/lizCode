@@ -558,9 +558,9 @@ void SmileiIO_Cart2D::writeGrid(Grid* grid)
     ndim_segment = 1;
     dim1d_segment[0] = grid2D->n_line;
     segment_dataspace_id = H5Screate_simple(ndim_segment, dim1d_segment, NULL);
-    segment_dataset_id = H5Dcreate2(grid_file_id, "n_segments", H5T_NATIVE_DOUBLE, segment_dataspace_id,
+    segment_dataset_id = H5Dcreate2(grid_file_id, "n_segments", H5T_NATIVE_INT, segment_dataspace_id,
                                    H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    H5Dwrite(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, n_segments);
+    H5Dwrite(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, n_segments);
     H5Sclose(segment_dataspace_id);
     H5Dclose(segment_dataset_id);
 
@@ -711,7 +711,7 @@ void SmileiIO_Cart2D::readGrid(Grid* grid)
     grid2D->n_line = dim1d_segment[0];
 
     int *n_segments = new int[grid2D->n_line];
-    H5Dread(segment_dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, n_segments);
+    H5Dread(segment_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, n_segments);
     grid2D->n_segments.resize(grid2D->n_line);
     grid2D->n_segment_total = 0;
     for(int i = 0; i < grid2D->n_line; i++)
