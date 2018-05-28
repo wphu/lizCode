@@ -383,7 +383,23 @@ if isRecycling:
 		recycling_factor = cr
 	)
 
+	PSI(
+		species1 = ["D"],
+		species2 = ["D"],
+		PSI_type = "Recycling",
+		psiPos = "left",
+		emitTemp = temp_recycling,
+		recycling_factor = cr
+	)
 
+	PSI(
+		species1 = ["D"],
+		species2 = ["D"],
+		PSI_type = "Recycling",
+		psiPos = "right",
+		emitTemp = temp_recycling,
+		recycling_factor = cr
+	)
 
 #==================== Collisions =================================
 
@@ -444,7 +460,12 @@ if isRecycling:
 		crossSection_fileName = "crossSection/Excitation_H_1s-4p.dat"
 	)
 
-
+	Collisions(
+		collisions_type = "ChargeExchange",
+		species1 = ["D1"],
+		species2 = ["D"],
+		crossSection_fileName = "crossSection/Charge_exchange_H+-H.dat"
+	)
 
 
 # For C ==========

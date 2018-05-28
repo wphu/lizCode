@@ -178,7 +178,10 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
             v_magnitude = sqrt(v_square);
             // kinetic energy of species1 (ion)
             ke_primary = 0.5 * m1 * v_square / const_e;
-            ke1 =  ke_primary / atomic_mass;
+            ke1 =  ke_primary;
+
+            sigma_cr = v_magnitude * interpCrossSection(ke1);
+            P_collision = sigma_cr / sigma_cr_max;
 
             v_square = p1->momentum(0,i1) * p1->momentum(0,i1) +
                        p1->momentum(1,i1) * p1->momentum(1,i1) +
@@ -187,13 +190,12 @@ void Collisions1D_ChargeExchange::collide(PicParams& params, SmileiMPI* smpi, El
             // kinetic energy of species1 (ion)
             ke_primary = 0.5 * m1 * v_square / const_e;
 
-
-            sigma_cr = v_magnitude * interpCrossSection(ke1);
-            P_collision = sigma_cr / sigma_cr_max;
             // Generate a random number between 0 and 1
             double ran_p = (double)rand() / RAND_MAX;
 
-            if(ran_p < P_collision){
+            if(ran_p < P_collision)
+            {
+                calculate_scatter_velocity(s1, s2, i1, i2);
                 temp[0] = p2->momentum(0, i2);
                 temp[1] = p2->momentum(1, i2);
                 temp[2] = p2->momentum(2, i2);
@@ -236,7 +238,8 @@ double  Collisions1D_ChargeExchange::cross_section(double ke)
 
 }
 
-double Collisions1D_ChargeExchange::maxCV(Species* s1, Species* s2){
+double Collisions1D_ChargeExchange::maxCV(Species* s1, Species* s2)
+{
     int nPart1, nPart2, npairs;
     Particles *p1, *p2;
 
@@ -263,9 +266,52 @@ double Collisions1D_ChargeExchange::maxCV(Species* s1, Species* s2){
                    ( p1->momentum(1,iPart) - p2->momentum(1,iPart) ) * ( p1->momentum(1,iPart) - p2->momentum(1,iPart) ) +
                    ( p1->momentum(2,iPart) - p2->momentum(2,iPart) ) * ( p1->momentum(2,iPart) - p2->momentum(2,iPart) );
         v_magnitude = sqrt(v_square);
-        ke = 0.5 * mass * v_square / atomic_mass;
-        crossSectionV = v_magnitude * interpCrossSection( ke / const_e);
+        ke = 0.5 * mass * v_square  / const_e;
+        crossSectionV = v_magnitude * interpCrossSection(ke);
         if(crossSectionV > maxCrossSectionV) {maxCrossSectionV = crossSectionV;};
     }
     return maxCrossSectionV;
+}
+
+
+// elastic collision is assumed, same as Collisions1D_DSMC::ELASTIC
+void Collisions1D_ChargeExchange::calculate_scatter_velocity(Species* s1, Species* s2, int i1, int i2)
+{
+    double VRCP[3];		//VRCP(3) are the post-collision components of the relative velocity
+    double VCCM[3];		//VCCM(3) are the components of the centre of mass velocity
+    double RML = 0.5;
+    double RMM = 0.5;
+    double A,B,C,D;
+    double OC,SC;
+    double VR;
+
+    Particles *p1, *p2;
+    p1 = &(s1->particles);
+    p2 = &(s2->particles);
+
+    for (int i=0;i<3;i++)
+	{
+		VCCM[i] = RML * p1->momentum(i,i1) + RMM * p2->momentum(i,i2);
+	}
+
+    VR = sqrt( pow(p1->momentum(0, i1) - p2->momentum(0, i2), 2)
+              +pow(p1->momentum(1, i1) - p2->momentum(1, i2), 2)
+              +pow(p1->momentum(2, i1) - p2->momentum(2, i2), 2) );
+
+    //use the VHS logic
+    double RF = (double)random() / RAND_MAX;
+	B = 2.0 * RF - 1.0;	//B is the cosine of a random elevation angle
+	A = sqrt(1.0 - B * B);
+	VRCP[0] = B * VR;
+    
+    RF = (double)random() / RAND_MAX;
+	C = 2.0 * const_pi * RF; //C is a random azimuth angle
+	VRCP[1] = A * cos(C) * VR;
+	VRCP[2] = A * sin(C) * VR;
+
+    for (int i = 0; i < 3; i++)
+	{
+        p1->momentum(i,i1) = VCCM[i] + VRCP[i] * RMM;
+        p2->momentum(i,i2) = VCCM[i] - VRCP[i] * RML;
+	}
 }

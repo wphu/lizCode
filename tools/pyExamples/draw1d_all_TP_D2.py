@@ -39,30 +39,30 @@ fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
 # ===================================== Te ================================
 ax0=fig.add_subplot(3,1,1)
 ##============ case 0 =============
-path = "Re0.8/data"
-val = collect("/Fields/", "T_global_e_avg", path = path)
-
-val_1d = np.transpose(val[t, 0, 0, :])
-val_1d = val_1d[::x_step]
-line0=ax0.plot(x_less, val_1d, label = r'$c_r$ = 0.80', linestyle = linestyles[0])
-
-
-##============ case 1 ==========
 path = "Re0.85/data"
 val = collect("/Fields/", "T_global_e_avg", path = path)
 
 val_1d = np.transpose(val[t, 0, 0, :])
 val_1d = val_1d[::x_step]
-line0=ax0.plot(x_less, val_1d, label = r'$c_r$ = 0.85', linestyle = linestyles[1])
+line0=ax0.plot(x_less, val_1d, label = r'$n_u \mathrm{=1.0\times 10^{19}m^{-3}}$', linestyle = linestyles[0])
 
 
-##============ case 2 ============
-path = "Re0.9/data"
+##============ case 1 ==========
+path = "Re0.85-n1.5/data"
 val = collect("/Fields/", "T_global_e_avg", path = path)
 
 val_1d = np.transpose(val[t, 0, 0, :])
 val_1d = val_1d[::x_step]
-line0=ax0.plot(x_less, val_1d, label = r'$c_r$ = 0.90', linestyle = linestyles[2])
+line0=ax0.plot(x_less, val_1d, label = r'$n_u \mathrm{=1.5\times 10^{19}m^{-3}}$', linestyle = linestyles[1])
+
+
+##============ case 2 ============
+path = "Re0.85-n2.0/data"
+val = collect("/Fields/", "T_global_e_avg", path = path)
+
+val_1d = np.transpose(val[t, 0, 0, :])
+val_1d = val_1d[::x_step]
+line0=ax0.plot(x_less, val_1d, label = r'$n_u \mathrm{=2.0\times 10^{19}m^{-3}}$', linestyle = linestyles[2])
 
 
 ax0.grid(True)
@@ -83,29 +83,29 @@ ax0.annotate(r"$\mathbf{(a)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ax0=fig.add_subplot(3,1,2)
 ax0.yaxis.set_major_formatter(yformatter)
 ##============ case 0 =============
-path = "Re0.8/data"
-val = collect("/Fields/", "T_global_D1_avg", path = path)
-
-val_1d = np.transpose(val[t, 0, 0, :])
-val_1d = val_1d[::x_step]
-line0=ax0.plot(x_less, val_1d, label = r'$c_r=0.80$', linestyle = linestyles[0])
-
-##============ case 1 ==========
 path = "Re0.85/data"
 val = collect("/Fields/", "T_global_D1_avg", path = path)
 
 val_1d = np.transpose(val[t, 0, 0, :])
 val_1d = val_1d[::x_step]
-line0=ax0.plot(x_less, val_1d, label = r'$c_r=0.85$', linestyle = linestyles[1])
+line0=ax0.plot(x_less, val_1d, label = r'$n_u \mathrm{=1.0\times 10^{19}m^{-3}}$', linestyle = linestyles[0])
 
-
-##============ case 2 ============
-path = "Re0.9/data"
+##============ case 1 ==========
+path = "Re0.85-n1.5/data"
 val = collect("/Fields/", "T_global_D1_avg", path = path)
 
 val_1d = np.transpose(val[t, 0, 0, :])
 val_1d = val_1d[::x_step]
-line0=ax0.plot(x_less, val_1d, label = r'$c_r=0.9$', linestyle = linestyles[2])
+line0=ax0.plot(x_less, val_1d, label = r'$n_u \mathrm{=1.5\times 10^{19}m^{-3}}$', linestyle = linestyles[1])
+
+
+##============ case 2 ============
+path = "Re0.85-n2.0/data"
+val = collect("/Fields/", "T_global_D1_avg", path = path)
+
+val_1d = np.transpose(val[t, 0, 0, :])
+val_1d = val_1d[::x_step]
+line0=ax0.plot(x_less, val_1d, label = r'$n_u \mathrm{=2.0\times 10^{19}m^{-3}}$', linestyle = linestyles[2])
 
 
 

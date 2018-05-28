@@ -33,7 +33,8 @@ public:
 
 
     // interplate cross section with energy (eV)
-    double interpCrossSection(double energy){
+    double interpCrossSection(double energy)
+    {
         int low = 0;
         int high = crossSection[0].size() - 1;
         int mid = 0;
@@ -68,6 +69,7 @@ public:
                crossSection[1][low] * (energy - crossSection[0][high]) * dEnergy_inv;
     };
 
+    void calculate_scatter_velocity(Species* s1, Species* s2, int i1, int i2);
 
 
 private:
