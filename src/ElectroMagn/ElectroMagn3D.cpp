@@ -59,7 +59,8 @@ isNorthern(smpi->isNorthern())
     dim_global.resize( nDim_field );
 
     // Dimension of the primal and dual grids
-    for (size_t i=0 ; i<nDim_field ; i++) {
+    for (size_t i=0 ; i<nDim_field ; i++) 
+    {
         // Standard scheme
         dimPrim[i] = n_space[i]+1;
         dimDual[i] = n_space[i]+2;
@@ -145,7 +146,8 @@ isNorthern(smpi->isNorthern())
     Bz_avg  = new Field3D(dimPrim, "Bz_avg" );
 
     // Charge currents currents and density for each species
-    for (unsigned int ispec=0; ispec<n_species; ispec++) {
+    for (unsigned int ispec=0; ispec<n_species; ispec++) 
+    {
         Jx_s[ispec]  = new Field3D(dimPrim, ("Jx_"+params.species_param[ispec].species_type).c_str());
         Jy_s[ispec]  = new Field3D(dimPrim, ("Jy_"+params.species_param[ispec].species_type).c_str());
         Jz_s[ispec]  = new Field3D(dimPrim, ("Jz_"+params.species_param[ispec].species_type).c_str());
@@ -181,7 +183,6 @@ isNorthern(smpi->isNorthern())
         T_s_global[ispec]       = new Field3D(dim_global, ("T_global_"+params.species_param[ispec].species_type).c_str());
         T_s_global_avg[ispec]   = new Field3D(dim_global, ("T_global_"+params.species_param[ispec].species_type+"_avg").c_str());
 
-
     }
 
 
@@ -207,7 +208,8 @@ isNorthern(smpi->isNorthern())
     // ----------------------------------------------------------------
     index_bc_min.resize( nDim_field, 0 );
     index_bc_max.resize( nDim_field, 0 );
-    for (unsigned int i=0 ; i<nDim_field ; i++) {
+    for (unsigned int i=0 ; i<nDim_field ; i++) 
+    {
         index_bc_min[i] = oversize[i];
         index_bc_max[i] = dimDual[i]-oversize[i]-1;
     }
@@ -221,34 +223,59 @@ isNorthern(smpi->isNorthern())
     // (by construction 1 (prim) or 2 (dual) elements shared between per MPI process)
     // istart
     for (unsigned int i=0 ; i<3 ; i++)
+    {
         for (unsigned int isDual=0 ; isDual<2 ; isDual++)
+        {
             istart[i][isDual] = 0;
-    for (unsigned int i=0 ; i<nDim_field ; i++) {
-        for (unsigned int isDual=0 ; isDual<2 ; isDual++) {
+        }
+    }
+        
+    for (unsigned int i=0 ; i<nDim_field ; i++) 
+    {
+        for (unsigned int isDual=0 ; isDual<2 ; isDual++) 
+        {
             istart[i][isDual] = oversize[i];
-            if (smpi3D->getProcCoord(i)!=0) istart[i][isDual]+=1;
+            if (smpi3D->getProcCoord(i)!=0)
+            {
+                istart[i][isDual]+=1;
+            }
         }
     }
 
     // bufsize = nelements
     for (unsigned int i=0 ; i<3 ; i++)
+    {
         for (unsigned int isDual=0 ; isDual<2 ; isDual++)
+        {
             bufsize[i][isDual] = 1;
+        }
+    }
+        
 
-    for (unsigned int i=0 ; i<nDim_field ; i++) {
+    for (unsigned int i=0 ; i<nDim_field ; i++) 
+    {
         for (int isDual=0 ; isDual<2 ; isDual++)
+        {
             bufsize[i][isDual] = n_space[i] + 1;
+        }
 
-        for (int isDual=0 ; isDual<2 ; isDual++) {
+        for (int isDual=0 ; isDual<2 ; isDual++) 
+        {
             bufsize[i][isDual] += isDual;
-            if ( smpi3D->getNbrOfProcs(i)!=1 ) {
+            if ( smpi3D->getNbrOfProcs(i)!=1 ) 
+            {
 
                 if ( ( !isDual ) && (smpi3D->getProcCoord(i)!=0) )
+                {
                     bufsize[i][isDual]--;
-                else if  (isDual) {
+                }
+                else if  (isDual) 
+                {
                     bufsize[i][isDual]--;
                     if ( (smpi3D->getProcCoord(i)!=0) && (smpi3D->getProcCoord(i)!=smpi3D->getNbrOfProcs(i)-1) )
+                    {
                         bufsize[i][isDual]--;
+                    }
                 }
 
             } // if ( smpi3D->getNbrOfProcs(i)!=1 )
@@ -330,43 +357,51 @@ void ElectroMagn3D::centerMagneticFields()
 void ElectroMagn3D::incrementAvgFields(unsigned int time_step)
 {
     // reset the averaged fields for (time_step-1)%ntime_step_avg == 0
-    if ( (time_step-1) % dump_step == 0 ){
+    if ( (time_step-1) % dump_step == 0 )
+    {
         rho_global_avg->put_to(0.0);
         phi_global_avg->put_to(0.0);
         Ex_global_avg->put_to(0.0);
         for (unsigned int ispec=0; ispec<n_species; ispec++)
         {
             rho_s_avg[ispec]->put_to(0.0);
-        }//END loop on species ispec
+        }
     }
 
     // Calculate the sum values for global rho phi Ex and Ey
     if( (time_step % dump_step) > (dump_step - avg_step) || (time_step % dump_step) == 0 )
     {
-        for (unsigned int i=0 ; i<dim_global[0]*dim_global[1]*dim_global[2] ; i++) {
+        for (unsigned int i=0 ; i<dim_global[0]*dim_global[1]*dim_global[2] ; i++) 
+        {
             (*rho_global_avg)(i) += (*rho_global)(i);
             (*phi_global_avg)(i) += (*phi_global)(i);
             (*Ex_global_avg)(i)  += (*Ex_global)(i);
         }
 
         // Calculate the sum values for density of each species
-        for (unsigned int ispec=0; ispec<n_species; ispec++) {
+        for (unsigned int ispec=0; ispec<n_species; ispec++) 
+        {
             // all fields are defined on the primal grid
-            for (unsigned int ix=0 ; ix<dimPrim[0]*dimPrim[1]*dimPrim[2] ; ix++) {
+            for (unsigned int ix=0 ; ix<dimPrim[0]*dimPrim[1]*dimPrim[2] ; ix++) 
+            {
                 (*rho_s_avg[ispec])(ix) += (*rho_s[ispec])(ix);
             }
         }//END loop on species ispec
     }
 
     // calculate the averaged values
-    if ( time_step % dump_step == 0 ){
-        for (unsigned int i=0 ; i<dim_global[0]*dim_global[1]*dim_global[2]; i++) {
+    if ( time_step % dump_step == 0 )
+    {
+        for (unsigned int i=0 ; i<dim_global[0]*dim_global[1]*dim_global[2]; i++) 
+        {
             (*rho_global_avg)(i) /= avg_step;
             (*phi_global_avg)(i) /= avg_step;
             (*Ex_global_avg)(i)  /= avg_step;
         }
-        for (unsigned int ispec=0; ispec<n_species; ispec++) {
-            for (unsigned int ix=0 ; ix<dimPrim[0]*dimPrim[1] ; ix++) {
+        for (unsigned int ispec=0; ispec<n_species; ispec++) 
+        {
+            for (unsigned int ix=0 ; ix<dimPrim[0]*dimPrim[1] ; ix++) 
+            {
                 (*rho_s_avg[ispec])(ix) /= avg_step;
             }
         }//END loop on species ispec
@@ -415,7 +450,8 @@ void ElectroMagn3D::restartRhoJs(int ispec, bool currents)
 
     rho3D_s->put_to(0.0);
 
-    if (currents){
+    if (currents)
+    {
         Jx3D_s->put_to(0.0);
         Jy3D_s->put_to(0.0);
         Jz3D_s->put_to(0.0);
@@ -441,43 +477,26 @@ void ElectroMagn3D::computeTotalRhoJ()
     // -----------------------------------
     // Species currents and charge density
     // -----------------------------------
-    for (unsigned int ispec=0; ispec<n_species; ispec++) {
+    for (unsigned int ispec=0; ispec<n_species; ispec++) 
+    {
         Field3D* Jx3D_s  = static_cast<Field3D*>(Jx_s[ispec]);
         Field3D* Jy3D_s  = static_cast<Field3D*>(Jy_s[ispec]);
         Field3D* Jz3D_s  = static_cast<Field3D*>(Jz_s[ispec]);
         Field3D* rho3D_s = static_cast<Field3D*>(rho_s[ispec]);
 
         // Charge density rho^(p,p) to 0
-        for (unsigned int i=0 ; i<nx_p ; i++) {
-            for (unsigned int j=0 ; j<ny_p ; j++) {
-              for (unsigned int k=0 ; k<nz_p ; k++) {
-                (*rho3D)(i,j,k) += ( (*rho3D_s)(i,j,k) * species_param[ispec].charge );
-              }
-            }
-        }
-/*
-        // Current Jx^(d,p) to 0
-        for (unsigned int i=0 ; i<nx_p ; i++) {
-            for (unsigned int j=0 ; j<ny_p ; j++) {
-                (*Jx3D)(i,j) += (*Jx3D_s)(i,j);
+        for (unsigned int i=0 ; i<nx_p ; i++) 
+        {
+            for (unsigned int j=0 ; j<ny_p ; j++) 
+            {
+                for (unsigned int k=0 ; k<nz_p ; k++) 
+                {
+                    (*rho3D)(i,j,k) += ( (*rho3D_s)(i,j,k) * species_param[ispec].charge );
+                }
             }
         }
 
-        // Current Jy^(p,d) to 0
-        for (unsigned int i=0 ; i<nx_p ; i++) {
-            for (unsigned int j=0 ; j<ny_p ; j++) {
-                (*Jy3D)(i,j) += (*Jy3D_s)(i,j);
-            }
-        }
-
-        // Current Jz^(p,p) to 0
-        for (unsigned int i=0 ; i<nx_p ; i++) {
-            for (unsigned int j=0 ; j<ny_p ; j++) {
-                (*Jz3D)(i,j) += (*Jz3D_s)(i,j);
-            }
-        }
-*/
-    }//END loop on species ispec
+    }
 
 }//END computeTotalRhoJ
 
@@ -485,9 +504,10 @@ void ElectroMagn3D::computeTotalRhoJ()
 // ---------------------------------------------------------------------------------------------------------------------
 // Compute electromagnetic energy flows vectors on the border of the simulation box
 // ---------------------------------------------------------------------------------------------------------------------
-void ElectroMagn3D::computePoynting() {
-
-    if (isWestern) {
+void ElectroMagn3D::computePoynting() 
+{
+    if (isWestern) 
+    {
         unsigned int iEy=istart[0][Ey_->isDual(0)];
         unsigned int iBz=istart[0][Bz_m->isDual(0)];
         unsigned int iEz=istart[0][Ez_->isDual(0)];
@@ -498,8 +518,8 @@ void ElectroMagn3D::computePoynting() {
         unsigned int jEz=istart[1][Ez_->isDual(1)];
         unsigned int jBy=istart[1][By_m->isDual(1)];
 
-        for (unsigned int j=0; j<=bufsize[1][Ez_->isDual(1)]; j++) {
-
+        for (unsigned int j=0; j<=bufsize[1][Ez_->isDual(1)]; j++) 
+        {
             double Ey__ = 0.5*((*Ey_)(iEy,jEy+j) + (*Ey_)(iEy, jEy+j+1));
             double Bz__ = 0.25*((*Bz_m)(iBz,jBz+j)+(*Bz_m)(iBz+1,jBz+j)+(*Bz_m)(iBz,jBz+j+1)+(*Bz_m)(iBz+1,jBz+j+1));
             double Ez__ = (*Ez_)(iEz,jEz+j);
@@ -511,7 +531,8 @@ void ElectroMagn3D::computePoynting() {
     }//if Western
 
 
-    if (isEastern) {
+    if (isEastern) 
+    {
         unsigned int iEy=istart[0][Ey_->isDual(0)]  + bufsize[0][Ey_->isDual(0)] -1;
         unsigned int iBz=istart[0][Bz_m->isDual(0)] + bufsize[0][Bz_m->isDual(0)]-1;
         unsigned int iEz=istart[0][Ez_->isDual(0)]  + bufsize[0][Ez_->isDual(0)] -1;
@@ -522,8 +543,8 @@ void ElectroMagn3D::computePoynting() {
         unsigned int jEz=istart[1][Ez_->isDual(1)];
         unsigned int jBy=istart[1][By_m->isDual(1)];
 
-        for (unsigned int j=0; j<=bufsize[1][Ez_->isDual(1)]; j++) {
-
+        for (unsigned int j=0; j<=bufsize[1][Ez_->isDual(1)]; j++) 
+        {
             double Ey__ = 0.5*((*Ey_)(iEy,jEy+j) + (*Ey_)(iEy, jEy+j+1));
             double Bz__ = 0.25*((*Bz_m)(iBz,jBz+j)+(*Bz_m)(iBz+1,jBz+j)+(*Bz_m)(iBz,jBz+j+1)+(*Bz_m)(iBz+1,jBz+j+1));
             double Ez__ = (*Ez_)(iEz,jEz+j);
@@ -534,8 +555,8 @@ void ElectroMagn3D::computePoynting() {
         }
     }//if Easter
 
-    if (isSouthern) {
-
+    if (isSouthern) 
+    {
         unsigned int iEz=istart[0][Ez_->isDual(0)];
         unsigned int iBx=istart[0][Bx_m->isDual(0)];
         unsigned int iEx=istart[0][Ex_->isDual(0)];
@@ -546,7 +567,8 @@ void ElectroMagn3D::computePoynting() {
         unsigned int jEx=istart[1][Ex_->isDual(1)];
         unsigned int jBz=istart[1][Bz_m->isDual(1)];
 
-        for (unsigned int i=0; i<=bufsize[0][Ez_->isDual(0)]; i++) {
+        for (unsigned int i=0; i<=bufsize[0][Ez_->isDual(0)]; i++) 
+        {
             double Ez__ = (*Ez_)(iEz+i,jEz);
             double Bx__ = 0.5*((*Bx_m)(iBx+i,jBx) + (*Bx_m)(iBx+i, jBx+1));
             double Ex__ = 0.5*((*Ex_)(iEx+i,jEx) + (*Ex_)(iEx+i+1, jEx));
@@ -557,7 +579,8 @@ void ElectroMagn3D::computePoynting() {
         }
     }// if South
 
-    if (isNorthern) {
+    if (isNorthern) 
+    {
         unsigned int iEz=istart[0][Ez_->isDual(0)];
         unsigned int iBx=istart[0][Bx_m->isDual(0)];
         unsigned int iEx=istart[0][Ex_->isDual(0)];
@@ -568,7 +591,8 @@ void ElectroMagn3D::computePoynting() {
         unsigned int jEx=istart[1][Ex_->isDual(1)]  + bufsize[1][Ex_->isDual(1)] -1;
         unsigned int jBz=istart[1][Bz_m->isDual(1)] + bufsize[1][Bz_m->isDual(1)]-1;
 
-        for (unsigned int i=0; i<=bufsize[0][Ez_->isDual(0)]; i++) {
+        for (unsigned int i=0; i<=bufsize[0][Ez_->isDual(0)]; i++) 
+        {
             double Ez__ = (*Ez_)(iEz+i,jEz);
             double Bx__ = 0.5*((*Bx_m)(iBx+i,jBx) + (*Bx_m)(iBx+i, jBx+1));
             double Ex__ = 0.5*((*Ex_)(iEx+i,jEx) + (*Ex_)(iEx+i+1, jEx));
