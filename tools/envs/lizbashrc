@@ -1,15 +1,15 @@
 #export SuperLU_type=mpi
 export SuperLU_type=serial
 
-export lizHomePath=/home/wphu/codes/cpp/lizCode-test
+export lizHomePath=/home/huwanpeng/codes/lizCode
 
 # dependencies
-export intel_compiler_dir=/home/wphu/opt/intel
-export mpich_dir=/home/wphu/opt/mpich-intel
-export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
-export SuperLU_dir=/home/wphu/opt/SuperLU_4.3-intel
-export SuperLU_DIST_dir=/home/wphu/opt/SuperLU_DIST_5.3.0
-export anaconda3_dir=/home/wphu/opt/anaconda3
+#export intel_compiler_dir=/home/wphu/opt/intel
+#export mpich_dir=/home/wphu/opt/mpich-intel
+#export hdf5_dir=/home/wphu/opt/hdf5-intel-mpi
+export SuperLU_dir=/opt/deepin15.6/SuperLU_4.3
+#export SuperLU_DIST_dir=/home/wphu/opt/SuperLU_DIST_5.3.0
+export anaconda3_dir=/opt/anaconda3
 
 source ${intel_compiler_dir}/bin/compilervars.sh intel64
 export PATH=${mpich_dir}/bin:$PATH
