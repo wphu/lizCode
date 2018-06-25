@@ -394,7 +394,7 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         }
         fieldsGroup.status = H5Gclose(fieldsGroup.group_id);
 
-/*
+        /*
         // ==============write particle velocity distribution function=========================
         ptclsGroup.group_id = H5Gopen(data_file_id, "/VDF", H5P_DEFAULT);
         for(int i = 0; i < ptclsGroup.dataset_stringName.size(); i++)
@@ -425,7 +425,7 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             ptclsGroup.status = H5Dclose( ptclsGroup.dataset_id[i] );
         }
         ptclsGroup.status = H5Gclose( ptclsGroup.group_id );
-*/
+        */
 
         // ============== write Diagnostic: particleFlux, heatFlux and angleDist ============
         // ============== particleNumber, kineticEnergy, radiative_energy_collision ============

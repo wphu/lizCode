@@ -459,14 +459,10 @@ if __name__ == "__main__":
             if is_in_polygon:
                 is_wall[i,j] = 1
                 
-    # ============================= bndr_type and bndr_val ========================
+    # ============================= bndr_type ========================
     # lower boundary of source region
-    bndr_type[:, ny-ny_source] = 1
-    bndr_val [:, ny-ny_source] = 0.0
-
-    # source region, not solve
-    bndr_type[:, ny-ny_source+1:ny] = 5
-    bndr_val [:, ny-ny_source+1:ny] = 0.0
+    bndr_type[:, ny-ny_source:ny] = 1
+    bndr_val [:, ny-ny_source:ny] = 0.0
 
     # left and right boundary between source region and wall
     bndr_type[0, ny_wall_boundary+1:ny-ny_source-1] = 8
@@ -478,22 +474,12 @@ if __name__ == "__main__":
     bndr_val [0, ny_wall_boundary] = wall_potential
     bndr_val [nx,ny_wall_boundary] = wall_potential
 
-    # left, right and bottom boudnary of the wall
-    bndr_type[0, 0:ny_wall_boundary-1] = 5
-    bndr_type[nx,0:ny_wall_boundary-1] = 5
-    bndr_type[0:nx,0] 		       = 5
-    bndr_val [0, 0:ny_wall_boundary-1] = wall_potential
-    bndr_val [nx,0:ny_wall_boundary-1] = wall_potential
-    bndr_val [0:nx,0] 		       = wall_potential
-
     # wall surface
     for i in np.arange(1, nx):
         for j in np.arange(1, ny_wall_max):
             if is_wall[i,j] == 1 and (is_wall[i-1, j] == 0 or is_wall[i+1, j] == 0 or is_wall[i, j-1] == 0 or is_wall[i, j+1] == 0):
                 bndr_type[i,j] = 1
-                bndr_val [i,j] = wall_potential
-            elif is_wall[i,j] == 1:
-                bndr_type[i,j] = 5
+            if is_wall[i,j] == 1:
                 bndr_val [i,j] = wall_potential
     
     # ============================= boundary lines ========================
@@ -523,3 +509,4 @@ if __name__ == "__main__":
     grid2d = Grid2D(dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list)
     grid2d.save_grid()
     grid2d.save_fig()
+

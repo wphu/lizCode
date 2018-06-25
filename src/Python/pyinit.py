@@ -128,6 +128,7 @@ class Grid(SmileiComponent):
     ny_gapHeight = 100
     nx_gapWeight = 100
     potential_wall = 0.0
+    ny_bevel_depth = 0.0
 
 
 
