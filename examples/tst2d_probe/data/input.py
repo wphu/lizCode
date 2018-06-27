@@ -6,17 +6,17 @@ import math
 
 method = 'explicit'
 
-l0 = 0.4e-5
-nx = 200
-ny = 300
+l0 = 1.0e-5
+nx = 500
+ny = 500
 Lsim = [nx*l0,ny*l0]
 
 t0 = 0.5e-12
 ns = int(1.0e-9 / t0)
-Tsim = 5 * ns			# duration of the simulation
+Tsim = 50 # * ns			# duration of the simulation
 number_output = 5
 
-number_of_procs = [8, 4]
+number_of_procs = [5, 4]
 
 
 #> Timestep to output some fields into hdf5 file
@@ -90,6 +90,10 @@ vz = 0.0
 # this is used to randomize the random number generator
 random_seed = 0
 
+gapHeight = 200
+gapWidth = 50
+sourceLength=5
+bevel_depth = 20 * l0
 
 Grid(
 	gridType = "from_file",
@@ -218,6 +222,7 @@ PartSource(
 	loadPos_end 	= nx*l0,
 	loadPos_Ystart 	= (ny-sourceLength)*l0,
 	loadPos_Yend 	= ny*l0,
+	step_update	= 10,
 
 )
 
@@ -236,6 +241,7 @@ PartSource(
 	loadPos_end 	= nx*l0,
 	loadPos_Ystart 	= (ny-sourceLength)*l0,
 	loadPos_Yend 	= ny*l0,
+	step_update	= 10,
 
 )
 

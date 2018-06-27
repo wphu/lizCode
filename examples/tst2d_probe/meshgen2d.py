@@ -395,7 +395,7 @@ if __name__ == "__main__":
     ny_wall_boundary = 200 + ny_base
     ny_wall_max = ny - ny_source - 5
 
-    wall_potential = 60.0
+    wall_potential = -60.0
 
     polygon_list = []
 
@@ -459,14 +459,18 @@ if __name__ == "__main__":
             if is_in_polygon:
                 is_wall[i,j] = 1
                 
-    # ============================= bndr_type ========================
+    # ============================= bndr_type and bndr_val ========================
     # lower boundary of source region
-    bndr_type[:, ny-ny_source:ny] = 1
-    bndr_val [:, ny-ny_source:ny] = 0.0
+    bndr_type[:, ny-ny_source] = 1
+    bndr_val [:, ny-ny_source] = 0.0
+
+    # source region, not solve
+    bndr_type[:, ny-ny_source+1:ny+1] = 5
+    bndr_val [:, ny-ny_source+1:ny+1] = 0.0
 
     # left and right boundary between source region and wall
-    bndr_type[0, ny_wall_boundary+1:ny-ny_source-1] = 8
-    bndr_type[nx,ny_wall_boundary+1:ny-ny_source-1] = 8
+    bndr_type[0, ny_wall_boundary+1:ny-ny_source] = 8
+    bndr_type[nx,ny_wall_boundary+1:ny-ny_source] = 8
 
     # corner points of wall at left and right boudnary
     bndr_type[0, ny_wall_boundary] = 1
@@ -474,12 +478,22 @@ if __name__ == "__main__":
     bndr_val [0, ny_wall_boundary] = wall_potential
     bndr_val [nx,ny_wall_boundary] = wall_potential
 
+    # left, right and bottom boudnary of the wall
+    bndr_type[0, 0:ny_wall_boundary] = 5
+    bndr_type[nx,0:ny_wall_boundary] = 5
+    bndr_type[0:nx,0] 		       = 5
+    bndr_val [0, 0:ny_wall_boundary] = wall_potential
+    bndr_val [nx,0:ny_wall_boundary] = wall_potential
+    bndr_val [0:nx,0] 		       = wall_potential
+
     # wall surface
     for i in np.arange(1, nx):
         for j in np.arange(1, ny_wall_max):
             if is_wall[i,j] == 1 and (is_wall[i-1, j] == 0 or is_wall[i+1, j] == 0 or is_wall[i, j-1] == 0 or is_wall[i, j+1] == 0):
                 bndr_type[i,j] = 1
-            if is_wall[i,j] == 1:
+                bndr_val [i,j] = wall_potential
+            elif is_wall[i,j] == 1:
+                bndr_type[i,j] = 5
                 bndr_val [i,j] = wall_potential
     
     # ============================= boundary lines ========================

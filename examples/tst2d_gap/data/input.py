@@ -6,14 +6,14 @@ import math
 
 method = 'explicit'
 
-l0 = 0.4e-5
-nx = 200
-ny = 300
-Lsim = [nx*l0,ny*l0]
+l0 = 3.5e-6
+nx = 1000
+ny = 1485
+Lsim = [nx * l0, ny * l0]
 
-t0 = 0.5e-12
+t0 = 2.0e-12
 ns = int(1.0e-9 / t0)
-Tsim = 5 * ns			# duration of the simulation
+Tsim = 100 # * ns			# duration of the simulation
 number_output = 5
 
 number_of_procs = [8, 4]
@@ -90,20 +90,11 @@ vz = 0.0
 # this is used to randomize the random number generator
 random_seed = 0
 
-
-
-gapHeight = 100
-gapWidth = 50
-sourceLength=5
-bevel_depth = 20 * l0
+gapHeight = int(2.0e-3 / l0) + 3
+sourceLength = 20
 
 Grid(
-	gridType = "iter_gap",
-	gapKind = "divertor",
-	ny_source = sourceLength,
-	ny_gapHeight = gapHeight,
-	nx_gapWeight = gapWidth,
-	ny_bevel_depth = bevel_depth / l0,
+	gridType = "from_file",
 	potential_wall = -60.0
 )
 
@@ -229,6 +220,7 @@ PartSource(
 	loadPos_end 	= nx*l0,
 	loadPos_Ystart 	= (ny-sourceLength)*l0,
 	loadPos_Yend 	= ny*l0,
+	step_update	= 10,
 
 )
 
@@ -247,6 +239,7 @@ PartSource(
 	loadPos_end 	= nx*l0,
 	loadPos_Ystart 	= (ny-sourceLength)*l0,
 	loadPos_Yend 	= ny*l0,
+	step_update	= 10,
 
 )
 

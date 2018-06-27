@@ -382,17 +382,19 @@ class Grid2D:
 
 
 if __name__ == "__main__":
-    dx = 1.0e-5
-    dy = 1.0e-5
-    nx = 500
-    ny = 500
-    lx = dx * nx
-    ly = dy * ny
-
+    dx = 3.5e-6
+    dy = 3.5e-6
+    lx = 3.5e-3
+    ly = 5.2e-3
+    nx = int(lx / dx)
+    ny = int(ly / dy)
     ny_source = 20
     ny_base = 3
 
-    ny_wall_boundary = 200 + ny_base
+    print("nx, ny is : ", nx, ny)
+
+
+    ny_wall_boundary = int(2.0e-3 / dy) + ny_base
     ny_wall_max = ny - ny_source - 5
 
     wall_potential = -60.0
@@ -400,9 +402,9 @@ if __name__ == "__main__":
     polygon_list = []
 
     point0 = Point(0.0,     ny_base*dy)
-    point1 = Point(200*dx,  ny_base*dy)
-    point2 = Point(200*dx,  (ny_base+200)*dy)
-    point3 = Point(0.0,     (ny_base+200)*dy)
+    point1 = Point(1.5e-3,  ny_base*dy)
+    point2 = Point(1.5e-3,  ny_base*dy + 2.0e-3)
+    point3 = Point(0.0,     ny_base*dy + 2.0e-3)
 
     line0 = Straight_line(point0, point1)
     line1 = Straight_line(point1, point2)
@@ -417,11 +419,11 @@ if __name__ == "__main__":
     polygon_list.append(polygon0)
 
 
-    point4 = Point(300*dx,  ny_base*dy)
-    point5 = Point(500*dx,  ny_base*dy)
-    point6 = Point(500*dx,  (ny_base+200)*dy)
-    point7 = Point(350*dx,  (ny_base+200)*dy)
-    point8 = Point(300*dx,  (ny_base+150)*dy)
+    point4 = Point(2.0e-3,  ny_base*dy)
+    point5 = Point(3.5e-3,  ny_base*dy)
+    point6 = Point(3.5e-3,  ny_base*dy + 2.0e-3)
+    point7 = Point(2.5e-3,  ny_base*dy + 2.0e-3)
+    point8 = Point(2.0e-3,  ny_base*dy + 1.5e-3)
 
     line4 = Straight_line(point4, point5)
     line5 = Straight_line(point5, point6)
@@ -523,3 +525,4 @@ if __name__ == "__main__":
     grid2d = Grid2D(dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list)
     grid2d.save_grid()
     grid2d.save_fig()
+
