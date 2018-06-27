@@ -7,8 +7,8 @@ import math
 method = 'explicit'
 
 l0 = 1.0e-5
-nx = 500
-ny = 500
+nx = 800
+ny = 519
 Lsim = [nx*l0,ny*l0]
 
 t0 = 0.5e-12
@@ -90,10 +90,9 @@ vz = 0.0
 # this is used to randomize the random number generator
 random_seed = 0
 
-gapHeight = 200
-gapWidth = 50
-sourceLength=5
-bevel_depth = 20 * l0
+gapHeight = int(2.0e-3 / l0) + 3
+sourceLength = 20
+
 
 Grid(
 	gridType = "from_file",
