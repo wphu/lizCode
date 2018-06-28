@@ -28,10 +28,10 @@ public:
         int nx_gapWeight_temp,
         double potential_wall_temp);
 
-    //! Destructor for Grid3D
+    // Destructor for Grid3D
     ~Grid3D();
 
-    //! Method used to allocate a Grid3D
+    // Method used to allocate a Grid3D
     void allocateDims();
     void geometry();
     void geometry_gap();
@@ -40,23 +40,14 @@ public:
   	int **iswall_global_3D;
     int **bndr_global_3D;
     double **bndrVal_global_3D;
-    //! The number of the current point in the discrete Poisson Eqution left coefficient matrix
+    // The number of the current point in the discrete Poisson Eqution left coefficient matrix
     int **numcp_global_3D;
 
-    //>>>temp variable
-
-
-
-    // Tomakak divertor gap geometry Parameters
-    std::string gapKind;
-    int ny_source;
-    int ny_gapHeight;
-    int nx_gapWeight;
     double potential_wall;
 
 
 private:
-    //!\todo{Comment what are these stuffs (MG for JD)}
+    // \todo{Comment what are these stuffs (MG for JD)}
     //double *data_3D;
 };
 

@@ -58,6 +58,8 @@ public:
 	    double loadPos_end;
 		double loadPos_Ystart;
 	    double loadPos_Yend;
+		double load_Pos_Zstart;
+		double load_Pos_Zend;
 
 	    bool intra, debye_length_required = false;
 	    int debug_every;
@@ -237,6 +239,62 @@ public:
 		        //vecPartSource.push_back( new PartSource1D_Load(params, smpi, sgroup1[0], loadDensity, loadTemperature, loadPos_start, loadPos_end) );
 				vecPartSource.push_back( new PartSource2D_Load(params, smpi, sgroup1[0], mean_velocity, loadKind, loadNumber, everyTime, loadDn,loadDensity,
 				loadTemperature, loadPos_start, loadPos_end, loadPos_Ystart, loadPos_Yend, step_update) );
+
+			}
+
+			else if(params.geometry == "3d3v" && PartSource_type == "Load")
+			{
+		        ifile.extract("species1",sg1,"PartSource",n_PartSource);
+		        // Obtain the lists of species numbers from the lists of species names.
+		        sgroup1 = params.FindSpecies(sg1);
+		        // Each group of species sgroup1 and sgroup2 must not be empty
+		        if (sgroup1.size()==0) ERROR("No valid `species1` requested in PSI #" << n_PartSource);
+
+				ifile.extract("mean_velocity",mean_velocity,"PartSource",n_PartSource);
+
+		        ifile.extract("loadKind",loadKind,"PartSource",n_PartSource);
+				ifile.extract("loadNumber",loadNumber,"PartSource",n_PartSource);
+				ifile.extract("everyTime",everyTime,"PartSource",n_PartSource);
+
+		        loadDensity = 0.0; // default
+		        ifile.extract("loadDensity",loadDensity,"PartSource",n_PartSource);
+
+				loadTemperature = 0.0; // default
+		        ifile.extract("loadTemperature",loadTemperature,"PartSource",n_PartSource);
+
+				loadDn= 0.0; // default
+		        ifile.extract("loadDn",loadDn,"PartSource",n_PartSource);
+
+				loadPos_start = 0.0; // default
+				ifile.extract("loadPos_start",loadPos_start,"PartSource",n_PartSource);
+
+				loadPos_end = 0.0; // default
+				ifile.extract("loadPos_end",loadPos_end,"PartSource",n_PartSource);
+
+				loadPos_Ystart = 0.0; // default
+				ifile.extract("loadPos_Ystart",loadPos_Ystart,"PartSource",n_PartSource);
+
+				loadPos_Yend = 0.0; // default
+				ifile.extract("loadPos_Yend",loadPos_Yend,"PartSource",n_PartSource);
+
+				loadPos_Zstart = 0.0; // default
+				ifile.extract("loadPos_Zstart",loadPos_Zstart,"PartSource",n_PartSource);
+
+				loadPos_Zend = 0.0; // default
+				ifile.extract("loadPos_Zend",loadPos_Zend,"PartSource",n_PartSource);
+
+				step_update = 1;
+				ifile.extract("step_update",step_update,"PartSource",n_PartSource);
+
+		        // Print PSI parameters
+		        mystream.str(""); // clear
+		        for (unsigned int rs=0 ; rs<sgroup1.size() ; rs++) mystream << " #" << sgroup1[rs];
+		        MESSAGE(1,"First  group of species :" << mystream.str());
+
+		        // Add new PSI objects to vector
+		        //vecPartSource.push_back( new PartSource1D_Load(params, smpi, sgroup1[0], loadDensity, loadTemperature, loadPos_start, loadPos_end) );
+				vecPartSource.push_back( new PartSource3D_Load(params, smpi, sgroup1[0], mean_velocity, loadKind, loadNumber, everyTime, loadDn,loadDensity,
+				loadTemperature, loadPos_start, loadPos_end, loadPos_Ystart, loadPos_Yend, loadPos_Zstart, loadPos_Zend, step_update) );
 
 			}
 

@@ -33,24 +33,23 @@ Grid3D::Grid3D(
     Grid(params)
 {
     gridType = grid_type;
-    gapKind = gap_kind;
-    ny_source = ny_source_temp;
-    ny_gapHeight = ny_gapHeight_temp;
-    nx_gapWeight = nx_gapWeight_temp;
     potential_wall = potential_wall_temp;
 
     // number of nodes of the grid in the x-direction
-    dims_.resize(2);
-    globalDims_.resize(2);
+    dims_.resize(3);
+    globalDims_.resize(3);
 
     dims_[0] = params.n_space[0]+1+2*params.oversize[0];
     dims_[1] = params.n_space[1]+1+2*params.oversize[1];
+    dims_[1] = params.n_space[2]+1+2*params.oversize[2];
 
     globalDims_[0]=params.n_space_global[0]+1;
     globalDims_[1]=params.n_space_global[1]+1;
+    globalDims_[2]=params.n_space_global[2]+1;
 
     nx=globalDims_[0];
     ny=globalDims_[1];
+    nz=globalDims_[2];
 
     allocateDims();
     if(gridType == "rectangle")
@@ -76,11 +75,11 @@ Grid3D::~Grid3D()
 
 void Grid3D::allocateDims( )
 {
-    iswall_             = new int[dims_[0]*dims_[1]];
-    iswall_global_      = new int[globalDims_[0]*globalDims_[1]];
-    bndr_global_        = new int[globalDims_[0]*globalDims_[1]];
-    bndrVal_global_     = new double[globalDims_[0]*globalDims_[1]];
-    numcp_global_       = new int[globalDims_[0]*globalDims_[1]];
+    iswall_             = new int[dims_[0]*dims_[1]*dims_[2]];
+    iswall_global_      = new int[globalDims_[0]*globalDims_[1]*globalDims_[2]];
+    bndr_global_        = new int[globalDims_[0]*globalDims_[1]*globalDims_[2]];
+    bndrVal_global_     = new double[globalDims_[0]*globalDims_[1]*globalDims_[2]];
+    numcp_global_       = new int[globalDims_[0]*globalDims_[1]*globalDims_[2]];
 
     iswall_3D           =new int*[dims_[0]];
     for (int i=0; i<dims_[0]; i++)  {
