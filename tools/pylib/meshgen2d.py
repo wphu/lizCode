@@ -382,9 +382,9 @@ class Grid2D:
 
 
 if __name__ == "__main__":
-    dx = 3.5e-6
-    dy = 3.5e-6
-    lx = 3.5e-3
+    dx = 1.0e-5 #3.5e-6
+    dy = 1.0e-5 #3.5e-6
+    lx = 8.0e-3
     ly = 5.2e-3
     nx = int(lx / dx)
     ny = int(ly / dy)
@@ -401,6 +401,7 @@ if __name__ == "__main__":
 
     polygon_list = []
 
+    # left tile
     point0 = Point(0.0,     ny_base*dy)
     point1 = Point(1.5e-3,  ny_base*dy)
     point2 = Point(1.5e-3,  ny_base*dy + 2.0e-3)
@@ -418,26 +419,43 @@ if __name__ == "__main__":
     polygon0.add_straight_line(line3)
     polygon_list.append(polygon0)
 
-
-    point4 = Point(2.0e-3,  ny_base*dy)
-    point5 = Point(3.5e-3,  ny_base*dy)
-    point6 = Point(3.5e-3,  ny_base*dy + 2.0e-3)
-    point7 = Point(2.5e-3,  ny_base*dy + 2.0e-3)
-    point8 = Point(2.0e-3,  ny_base*dy + 1.5e-3)
+    # right tile
+    point4 = Point(6.5e-3,  ny_base*dy)
+    point5 = Point(8.0e-3,  ny_base*dy)
+    point6 = Point(8.0e-3,  ny_base*dy + 2.0e-3)
+    point7 = Point(6.5e-3,  ny_base*dy + 2.0e-3)
 
     line4 = Straight_line(point4, point5)
     line5 = Straight_line(point5, point6)
     line6 = Straight_line(point6, point7)
-    line7 = Straight_line(point7, point8)
-    line8 = Straight_line(point8, point4)
+    line7 = Straight_line(point7, point4)
 
     polygon1 = Polygon()
     polygon1.add_straight_line(line4)
     polygon1.add_straight_line(line5)
     polygon1.add_straight_line(line6)
     polygon1.add_straight_line(line7)
-    polygon1.add_straight_line(line8)
     polygon_list.append(polygon1)
+
+
+    # the probe in the gap
+    point8 = Point(3.5e-3,  ny_base*dy)
+    point9 = Point(4.5e-3,  ny_base*dy)
+    point10 = Point(4.5e-3,  ny_base*dy + 1.5e-3)
+    point11 = Point(3.5e-3,  ny_base*dy + 1.5e-3)
+
+    line8 = Straight_line(point8, point9)
+    line9 = Straight_line(point9, point10)
+    line10 = Straight_line(point10, point11)
+    line11 = Straight_line(point11, point8)
+
+    polygon1 = Polygon()
+    polygon1.add_straight_line(line8)
+    polygon1.add_straight_line(line9)
+    polygon1.add_straight_line(line10)
+    polygon1.add_straight_line(line11)
+    polygon_list.append(polygon1)
+
 
     is_wall     = np.zeros((nx+1, ny+1), dtype = 'int')
     bndr_type   = np.zeros((nx+1, ny+1), dtype = 'int')
@@ -502,10 +520,13 @@ if __name__ == "__main__":
     bndr_line_list = []
     bndr_line0 = Straight_line(point3, point2)
     bndr_line1 = Straight_line(point2, point1)
-    bndr_line2 = Straight_line(point1, point4)
-    bndr_line3 = Straight_line(point4, point8)
-    bndr_line4 = Straight_line(point8, point7)
-    bndr_line5 = Straight_line(point7, point6)
+    bndr_line2 = Straight_line(point1, point8)
+    bndr_line3 = Straight_line(point8, point11)
+    bndr_line4 = Straight_line(point11, point10)
+    bndr_line5 = Straight_line(point10, point9)
+    bndr_line6 = Straight_line(point9, point4)
+    bndr_line7 = Straight_line(point4, point7)
+    bndr_line8 = Straight_line(point7, point6)
 
     bndr_line_list.append(bndr_line0)
     bndr_line_list.append(bndr_line1)
@@ -513,6 +534,9 @@ if __name__ == "__main__":
     bndr_line_list.append(bndr_line3)
     bndr_line_list.append(bndr_line4)
     bndr_line_list.append(bndr_line5)
+    bndr_line_list.append(bndr_line6)
+    bndr_line_list.append(bndr_line7)
+    bndr_line_list.append(bndr_line8)
 
     segment_list = []
     n_segments = []
