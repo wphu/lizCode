@@ -21,7 +21,7 @@ Solver3D(params)
     dx = params.cell_length[0];
     dy = params.cell_length[1];
     dz = params.cell_length[2];
-    dxyz = dx * dy * dz;
+    dxyz = dx * dy;
 
     nprow = params.number_of_procs[0];
     npcol = params.number_of_procs[1];
@@ -55,22 +55,25 @@ void EF_Solver3D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     // Static-cast of the fields
     Field3D* Ex3D = static_cast<Field3D*>(fields->Ex_);
     Field3D* Ey3D = static_cast<Field3D*>(fields->Ey_);
+    Field3D* Ez3D = static_cast<Field3D*>(fields->Ez_);
 
     Field3D* rho3D           = static_cast<Field3D*>(fields->rho_);
     Field3D* rho3D_global    = static_cast<Field3D*>(fields->rho_global);
     Field3D* phi3D_global    = static_cast<Field3D*>(fields->phi_global);
     Field3D* Ex3D_global    = static_cast<Field3D*>(fields->Ex_global);
     Field3D* Ey3D_global    = static_cast<Field3D*>(fields->Ey_global);
+    Field3D* Ez3D_global    = static_cast<Field3D*>(fields->Ez_global);
 
     smpi3D->barrier();
     smpi3D->gather_rho_all(rho3D_global, rho3D);
 
     solve_SLU(rho3D_global, phi3D_global);
-    solve_Exy(phi3D_global, Ex3D_global, Ey3D_global);
+    solve_Exyz(phi3D_global, Ex3D_global, Ey3D_global, Ez3D_global);
 
     smpi3D->barrier();
     smpi3D->scatterField(Ex3D_global, Ex3D);
     smpi3D->scatterField(Ey3D_global, Ey3D);
+    smpi3D->scatterField(Ez3D_global, Ez3D);
 }
 
 
@@ -94,130 +97,186 @@ void EF_Solver3D_SLU_DIST::initSLU()
     {
         for(j=0; j<ny; j++)
         {
-            // normal points in the calculation region
-            if(grid3D->bndr_global_3D[i][j]==0) 
+            for(k=0; k<nz; k++)
             {
-                hl = grid3D->numcp_global_3D[i][j] - grid3D->numcp_global_3D[i-1][j];
-                hr = grid3D->numcp_global_3D[i+1][j] - grid3D->numcp_global_3D[i][j];
-                /*
-                for(k=0; k<grid3D->ncp; k++)
+                // normal points in the calculation region
+                if(grid3D->bndr_global_3D[i][j][k]==0) 
                 {
-                    b[k]=0.0;
+                    // order: left, right, down, up, in, out
+                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
+                    hr = grid3D->numcp_global_3D[i+1][j][k] - grid3D->numcp_global_3D[i][j][k];
+                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
+                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
+                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
+                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
+
+                    nnz = nnz + 7;
+                    
+                    val[ii].push_back(-4.0);
+                    row[ii].push_back(ii);
+                    val[ii-hl].push_back(1.0);
+                    row[ii-hl].push_back(ii);
+                    val[ii+hr].push_back(1.0);
+                    row[ii+hr].push_back(ii);
+                    val[ii-hd].push_back(1.0);
+                    row[ii-hd].push_back(ii);
+                    val[ii+hu].push_back(1.0);
+                    row[ii+hu].push_back(ii);
+                    val[ii-hi].push_back(1.0);
+                    row[ii-hi].push_back(ii);
+                    val[ii+ho].push_back(1.0);
+                    row[ii+ho].push_back(ii);
+
+                    ii++;
                 }
-                b[ii]=-4.0; b[ii-hl]=1.0; b[ii-1]=1.0; b[ii+hr]=1.0; b[ii+1]=1.0;
-                */
 
-                nnz=nnz+5;
-                
-                val[ii].push_back(-4.0);
-                row[ii].push_back(ii);
-                val[ii-hl].push_back(1.0);
-                row[ii-hl].push_back(ii);
-                val[ii-1].push_back(1.0);
-                row[ii-1].push_back(ii);
-                val[ii+hr].push_back(1.0);
-                row[ii+hr].push_back(ii);
-                val[ii+1].push_back(1.0);
-                row[ii+1].push_back(ii);
-
-                /*
-                for(k=0; k<grid3D->ncp; k++)
+                // Dirchlet boudnary points
+                else if(grid3D->bndr_global_3D[i][j][k]==1) 
                 {
-                    if(b[k] != 0.0)
-                    {
-                        if(v>=grid3D->ncp*5) cout<<"error"<<v<<endl;
-                        val[v] = b [k];
-                        row[v] = ii;
-                        col[v] = k;
-                        v++;
-                    }
+                    nnz++;
+
+                    val[ii].push_back(1.0);
+                    row[ii].push_back(ii);
+
+                    ii++;
                 }
-                */
 
-                ii++;
-            }
+ 
+                // periodic boudnary points at left boudary in x direction
+                else if( grid3D->bndr_global_3D[i][j][k]==8 && i==0) 
+                {
+                    hr = grid3D->numcp_global_3D[nx-1][j][k] - grid3D->numcp_global_3D[i][j][k];
+                    nnz = nnz + 2;
 
-            // Dirchlet boudnary points
-            else if(grid3D->bndr_global_3D[i][j]==1) 
-            {
-                nnz++;
+                    val[ii].push_back(1.0);
+                    row[ii].push_back(ii);
+                    val[ii+hr].push_back(-1.0);
+                    row[ii+hr].push_back(ii);
 
-                val[ii].push_back(1.0);
-                row[ii].push_back(ii);
+                    ii++;
+                }
 
-                ii++;
-            }
+                // periodic boudnary points at right boudary in x direction
+                else if ( grid3D->bndr_global_3D[i][j][k] == 8 && i == nx-1 ) {
+                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
+                    hr = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[1][j][k];
+                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
+                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
+                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
+                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
 
-            // periodic boudnary points at lowwer boudary in y direction
-            else if( grid3D->bndr_global_3D[i][j]==8 && j==0) 
-            {
-                hu = grid3D->numcp_global_3D[i][ny-1] - grid3D->numcp_global_3D[i][j];
-                nnz=nnz+2;
+                    nnz = nnz + 7;
 
-                val[ii].push_back(1.0);
-                row[ii].push_back(ii);
-                val[ii+hu].push_back(-1.0);
-                row[ii+hu].push_back(ii);
+                    val[ii].push_back(-4.0);
+                    row[ii].push_back(ii);
+                    val[ii-hl].push_back(1.0);
+                    row[ii-hl].push_back(ii);
+                    val[ii+hr].push_back(1.0);
+                    row[ii+hr].push_back(ii);
+                    val[ii-hd].push_back(1.0);
+                    row[ii-hd].push_back(ii);
+                    val[ii-hu].push_back(1.0);
+                    row[ii-hu].push_back(ii);
+                    val[ii-hi].push_back(1.0);
+                    row[ii-hi].push_back(ii);
+                    val[ii+ho].push_back(1.0);
+                    row[ii+ho].push_back(ii);
 
-                ii++;
-            }
+                    ii++;
+                }
 
-            // periodic boudnary points at upper boudary in y direction
-            else if ( grid3D->bndr_global_3D[i][j] == 8 && j == ny-1 ) 
-            {
-                hl = grid3D->numcp_global_3D[i][j] - grid3D->numcp_global_3D[i-1][j];
-                hr = grid3D->numcp_global_3D[i+1][j] - grid3D->numcp_global_3D[i][j];
-                hd = grid3D->numcp_global_3D[i][ny-1] - grid3D->numcp_global_3D[i][1];
-                nnz=nnz+5;
+               // periodic boudnary points at lowwer boudary in y direction
+                else if( grid3D->bndr_global_3D[i][j][k]==8 && j==0) 
+                {
+                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
 
-                val[ii].push_back(-4.0);
-                row[ii].push_back(ii);
-                val[ii-hl].push_back(1.0);
-                row[ii-hl].push_back(ii);
-                val[ii-1].push_back(1.0);
-                row[ii-1].push_back(ii);
-                val[ii+hr].push_back(1.0);
-                row[ii+hr].push_back(ii);
-                val[ii-hd].push_back(1.0);
-                row[ii-hd].push_back(ii);
+                    nnz = nnz + 2;
 
-                ii++;
-            }
+                    val[ii].push_back(1.0);
+                    row[ii].push_back(ii);
+                    val[ii+hu].push_back(-1.0);
+                    row[ii+hu].push_back(ii);
 
-            // periodic boudnary points at left boudary in x direction
-            else if( grid3D->bndr_global_3D[i][j]==8 && i==0) 
-            {
-                hr = grid3D->numcp_global_3D[nx-1][j] - grid3D->numcp_global_3D[i][j];
-                nnz=nnz+2;
+                    ii++;
+                }
 
-                val[ii].push_back(1.0);
-                row[ii].push_back(ii);
-                val[ii+hr].push_back(-1.0);
-                row[ii+hr].push_back(ii);
+                // periodic boudnary points at upper boudary in y direction
+                else if ( grid3D->bndr_global_3D[i][j][k] == 8 && j == ny-1 ) 
+                {
+                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
+                    hr = grid3D->numcp_global_3D[i+1][j][k] - grid3D->numcp_global_3D[i][j][k];
+                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
+                    hu = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][1][k];
+                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
+                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
 
-                ii++;
-            }
+                    nnz = nnz + 7;
 
-            // periodic boudnary points at right boudary in x direction
-            else if ( grid3D->bndr_global_3D[i][j] == 8 && i == nx-1 ) {
-                hl = grid3D->numcp_global_3D[i][j] - grid3D->numcp_global_3D[i-1][j];
-                hr = grid3D->numcp_global_3D[i][j] - grid3D->numcp_global_3D[1][j];
-                nnz=nnz+5;
+                    val[ii].push_back(-4.0);
+                    row[ii].push_back(ii);
+                    val[ii-hl].push_back(1.0);
+                    row[ii-hl].push_back(ii);
+                    val[ii+hr].push_back(1.0);
+                    row[ii+hr].push_back(ii);
+                    val[ii-hd].push_back(1.0);
+                    row[ii-hd].push_back(ii);
+                    val[ii-hu].push_back(1.0);
+                    row[ii-hu].push_back(ii);
+                    val[ii-hi].push_back(1.0);
+                    row[ii-hi].push_back(ii);
+                    val[ii+ho].push_back(1.0);
+                    row[ii+ho].push_back(ii);
 
-                val[ii].push_back(-4.0);
-                row[ii].push_back(ii);
-                val[ii-hl].push_back(1.0);
-                row[ii-hl].push_back(ii);
-                val[ii-1].push_back(1.0);
-                row[ii-1].push_back(ii);
-                val[ii-hr].push_back(1.0);
-                row[ii-hr].push_back(ii);
-                val[ii+1].push_back(1.0);
-                row[ii+1].push_back(ii);
+                    ii++;
+                }
 
-                ii++;
+               // periodic boudnary points at lowwer boudary in z direction
+                else if( grid3D->bndr_global_3D[i][j][k]==8 && k==0) 
+                {
+                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
+                    nnz = nnz + 2;
+
+                    val[ii].push_back(1.0);
+                    row[ii].push_back(ii);
+                    val[ii+ho].push_back(-1.0);
+                    row[ii+ho].push_back(ii);
+
+                    ii++;
+                }
+
+                // periodic boudnary points at upper boudary in z direction
+                else if ( grid3D->bndr_global_3D[i][j][k] == 8 && k == nz-1 ) 
+                {
+                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
+                    hr = grid3D->numcp_global_3D[i+1][j][k] - grid3D->numcp_global_3D[i][j][k];
+                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
+                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
+                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
+                    ho = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][1];
+
+                    nnz = nnz + 7;
+
+                    val[ii].push_back(-4.0);
+                    row[ii].push_back(ii);
+                    val[ii-hl].push_back(1.0);
+                    row[ii-hl].push_back(ii);
+                    val[ii+hr].push_back(1.0);
+                    row[ii+hr].push_back(ii);
+                    val[ii-hd].push_back(1.0);
+                    row[ii-hd].push_back(ii);
+                    val[ii-hu].push_back(1.0);
+                    row[ii-hu].push_back(ii);
+                    val[ii-hi].push_back(1.0);
+                    row[ii-hi].push_back(ii);
+                    val[ii-ho].push_back(1.0);
+                    row[ii-ho].push_back(ii);
+
+                    ii++;
+                }
+
             }
         }
+
     }
 
     // convert the temp "val row col" to A (compressed column format, i.e. Harwell-Boeing format)
@@ -338,29 +397,37 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
     //>>>convert Field3D rho to SuperLU right hand side matrix
     int ii;
     ii = 0;
-    for ( int i=0; i<nx; i++)
+    for(int i=0; i<nx; i++)
     {
-      for ( int j=0; j<ny; j++) {
-        if ( grid3D->bndr_global_3D[i][j] == 0 ) {
-          b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j);
-          ii++;
+        for(int j=0; j<ny; j++) 
+        {
+            for(int k = 0; k < nz; k++)
+            {
+                if(grid3D->bndr_global_3D[i][j][k] == 0 ) 
+                {
+                    b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j,k);
+                    ii++;
+                }
+                else if(grid3D->bndr_global_3D[i][j][k] == 1) 
+                {
+                    b1[ii] = grid3D->bndrVal_global_3D[i][j][k];
+                    ii++;
+                }
+                else if(grid3D->bndr_global_3D[i][j][k] == 8 && ( i == 0 || j == 0 || k == 0)) 
+                {
+                    b1[ii] = 0.0;
+                    ii++;
+                }
+                else if(grid3D->bndr_global_3D[i][j] == 8 && ( i == nx - 1 || j == ny - 1 || k == nz - 1)) 
+                {
+                    b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j,k);
+                    ii++;
+                }
+                else 
+                {
+                }
+            }
         }
-        else if ( grid3D->bndr_global_3D[i][j] == 1) {
-          b1[ii] = grid3D->bndrVal_global_3D[i][j];
-          ii++;
-        }
-        else if ( grid3D->bndr_global_3D[i][j] == 8 && ( j == 0 || i == 0 )) {
-          b1[ii] = 0.0;
-          ii++;
-        }
-        else if ( grid3D->bndr_global_3D[i][j] == 8 && ( j == ny-1 || i == nx-1 )) {
-          b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j);
-          ii++;
-        }
-        else {
-        }
-
-      }
     }//>>>end convert
 
     /* ------------------------------------------------------------
@@ -376,19 +443,25 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
 
     //>>>convert SuperLU solution X to Field3D phi
     ii=0;
-    for ( int i=0; i<nx; i++)
+    for(int i=0; i<nx; i++)
     {
-        for ( int j=0; j<ny; j++)
+        for(int j=0; j<ny; j++)
         {
-          if ( grid3D->bndr_global_3D[i][j] == 0 || grid3D->bndr_global_3D[i][j] == 1
-          || grid3D->bndr_global_3D[i][j] == 2 || grid3D->bndr_global_3D[i][j] == 8) {
-            (*phi3D)(i,j) = b1[ii];
-            ii++;
-          }
+            for(int k = 0; k < nz; k++)
+            {
+                if (grid3D->bndr_global_3D[i][j][k] == 0 || grid3D->bndr_global_3D[i][j][k] == 1
+                 || grid3D->bndr_global_3D[i][j][k] == 2 || grid3D->bndr_global_3D[i][j][k] == 8) 
+                {
+                    (*phi3D)(i,j,k) = b1[ii];
+                    ii++;
+                }
 
-          if(grid3D->bndr_global_3D[i][j] == 5) {
-              (*phi3D)(i,j) = grid3D->bndrVal_global_3D[i][j];
-          }
+                if(grid3D->bndr_global_3D[i][j][k] == 5) 
+                {
+                    (*phi3D)(i,j,k) = grid3D->bndrVal_global_3D[i][j][k];
+                }
+            }
+
 
         }//>>>end convert
     }

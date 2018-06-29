@@ -31,7 +31,7 @@ SmileiMPI_Cart3D::SmileiMPI_Cart3D( int* argc, char*** argv )
 SmileiMPI_Cart3D::SmileiMPI_Cart3D( SmileiMPI* smpi)
 : SmileiMPI( smpi )
 {
-    ndims_ = 2;
+    ndims_ = 3;
     number_of_procs = new int[ndims_];
     coords_  = new int[ndims_];
     periods_  = new int[ndims_];
@@ -86,34 +86,46 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
 
     //! Oversize domain to exchange less particles
     oversize = params.oversize;
-    for (unsigned int i=0 ; i<params.nDim_field ; i++) {
+    for (unsigned int i=0 ; i<params.nDim_field ; i++) 
+    {
         params.n_space_global[i] = round(params.sim_length[i]/params.cell_length[i]);
         MESSAGE("Total number of cells in direction " << i << ": " << params.n_space_global[i]);
     }
 
-    if (params.number_of_procs[0]!=0) {
+    if (params.number_of_procs[0]!=0) 
+    {
         for (unsigned int i=0 ; i<params.nDim_field ; i++)
+        {
             number_of_procs[i] = params.number_of_procs[i];
-        if (number_of_procs[0]*number_of_procs[1]!=smilei_sz) {
+        }
+            
+        if (number_of_procs[0]*number_of_procs[1]!=smilei_sz) 
+        {
             DEBUG(3,"Domain decomposition specified in the namelist don't match with the number of MPI process");
             DEBUG(3,"\tit will be computed to be as square as possible");
             for (unsigned int i=0 ; i<params.nDim_field ; i++)
+            {
                 params.number_of_procs[i] = 0;
+            }
         }
     }
-    if (params.number_of_procs[0]==0) {
+    if (params.number_of_procs[0]==0) 
+    {
         double tmp(0.);
         tmp  = params.res_space[0]*params.sim_length[0] / ( params.res_space[1]*params.sim_length[1] );
 
         number_of_procs[0] = min( smilei_sz, max(1, (int)sqrt ( (double)smilei_sz*tmp*tmp) ) );
         number_of_procs[1] = (int)(smilei_sz / number_of_procs[0]);
 
-        while ( number_of_procs[0]*number_of_procs[1] != smilei_sz ) {
-            if (number_of_procs[0]>=number_of_procs[1] ) {
+        while ( number_of_procs[0]*number_of_procs[1] != smilei_sz ) 
+        {
+            if (number_of_procs[0]>=number_of_procs[1] ) 
+            {
                 number_of_procs[0]++;
                 number_of_procs[1] = (int)(smilei_sz / number_of_procs[0]);
             }
-            else {
+            else 
+            {
                 number_of_procs[1]++;
                 number_of_procs[0] = (int)(smilei_sz / number_of_procs[1]);
             }
@@ -128,39 +140,50 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
     MESSAGE("em. bound. condit. in ymin & ymax directions: "<< params.bc_em_type_y[0] << ", "<< params.bc_em_type_y[1]);
 
     // Geometry periodic in x
-    if ( (params.bc_em_type_x[0]=="periodic") || (params.bc_em_type_x[1]=="periodic") ) {
+    if( (params.bc_em_type_x[0]=="periodic") || (params.bc_em_type_x[1]=="periodic") ) 
+    {
         periods_[0] = 1;
         MESSAGE(1,"applied topology for periodic BCs in x-direction");
     }
     // Geometry periodic in y
-    if ( (params.bc_em_type_y[0]=="periodic") || (params.bc_em_type_y[1]=="periodic") ) {
+    if( (params.bc_em_type_y[0]=="periodic") || (params.bc_em_type_y[1]=="periodic") ) 
+    {
         periods_[1] = 1;
         MESSAGE(2,"applied topology for periodic BCs in y-direction");
     }
+    // Geometry periodic in z
+    if( (params.bc_em_type_z[0]=="periodic") || (params.bc_em_type_z[1]=="periodic") ) 
+    {
+        periods_[2] = 1;
+        MESSAGE(2,"applied topology for periodic BCs in z-direction");
+    }
+
     MPI_Cart_create( SMILEI_COMM_WORLD, ndims_, number_of_procs, periods_, reorder_, &SMILEI_COMM_3D );
     MPI_Cart_coords( SMILEI_COMM_3D, smilei_rk, ndims_, coords_ );
 
-    for (int iDim=0 ; iDim<ndims_ ; iDim++) {
+    for(int iDim=0 ; iDim<ndims_ ; iDim++) 
+    {
         MPI_Cart_shift( SMILEI_COMM_3D, iDim, 1, &(neighbor_[iDim][0]), &(neighbor_[iDim][1]) );
         //DEBUG(3,smilei_rk,"Neighbors of process in direction " << iDim << " : " << neighbor_[iDim][0] << " - " << neighbor_[iDim][1]  );
     }
-    for (unsigned int i=0 ; i<params.nDim_field ; i++) {
+    for(unsigned int i=0 ; i<params.nDim_field ; i++) 
+    {
         n_space_global[i] = params.n_space_global[i];
-        //if (i!=0) {
-        if (1) {
-            params.n_space[i] = params.n_space_global[i] / number_of_procs[i];
-            cell_starting_global_index[i] = coords_[i]*(params.n_space_global[i] / number_of_procs[i]);
 
-            if ( number_of_procs[i]*params.n_space[i] != params.n_space_global[i] ) {
-                // Correction on the last MPI process of the direction to use the wished number of cells
-                if (coords_[i]==number_of_procs[i]-1) {
-                    params.n_space[i] = params.n_space_global[i] - params.n_space[i]*(number_of_procs[i]-1);
-                }
+        params.n_space[i] = params.n_space_global[i] / number_of_procs[i];
+        cell_starting_global_index[i] = coords_[i]*(params.n_space_global[i] / number_of_procs[i]);
+        if( number_of_procs[i]*params.n_space[i] != params.n_space_global[i] ) 
+        {
+            // Correction on the last MPI process of the direction to use the wished number of cells
+            if(coords_[i]==number_of_procs[i]-1) 
+            {
+                params.n_space[i] = params.n_space_global[i] - params.n_space[i]*(number_of_procs[i]-1);
             }
         }
 
         oversize[i] = params.oversize[i] = params.interpolation_order + (params.exchange_particles_each-1);
-        if ( params.n_space[i] <= 2*oversize[i] ) {
+        if ( params.n_space[i] <= 2*oversize[i] ) 
+        {
             WARNING ( "Increase space resolution or reduce number of MPI process in direction " << i << " "<< params.n_space[i]);
         }
 
@@ -176,27 +199,31 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
     //>>>calculate nspace_global_gather to gather and scatter the Field and Grid data
     dims_global_gather[0]=n_space_global[0]+(1+2*params.oversize[0])*number_of_procs[0];
     dims_global_gather[1]=n_space_global[1]+(1+2*params.oversize[1])*number_of_procs[1];
+    dims_global_gather[2]=n_space_global[2]+(1+2*params.oversize[2])*number_of_procs[2];
 
-    grid_global_gather= new int[dims_global_gather[0]*dims_global_gather[1]];
-    field_global_gather= new double[dims_global_gather[0]*dims_global_gather[1]];
+    grid_global_gather  = new int   [dims_global_gather[0] * dims_global_gather[1] * dims_global_gather[2]];
+    field_global_gather = new double[dims_global_gather[0] * dims_global_gather[1] * dims_global_gather[2]];
 
-    dims_gather         = new int[2*smilei_sz];
-    dims_gather_temp    = new int[2*smilei_sz];
+    dims_gather         = new int[3*smilei_sz];
+    dims_gather_temp    = new int[3*smilei_sz];
     for (unsigned int i=0;i< smilei_sz ; i++)
     {
-    	if(i==smilei_rk){
-    		dims_gather_temp[i*2]     = params.n_space[0] + 1 + 2*params.oversize[0];
-    		dims_gather_temp[i*2 + 1] = params.n_space[1] + 1 + 2*params.oversize[1];
+    	if(i==smilei_rk)
+        {
+    		dims_gather_temp[i*3]     = params.n_space[0] + 1 + 2*params.oversize[0];
+    		dims_gather_temp[i*3 + 1] = params.n_space[1] + 1 + 2*params.oversize[1];
+            dims_gather_temp[i*3 + 2] = params.n_space[2] + 1 + 2*params.oversize[2];
             //cout<<"dims_gather "<<params.n_space[0]<<" "<<params.n_space[1]<<" "<<params.number_of_procs[0]<<params.number_of_procs[1]<<endl;
     	}
     	else {
-    		dims_gather_temp[i*2]     = 0;
-    		dims_gather_temp[i*2 + 1] = 0;
+    		dims_gather_temp[i*3]     = 0;
+    		dims_gather_temp[i*3 + 1] = 0;
+            dims_gather_temp[i*3 + 2] = 0;
     	}
 
     }
 
-    MPI_Allreduce(dims_gather_temp, dims_gather, 2*smilei_sz, MPI_INT,MPI_SUM, SMILEI_COMM_3D);
+    MPI_Allreduce(dims_gather_temp, dims_gather, 3*smilei_sz, MPI_INT,MPI_SUM, SMILEI_COMM_3D);
 
     recv_disp.resize(smilei_sz);
     recv_cnt.resize(smilei_sz);
@@ -204,13 +231,15 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
     send_cnt.resize(smilei_sz);
     for(int i = 0; i < smilei_sz; i++)
     {
-        recv_cnt[i] = dims_gather[i*2] * dims_gather[i*2 + 1];
-        send_cnt[i] = dims_gather[i*2] * dims_gather[i*2 + 1];
-        if(i == 0){
+        recv_cnt[i] = dims_gather[i*3] * dims_gather[i*3 + 1] * dims_gather[i*3 + 2];
+        send_cnt[i] = dims_gather[i*3] * dims_gather[i*3 + 1] * dims_gather[i*3 + 2];
+        if(i == 0)
+        {
             recv_disp[i] = 0;
             send_disp[i] = 0;
         }
-        else{
+        else
+        {
             recv_disp[i] = recv_disp[i-1] + recv_cnt[i-1];
             send_disp[i] = send_disp[i-1] + send_cnt[i-1];
         }
@@ -682,96 +711,7 @@ void SmileiMPI_Cart3D::createType( PicParams& params )
 
 void SmileiMPI_Cart3D::sumField( Field* field )
 {
-/*
-    std::vector<unsigned int> n_elem = field->dims_;
-    std::vector<unsigned int> isDual = field->isDual_;
-    Field3D* f3D =  static_cast<Field3D*>(field);
 
-
-    // Use a buffer per direction to exchange data before summing
-    Field3D buf[ndims_][ nbNeighbors_ ];
-    // Size buffer is 2 oversize (1 inside & 1 outside of the current subdomain)
-    std::vector<unsigned int> oversize2 = oversize;
-    oversize2[0] *= 2;
-    oversize2[0] += 1 + f3D->isDual_[0];
-    oversize2[1] *= 2;
-    oversize2[1] += 1 + f3D->isDual_[1];
-
-    for (int iDim=0 ; iDim<ndims_ ; iDim++) {
-        for (int iNeighbor=0 ; iNeighbor<nbNeighbors_ ; iNeighbor++) {
-            std::vector<unsigned int> tmp(ndims_,0);
-            tmp[0] =    iDim  * n_elem[0] + (1-iDim) * oversize2[0];
-            tmp[1] = (1-iDim) * n_elem[1] +    iDim  * oversize2[1];
-            buf[iDim][iNeighbor].allocateDims( tmp );
-        }
-    }
-
-    int istart, ix, iy;
-
-
-    // Send/Recv in a buffer data to sum
-
-    for (int iDim=0 ; iDim<ndims_ ; iDim++) {
-
-        MPI_Datatype ntype = ntypeSum_[iDim][isDual[0]][isDual[1]];
-        //      MPI_Status stat[2];
-        //      MPI_Request request[2];
-        MPI_Status sstat    [ndims_][2];
-        MPI_Status rstat    [ndims_][2];
-        MPI_Request srequest[ndims_][2];
-        MPI_Request rrequest[ndims_][2];
-
-        for (int iNeighbor=0 ; iNeighbor<nbNeighbors_ ; iNeighbor++) {
-
-            if (neighbor_[iDim][iNeighbor]!=MPI_PROC_NULL) {
-                istart = iNeighbor * ( n_elem[iDim]- oversize2[iDim] ) + (1-iNeighbor) * ( 0 );
-                ix = (1-iDim)*istart;
-                iy =    iDim *istart;
-                MPI_Isend( &(f3D->data_3D[ix][iy]), 1, ntype, neighbor_[iDim][iNeighbor], 0, SMILEI_COMM_3D, &(srequest[iDim][iNeighbor]) );
-            } // END of Send
-
-            if (neighbor_[iDim][(iNeighbor+1)%2]!=MPI_PROC_NULL) {
-                int tmp_elem = (buf[iDim][(iNeighbor+1)%2]).dims_[0]*(buf[iDim][(iNeighbor+1)%2]).dims_[1];
-                MPI_Irecv( &( (buf[iDim][(iNeighbor+1)%2]).data_3D[0][0] ), tmp_elem, MPI_DOUBLE, neighbor_[iDim][(iNeighbor+1)%2], 0, SMILEI_COMM_3D, &(rrequest[iDim][(iNeighbor+1)%2]) );
-            } // END of Recv
-
-        } // END for iNeighbor
-
-
-        for (int iNeighbor=0 ; iNeighbor<nbNeighbors_ ; iNeighbor++) {
-            if (neighbor_[iDim][iNeighbor]!=MPI_PROC_NULL) {
-                MPI_Wait( &(srequest[iDim][iNeighbor]), &(sstat[iDim][iNeighbor]) );
-            }
-            if (neighbor_[iDim][(iNeighbor+1)%2]!=MPI_PROC_NULL) {
-                MPI_Wait( &(rrequest[iDim][(iNeighbor+1)%2]), &(rstat[iDim][(iNeighbor+1)%2]) );
-            }
-        }
-
-
-        // Synchro before summing, to not sum with data ever sum
-        // Merge loops, Sum direction by direction permits to not communicate with diagonal neighbors
-        barrier();
-
-        // Sum data on each process, same operation on both side
-
-
-        for (int iNeighbor=0 ; iNeighbor<nbNeighbors_ ; iNeighbor++) {
-            istart = ( (iNeighbor+1)%2 ) * ( n_elem[iDim]- oversize2[iDim] ) + (1-(iNeighbor+1)%2) * ( 0 );
-            int ix0 = (1-iDim)*istart;
-            int iy0 =    iDim *istart;
-            if (neighbor_[iDim][(iNeighbor+1)%2]!=MPI_PROC_NULL) {
-                for (unsigned int ix=0 ; ix< (buf[iDim][(iNeighbor+1)%2]).dims_[0] ; ix++) {
-                    for (unsigned int iy=0 ; iy< (buf[iDim][(iNeighbor+1)%2]).dims_[1] ; iy++)
-                        f3D->data_3D[ix0+ix][iy0+iy] += (buf[iDim][(iNeighbor+1)%2])(ix,iy);
-                }
-            } // END if
-
-        } // END for iNeighbor
-
-        barrier();
-
-    } // END for iDim
-*/
 } // END sumField
 
 
@@ -820,17 +760,16 @@ void SmileiMPI_Cart3D::scatterGrid( Grid* grid )
 
 void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
 {
-
-/*
     int procs_rk;
     int iGlobal, jGlobal, kGlobal;
     int iGlobal_gather;
-    int nx, ny;
+    int nx, ny, nz;
 
     Field3D* f3D =  static_cast<Field3D*>(field);
     Field3D* f3D_global =  static_cast<Field3D*>(field_global);
     nx = f3D_global->dims_[0];
     ny = f3D_global->dims_[1];
+    nz = f3D_global->dims_[2];
     f3D_global->put_to(0.0);
     MPI_Gatherv(f3D->data_, send_cnt[smilei_rk], MPI_DOUBLE, field_global_gather, &recv_cnt[0], &recv_disp[0], MPI_DOUBLE, 0, SMILEI_COMM_3D);
 
@@ -838,29 +777,38 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
     {
         for(int jProcs = 0; jProcs < number_of_procs[1]; jProcs++)
         {
-            procs_rk = iProcs * number_of_procs[1] + jProcs;
-            for(int i = 0; i < dims_gather[procs_rk*2]; i++)
+            for(int kProcs = 0; kProcs < number_of_procs[2]; kProcs++)
             {
-                for(int j = 0; j < dims_gather[procs_rk*2 + 1]; j++)
+                procs_rk = iProcs * number_of_procs[1] * number_of_procs[2] + jProcs * number_of_procs[2] + kProcs;
+                for(int i = 0; i < dims_gather[procs_rk*3]; i++)
                 {
-                    iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
-                    jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                    if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*2] - 1 - oversize[0]){
-                        iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                    for(int j = 0; j < dims_gather[procs_rk*3 + 1]; j++)
+                    {
+                        for(int k = 0; k < dims_gather[procs_rk*3 + 2]; k++)
+                        {
+                            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
+                            jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + j -oversize[2];
+                            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
+                                iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                            }
+                            if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*3+1] - 1 - oversize[1]){
+                                jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
+                            }
+                            if(kProcs == 0 && k < oversize[2] || kProcs == number_of_procs[2] -1 && k > dims_gather[procs_rk*3+2] - 1 - oversize[2]){
+                                kGlobal = abs((int)f3D_global->dims_[2] - abs(kGlobal) - 1);
+                            }
+                            iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*3+1] * dims_gather[procs_rk*3+2] + j * dims_gather[procs_rk*3+2] + k;
+                            //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
+
+                            f3D_global->data_3D[iGlobal][jGlobal][kGlobal] += field_global_gather[iGlobal_gather];
+
+                            //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;                     
+                        }
                     }
-                    if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*2+1] - 1 - oversize[1]){
-                        jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
-                    }
-                    iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*2+1] + j;
-                    //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
-
-                    f3D_global->data_3D[iGlobal][jGlobal][kGlobal] += field_global_gather[iGlobal_gather];
-
-                    //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;
-
-
                 }
             }
+
 
         }
     }
@@ -872,11 +820,20 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
     {
         for(int j = 0; j < ny; j++)
         {
-            if( i == 0){
-                f3D_global->data_3D[i][j] += f3D_global->data_3D[nx-1][j];
-            }
-            else if(j == 0){
-                f3D_global->data_3D[i][j] += f3D_global->data_3D[i][ny-1];
+            for(int k = 0; k < nz; k++)
+            {
+                if( i == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[nx-1][j][k];
+                }
+                else if(j == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][ny-1][k];
+                }
+                else if(k == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][j][nz-1];
+                }
             }
         }
 
@@ -885,33 +842,41 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
     {
         for(int j = 0; j < ny; j++)
         {
-            if( i == nx-1){
-                f3D_global->data_3D[i][j] = f3D_global->data_3D[0][j];
+            for(int k = 0; k < nz; k++)
+            {
+                if( i == nx - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[0][j][k];
+                }
+                else if(j == ny - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][0][k];
+                }
+                else if(k == nz - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][j][0];
+                }
             }
-            else if(j == ny-1){
-                f3D_global->data_3D[i][j] = f3D_global->data_3D[i][0];
-            }
+
         }
 
     }
-
-*/
 
 } // END gatherRho
 
 
 void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
 {
-/*
     int procs_rk;
-    int iGlobal, jGlobal;
+    int iGlobal, jGlobal, kGlobal;
     int iGlobal_gather;
-    int nx, ny;
+    int nx, ny, nz;
 
     Field3D* f3D =  static_cast<Field3D*>(field);
     Field3D* f3D_global =  static_cast<Field3D*>(field_global);
     nx = f3D_global->dims_[0];
     ny = f3D_global->dims_[1];
+    nz = f3D_global->dims_[2];
     f3D_global->put_to(0.0);
     MPI_Gatherv(f3D->data_, send_cnt[smilei_rk], MPI_DOUBLE, field_global_gather, &recv_cnt[0], &recv_disp[0], MPI_DOUBLE, 0, SMILEI_COMM_3D);
 
@@ -919,29 +884,38 @@ void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
     {
         for(int jProcs = 0; jProcs < number_of_procs[1]; jProcs++)
         {
-            procs_rk = iProcs * number_of_procs[1] + jProcs;
-            for(int i = 0; i < dims_gather[procs_rk*2]; i++)
+            for(int kProcs = 0; kProcs < number_of_procs[2]; kProcs++)
             {
-                for(int j = 0; j < dims_gather[procs_rk*2 + 1]; j++)
+                procs_rk = iProcs * number_of_procs[1] * number_of_procs[2] + jProcs * number_of_procs[2] + kProcs;
+                for(int i = 0; i < dims_gather[procs_rk*3]; i++)
                 {
-                    iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
-                    jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                    if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*2] - 1 - oversize[0]){
-                        iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                    for(int j = 0; j < dims_gather[procs_rk*3 + 1]; j++)
+                    {
+                        for(int k = 0; k < dims_gather[procs_rk*3 + 2]; k++)
+                        {
+                            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
+                            jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + j -oversize[2];
+                            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
+                                iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                            }
+                            if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*3+1] - 1 - oversize[1]){
+                                jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
+                            }
+                            if(kProcs == 0 && k < oversize[2] || kProcs == number_of_procs[2] -1 && k > dims_gather[procs_rk*3+2] - 1 - oversize[2]){
+                                kGlobal = abs((int)f3D_global->dims_[2] - abs(kGlobal) - 1);
+                            }
+                            iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*3+1] * dims_gather[procs_rk*3+2] + j * dims_gather[procs_rk*3+2] + k;
+                            //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
+
+                            f3D_global->data_3D[iGlobal][jGlobal][kGlobal] += field_global_gather[iGlobal_gather];
+
+                            //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;                     
+                        }
                     }
-                    if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*2+1] - 1 - oversize[1]){
-                        jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
-                    }
-                    iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*2+1] + j;
-                    //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
-
-                    f3D_global->data_3D[iGlobal][jGlobal] = field_global_gather[iGlobal_gather];
-
-                    //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;
-
-
                 }
             }
+
 
         }
     }
@@ -953,11 +927,20 @@ void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
     {
         for(int j = 0; j < ny; j++)
         {
-            if( i == 0){
-                f3D_global->data_3D[i][j] += f3D_global->data_3D[nx-1][j];
-            }
-            else if(j == 0){
-                f3D_global->data_3D[i][j] += f3D_global->data_3D[i][ny-1];
+            for(int k = 0; k < nz; k++)
+            {
+                if( i == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[nx-1][j][k];
+                }
+                else if(j == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][ny-1][k];
+                }
+                else if(k == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][j][nz-1];
+                }
             }
         }
 
@@ -966,17 +949,26 @@ void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
     {
         for(int j = 0; j < ny; j++)
         {
-            if( i == nx-1){
-                f3D_global->data_3D[i][j] = f3D_global->data_3D[0][j];
+            for(int k = 0; k < nz; k++)
+            {
+                if( i == nx - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[0][j][k];
+                }
+                else if(j == ny - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][0][k];
+                }
+                else if(k == nz - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][j][0];
+                }
             }
-            else if(j == ny-1){
-                f3D_global->data_3D[i][j] = f3D_global->data_3D[i][0];
-            }
+
         }
 
-    }
+    }   
 
-*/
 
 } // END gatherField
 
@@ -984,55 +976,67 @@ void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
 
 void SmileiMPI_Cart3D::scatterField( Field* field_global ,Field* field )
 {
-/*
+
     int procs_rk;
-    int iGlobal, jGlobal;
+    int iGlobal, jGlobal, kGlobal;
     int iGlobal_gather;
 
     Field3D* f3D =  static_cast<Field3D*>(field);
     Field3D* f3D_global =  static_cast<Field3D*>(field_global);
 
-    int ii,jj;
-    ii=f3D_global->dims_[0];
-    jj=f3D_global->dims_[1];
+    int ii, jj, kk;
+    ii = f3D_global->dims_[0];
+    jj = f3D_global->dims_[1];
+    kk = f3D_global->dims_[2];
 
     f3D->put_to(0.0);
 
     iGlobal = 0;
     jGlobal = 0;
+    kGlobal = 0;
 
 
     for(int iProcs = 0; iProcs < number_of_procs[0]; iProcs++)
     {
         for(int jProcs = 0; jProcs < number_of_procs[1]; jProcs++)
         {
-            procs_rk = iProcs * number_of_procs[1] + jProcs;
-            for(int i = 0; i < dims_gather[procs_rk*2]; i++)
+            for(int kProcs = 0; kProcs < number_of_procs[2]; kProcs++)
             {
-                for(int j = 0; j < dims_gather[procs_rk*2 + 1]; j++)
+                procs_rk = iProcs * number_of_procs[1] * number_of_procs[2] + jProcs * number_of_procs[2] + kProcs;
+                for(int i = 0; i < dims_gather[procs_rk*3]; i++)
                 {
-                    iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
-                    jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                    if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*2] - 1 - oversize[0]){
-                        iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                    for(int j = 0; j < dims_gather[procs_rk*3 + 1]; j++)
+                    {
+                        for(int k = 0; k < dims_gather[procs_rk*3 + 2]; k++)
+                        {
+                            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
+                            jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + k -oversize[2];
+                            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
+                                iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                            }
+                            if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*3+1] - 1 - oversize[1]){
+                                jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
+                            }
+                            if(kProcs == 0 && k < oversize[2] || kProcs == number_of_procs[2] -1 && k > dims_gather[procs_rk*3+2] - 1 - oversize[2]){
+                                kGlobal = abs((int)f3D_global->dims_[2] - abs(kGlobal) - 1);
+                            }
+                            iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*3+1] * dims_gather[procs_rk*3+2] + j * dims_gather[procs_rk*3+2] + k;
+                            if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
+
+                            field_global_gather[iGlobal_gather] = f3D_global->data_3D[iGlobal][jGlobal][kGlobal];
+
+                            //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;
+
+                        }
+
                     }
-                    if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*2+1] - 1 - oversize[1]){
-                        jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
-                    }
-                    iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*2+1] + j;
-                    if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
-
-                    field_global_gather[iGlobal_gather] = f3D_global->data_3D[iGlobal][jGlobal];
-
-                    //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;
-
                 }
             }
-
         }
     }
     MPI_Scatterv(field_global_gather, &send_cnt[0], &send_disp[0], MPI_DOUBLE, f3D->data_, recv_cnt[smilei_rk], MPI_DOUBLE, 0, SMILEI_COMM_3D);
 
-*/
+
 
 } // END scatterField

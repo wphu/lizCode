@@ -36,7 +36,7 @@ public:
 
     //>>>geometry parameters
     int nx, ny, nz;
-    double dx, dy, dz, dxyz;
+    double dx, dy, dz, dxy;
 
     Grid3D* grid3D;
 
