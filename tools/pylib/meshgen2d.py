@@ -378,31 +378,94 @@ class Grid2D:
         f.close()
 
     def save_fig(self):
-        pass
+        ##inite the fig of matplotlib
+        fig=plt.figure(figsize=(10,8))
+        fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
+
+        ##============ is_wall ======================================================
+        nx = is_wall.shape[0]
+        ny = is_wall.shape[1]
+        dx=1.0
+        dy=1.0
+        x, y=np.mgrid[slice(0.0,dx*nx,dx), slice(0.0,dy*ny,dy)]
+
+        ax0=fig.add_subplot(2,2,1)
+        contourf0 = ax0.contourf(x, y, is_wall, level_num, cmap=cm.get_cmap('jet'))
+
+        ax0.set_title(r"$\mathrm{is_wall}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(a)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+        ##============ bndr_lines ======================================================
+        ax0=fig.add_subplot(2,2,2)
+        for i in np.arange(0, len(self.segment_list)):
+            segment_x = [self.segment_list[i].start_point.x, self.segment_list[i].end_point.x]
+            segment_y = [self.segment_list[i].start_point.y, self.segment_list[i].end_point.y]
+            ax0.plot(segment_x, segment_y)
+
+        ax0.set_title(r"$\mathrm{is_wall}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        #ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+        ##============ bndr_type ======================================================
+        ax0=fig.add_subplot(2,2,3)
+        contourf0 = ax0.contourf(x, y, bndr_type, level_num, cmap=cm.get_cmap('jet'))
+
+        ax0.set_title(r"$\mathrm{bndr_type}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(c)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+        ##============ bndr_val ======================================================
+        ax0=fig.add_subplot(2,2,4)
+        contourf0 = ax0.contourf(x, y, bndr_val, level_num, cmap=cm.get_cmap('jet'))
+
+        ax0.set_title(r"$\mathrm{bndr_val}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(d)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+
+
+        pdf_file_name = "grid" + ".png"
+        fig.savefig(pdf_file_name, dpi = 300)
 
 
 if __name__ == "__main__":
-    dx = 1.0e-5
-    dy = 1.0e-5
-    nx = 500
-    ny = 500
-    lx = dx * nx
-    ly = dy * ny
-
+    dx = 1.0e-5 #3.5e-6
+    dy = 1.0e-5 #3.5e-6
+    lx = 8.0e-3
+    ly = 5.2e-3
+    nx = int(lx / dx)
+    ny = int(ly / dy)
     ny_source = 20
     ny_base = 3
 
-    ny_wall_boundary = 200 + ny_base
+    print("nx, ny is : ", nx, ny)
+
+
+    ny_wall_boundary = int(2.0e-3 / dy) + ny_base
     ny_wall_max = ny - ny_source - 5
 
-    wall_potential = 60.0
+    wall_potential = -60.0
 
     polygon_list = []
 
+    # left tile
     point0 = Point(0.0,     ny_base*dy)
-    point1 = Point(200*dx,  ny_base*dy)
-    point2 = Point(200*dx,  (ny_base+200)*dy)
-    point3 = Point(0.0,     (ny_base+200)*dy)
+    point1 = Point(1.5e-3,  ny_base*dy)
+    point2 = Point(1.5e-3,  ny_base*dy + 2.0e-3)
+    point3 = Point(0.0,     ny_base*dy + 2.0e-3)
 
     line0 = Straight_line(point0, point1)
     line1 = Straight_line(point1, point2)
@@ -416,26 +479,43 @@ if __name__ == "__main__":
     polygon0.add_straight_line(line3)
     polygon_list.append(polygon0)
 
-
-    point4 = Point(300*dx,  ny_base*dy)
-    point5 = Point(500*dx,  ny_base*dy)
-    point6 = Point(500*dx,  (ny_base+200)*dy)
-    point7 = Point(350*dx,  (ny_base+200)*dy)
-    point8 = Point(300*dx,  (ny_base+150)*dy)
+    # right tile
+    point4 = Point(6.5e-3,  ny_base*dy)
+    point5 = Point(8.0e-3,  ny_base*dy)
+    point6 = Point(8.0e-3,  ny_base*dy + 2.0e-3)
+    point7 = Point(6.5e-3,  ny_base*dy + 2.0e-3)
 
     line4 = Straight_line(point4, point5)
     line5 = Straight_line(point5, point6)
     line6 = Straight_line(point6, point7)
-    line7 = Straight_line(point7, point8)
-    line8 = Straight_line(point8, point4)
+    line7 = Straight_line(point7, point4)
 
     polygon1 = Polygon()
     polygon1.add_straight_line(line4)
     polygon1.add_straight_line(line5)
     polygon1.add_straight_line(line6)
     polygon1.add_straight_line(line7)
-    polygon1.add_straight_line(line8)
     polygon_list.append(polygon1)
+
+
+    # the probe in the gap
+    point8 = Point(3.5e-3,  ny_base*dy)
+    point9 = Point(4.5e-3,  ny_base*dy)
+    point10 = Point(4.5e-3,  ny_base*dy + 1.5e-3)
+    point11 = Point(3.5e-3,  ny_base*dy + 1.5e-3)
+
+    line8 = Straight_line(point8, point9)
+    line9 = Straight_line(point9, point10)
+    line10 = Straight_line(point10, point11)
+    line11 = Straight_line(point11, point8)
+
+    polygon1 = Polygon()
+    polygon1.add_straight_line(line8)
+    polygon1.add_straight_line(line9)
+    polygon1.add_straight_line(line10)
+    polygon1.add_straight_line(line11)
+    polygon_list.append(polygon1)
+
 
     is_wall     = np.zeros((nx+1, ny+1), dtype = 'int')
     bndr_type   = np.zeros((nx+1, ny+1), dtype = 'int')
@@ -459,14 +539,18 @@ if __name__ == "__main__":
             if is_in_polygon:
                 is_wall[i,j] = 1
                 
-    # ============================= bndr_type ========================
+    # ============================= bndr_type and bndr_val ========================
     # lower boundary of source region
-    bndr_type[:, ny-ny_source:ny] = 1
-    bndr_val [:, ny-ny_source:ny] = 0.0
+    bndr_type[:, ny-ny_source] = 1
+    bndr_val [:, ny-ny_source] = 0.0
+
+    # source region, not solve
+    bndr_type[:, ny-ny_source+1:ny+1] = 5
+    bndr_val [:, ny-ny_source+1:ny+1] = 0.0
 
     # left and right boundary between source region and wall
-    bndr_type[0, ny_wall_boundary+1:ny-ny_source-1] = 8
-    bndr_type[nx,ny_wall_boundary+1:ny-ny_source-1] = 8
+    bndr_type[0, ny_wall_boundary+1:ny-ny_source] = 8
+    bndr_type[nx,ny_wall_boundary+1:ny-ny_source] = 8
 
     # corner points of wall at left and right boudnary
     bndr_type[0, ny_wall_boundary] = 1
@@ -474,22 +558,35 @@ if __name__ == "__main__":
     bndr_val [0, ny_wall_boundary] = wall_potential
     bndr_val [nx,ny_wall_boundary] = wall_potential
 
+    # left, right and bottom boudnary of the wall
+    bndr_type[0, 0:ny_wall_boundary] = 5
+    bndr_type[nx,0:ny_wall_boundary] = 5
+    bndr_type[0:nx,0] 		       = 5
+    bndr_val [0, 0:ny_wall_boundary] = wall_potential
+    bndr_val [nx,0:ny_wall_boundary] = wall_potential
+    bndr_val [0:nx,0] 		       = wall_potential
+
     # wall surface
     for i in np.arange(1, nx):
         for j in np.arange(1, ny_wall_max):
             if is_wall[i,j] == 1 and (is_wall[i-1, j] == 0 or is_wall[i+1, j] == 0 or is_wall[i, j-1] == 0 or is_wall[i, j+1] == 0):
                 bndr_type[i,j] = 1
-            if is_wall[i,j] == 1:
+                bndr_val [i,j] = wall_potential
+            elif is_wall[i,j] == 1:
+                bndr_type[i,j] = 5
                 bndr_val [i,j] = wall_potential
     
     # ============================= boundary lines ========================
     bndr_line_list = []
     bndr_line0 = Straight_line(point3, point2)
     bndr_line1 = Straight_line(point2, point1)
-    bndr_line2 = Straight_line(point1, point4)
-    bndr_line3 = Straight_line(point4, point8)
-    bndr_line4 = Straight_line(point8, point7)
-    bndr_line5 = Straight_line(point7, point6)
+    bndr_line2 = Straight_line(point1, point8)
+    bndr_line3 = Straight_line(point8, point11)
+    bndr_line4 = Straight_line(point11, point10)
+    bndr_line5 = Straight_line(point10, point9)
+    bndr_line6 = Straight_line(point9, point4)
+    bndr_line7 = Straight_line(point4, point7)
+    bndr_line8 = Straight_line(point7, point6)
 
     bndr_line_list.append(bndr_line0)
     bndr_line_list.append(bndr_line1)
@@ -497,6 +594,9 @@ if __name__ == "__main__":
     bndr_line_list.append(bndr_line3)
     bndr_line_list.append(bndr_line4)
     bndr_line_list.append(bndr_line5)
+    bndr_line_list.append(bndr_line6)
+    bndr_line_list.append(bndr_line7)
+    bndr_line_list.append(bndr_line8)
 
     segment_list = []
     n_segments = []
@@ -509,4 +609,3 @@ if __name__ == "__main__":
     grid2d = Grid2D(dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list)
     grid2d.save_grid()
     grid2d.save_fig()
-
