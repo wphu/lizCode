@@ -2,6 +2,9 @@ from template import *
 import math
 from scipy import constants as const
 
+level_num = 50
+
+
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -41,21 +44,28 @@ class Straight_line:
             normal_z = 0.0
 
             i = int(self.start_point.x / dx)
-            j_min = int(self.start_point.y / dy)
-            j_max = int(self.end_point.y / dy)
-            if j_min > j_max:
-                j_temp = j_min
-                j_min = j_max
-                j_max = j_temp
-            for j in np.arange(j_min, j_max + 1):
-                segment_temp = Segment()
-                segment_temp.start_point = Point(i * dx, j * dy)
-                segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
-                segment_temp.grid_point0  = Point(i, j)
-                segment_temp.grid_point1  = Point(i, j)
-                segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
-                segment_temp.cal_length()
-                self.segment_list.append(segment_temp)
+            j_satrt = int(self.start_point.y / dy)
+            j_end = int(self.end_point.y / dy)
+            if j_start <= j_end:
+                for j in np.arange(j_start, j_end + 1):
+                    segment_temp = Segment()
+                    segment_temp.start_point = Point(i * dx, j * dy)
+                    segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
+                    segment_temp.grid_point0  = Point(i, j)
+                    segment_temp.grid_point1  = Point(i, j)
+                    segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+                    segment_temp.cal_length()
+                    self.segment_list.append(segment_temp)
+            elif j_start > j_end:
+                for j in np.arange(j_start, j_end - 1, -1):
+                    segment_temp = Segment()
+                    segment_temp.start_point = Point(i * dx, j * dy)
+                    segment_temp.end_point   = Point(i * dx, (j - 1) * dy)
+                    segment_temp.grid_point0  = Point(i, j)
+                    segment_temp.grid_point1  = Point(i, j)
+                    segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+                    segment_temp.cal_length()
+                    self.segment_list.append(segment_temp)
 
         # calculate a and b for slope-intercept form of a line: y = ax + b
         else:
@@ -378,7 +388,67 @@ class Grid2D:
         f.close()
 
     def save_fig(self):
-        pass
+        ##inite the fig of matplotlib
+        fig=plt.figure(figsize=(10,8))
+        fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
+
+        ##============ is_wall ======================================================
+        nx = is_wall.shape[0]
+        ny = is_wall.shape[1]
+        dx=1.0
+        dy=1.0
+        x, y=np.mgrid[slice(0.0,dx*nx,dx), slice(0.0,dy*ny,dy)]
+
+        ax0=fig.add_subplot(2,2,1)
+        contourf0 = ax0.contourf(x, y, is_wall, level_num, cmap=cm.get_cmap('jet'))
+
+        ax0.set_title(r"$\mathrm{is\_wall}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(a)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+        ##============ bndr_lines ======================================================
+        ax0=fig.add_subplot(2,2,2)
+        for i in np.arange(0, len(self.segment_list)):
+            segment_x = [self.segment_list[i].start_point.x, self.segment_list[i].end_point.x]
+            segment_y = [self.segment_list[i].start_point.y, self.segment_list[i].end_point.y]
+            ax0.plot(segment_x, segment_y)
+
+        ax0.set_title(r"$\mathrm{bndr\_lines}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        #ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+        ##============ bndr_type ======================================================
+        ax0=fig.add_subplot(2,2,3)
+        contourf0 = ax0.contourf(x, y, bndr_type, level_num, cmap=cm.get_cmap('jet'))
+
+        ax0.set_title(r"$\mathrm{bndr\_type}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(c)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+        ##============ bndr_val ======================================================
+        ax0=fig.add_subplot(2,2,4)
+        contourf0 = ax0.contourf(x, y, bndr_val, level_num, cmap=cm.get_cmap('jet'))
+
+        ax0.set_title(r"$\mathrm{bndr\_val}$", color='#1f77b4', fontsize = label_fontsize)
+        #ax0.axis('equal')
+        ax0.set_aspect('equal', adjustable='box')
+        ax0.set_xlabel('x ')
+        ax0.set_ylabel('y ')
+        ax0.annotate(r"$\mathbf{(d)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
+
+
+        pdf_file_name = "grid" + ".png"
+        fig.savefig(pdf_file_name, dpi = 300)
 
 
 if __name__ == "__main__":
@@ -549,4 +619,3 @@ if __name__ == "__main__":
     grid2d = Grid2D(dx, dy, is_wall, bndr_type, bndr_val, n_segments, segment_list)
     grid2d.save_grid()
     grid2d.save_fig()
-
