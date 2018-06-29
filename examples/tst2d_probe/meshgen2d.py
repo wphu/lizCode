@@ -44,7 +44,7 @@ class Straight_line:
             normal_z = 0.0
 
             i = int(self.start_point.x / dx)
-            j_satrt = int(self.start_point.y / dy)
+            j_start = int(self.start_point.y / dy)
             j_end = int(self.end_point.y / dy)
             if j_start <= j_end:
                 for j in np.arange(j_start, j_end + 1):

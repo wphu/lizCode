@@ -41,21 +41,28 @@ class Straight_line:
             normal_z = 0.0
 
             i = int(self.start_point.x / dx)
-            j_min = int(self.start_point.y / dy)
-            j_max = int(self.end_point.y / dy)
-            if j_min > j_max:
-                j_temp = j_min
-                j_min = j_max
-                j_max = j_temp
-            for j in np.arange(j_min, j_max + 1):
-                segment_temp = Segment()
-                segment_temp.start_point = Point(i * dx, j * dy)
-                segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
-                segment_temp.grid_point0  = Point(i, j)
-                segment_temp.grid_point1  = Point(i, j)
-                segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
-                segment_temp.cal_length()
-                self.segment_list.append(segment_temp)
+            j_start = int(self.start_point.y / dy)
+            j_end = int(self.end_point.y / dy)
+            if j_start <= j_end:
+                for j in np.arange(j_start, j_end + 1):
+                    segment_temp = Segment()
+                    segment_temp.start_point = Point(i * dx, j * dy)
+                    segment_temp.end_point   = Point(i * dx, (j + 1) * dy)
+                    segment_temp.grid_point0  = Point(i, j)
+                    segment_temp.grid_point1  = Point(i, j)
+                    segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+                    segment_temp.cal_length()
+                    self.segment_list.append(segment_temp)
+            elif j_start > j_end:
+                for j in np.arange(j_start, j_end - 1, -1):
+                    segment_temp = Segment()
+                    segment_temp.start_point = Point(i * dx, j * dy)
+                    segment_temp.end_point   = Point(i * dx, (j - 1) * dy)
+                    segment_temp.grid_point0  = Point(i, j)
+                    segment_temp.grid_point1  = Point(i, j)
+                    segment_temp.normal      = Vector(normal_x, normal_y, normal_z)
+                    segment_temp.cal_length()
+                    self.segment_list.append(segment_temp)
 
         # calculate a and b for slope-intercept form of a line: y = ax + b
         else:
