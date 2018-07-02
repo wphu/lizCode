@@ -3,5 +3,6 @@
     "files.associations": {
         "deque": "cpp",
         "vector": "cpp"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": false
 }

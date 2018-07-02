@@ -481,36 +481,67 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
 }
 
 
-void EF_Solver3D_SLU_DIST::solve_Exy(Field* phi, Field* Ex, Field* Ey)
+void EF_Solver3D_SLU_DIST::solve_Exyz(Field* phi, Field* Ex, Field* Ey, Field* Ez)
 {
     Field3D* phi3D = static_cast<Field3D*>(phi);
     Field3D* Ex3D = static_cast<Field3D*>(Ex);
     Field3D* Ey3D = static_cast<Field3D*>(Ey);
+    Field3D* Ez3D = static_cast<Field3D*>(Ez);
 
-
-    for(int j = 0; j < ny; j++)
+    for(int i = 1; i < nx - 1; i++)
     {
-        for(int i = 1; i < nx-1; i++)
+        for(int j = 1; j < ny - 1; j++)
         {
-            (*Ex3D)(i,j) = - ((*phi3D)(i+1,j) - (*phi3D)(i-1,j)) / (2.0*dx);
+            for(int k = 1; k < nz - 1; k++)
+            {
+                (*Ex3D)(i,j,k) = - ((*phi3D)(i+1,j,k) - (*phi3D)(i-1,j,k)) / (2.0*dx);
+                (*Ey3D)(i,j,k) = - ((*phi3D)(i,j+1,k) - (*phi3D)(i,j-1,k)) / (2.0*dx);
+                (*Ez3D)(i,j,k) = - ((*phi3D)(i,j,k+1) - (*phi3D)(i,j,k-1)) / (2.0*dx);
+            }
         }
-
-        (*Ex3D)(0,j) = -(-3.0 * (*phi3D)(0,j) + 4.0 * (*phi3D)(1,j) - (*phi3D)(2,j)) / (2.0*dx);
-        (*Ex3D)(nx-1,j) = -((*phi3D)(nx-3,j) - 4.0 * (*phi3D)(nx-2,j) + 3.0 * (*phi3D)(nx-1,j)) / (2.0*dx);
     }
 
-
-    for(int i = 0; i < nx; i++)
+    for(int j = 1; j < ny - 1; j++)
     {
-        for(int j = 1; j < ny-1; j++)
+        for(int k = 1; k < nz - 1; k++)
         {
-            (*Ey3D)(i,j) = - ((*phi3D)(i,j+1) - (*phi3D)(i,j-1)) / (2.0*dy);
-        }
+            (*Ex3D)(0,j,k) = -(-3.0 * (*phi3D)(0,j,k) + 4.0 * (*phi3D)(1,j,k) - (*phi3D)(2,j,k)) / (2.0*dx);
+            (*Ex3D)(nx-1,j,k) = -((*phi3D)(nx-3,j,k) - 4.0 * (*phi3D)(nx-2,j,k) + 3.0 * (*phi3D)(nx-1,j,k)) / (2.0*dx);
 
-        (*Ey3D)(i,0) = - (-3.0 * (*phi3D)(i,0) + 4.0 * (*phi3D)(i,1) - (*phi3D)(i,2)) / (2.0*dy);
-        (*Ey3D)(i,ny-1) = - ((*phi3D)(i,ny-3) - 4.0 * (*phi3D)(i,ny-2) + 3.0 * (*phi3D)(i,ny-1)) / (2.0*dy);
+            (*Ey3D)(0,j,k) = - ((*phi3D)(i,j+1,k) - (*phi3D)(0,j-1,k)) / (2.0*dx);
+            (*Ey3D)(nx-1,j,k) = - ((*phi3D)(nx-1,j+1,k) - (*phi3D)(nx-1,j-1,k)) / (2.0*dx);
+            (*Ez3D)(0,j,k) = - ((*phi3D)(0,j,k+1) - (*phi3D)(0,j,k-1)) / (2.0*dx);
+            (*Ez3D)(nx-1,j,k) = - ((*phi3D)(nx-1,j,k+1) - (*phi3D)(nx-1,j,k-1)) / (2.0*dx);
+        }
     }
 
+    for(int i = 1; i < nx - 1; i++)
+    {
+        for(int k = 1; k < nz - 1; k++)
+        {
+            (*Ey3D)(i,0,k) = -(-3.0 * (*phi3D)(i,0,k) + 4.0 * (*phi3D)(i,1,k) - (*phi3D)(i,2,k)) / (2.0*dx);
+            (*Ey3D)(i,ny-1,k) = -((*phi3D)(i,ny-3,k) - 4.0 * (*phi3D)(i,ny-2,k) + 3.0 * (*phi3D)(i,ny-1,k)) / (2.0*dx);
+
+            (*Ex3D)(i,0,k) = - ((*phi3D)(i+1,0,k) - (*phi3D)(i-1,0,k)) / (2.0*dx);
+            (*Ex3D)(i,ny-1,k) = - ((*phi3D)(i+1,ny-1,k) - (*phi3D)(i-1,ny-1,k)) / (2.0*dx);
+            (*Ez3D)(i,0,k) = - ((*phi3D)(i,0,k+1) - (*phi3D)(i,0,k-1)) / (2.0*dx);
+            (*Ez3D)(i,ny-1,k) = - ((*phi3D)(i,ny-1,k+1) - (*phi3D)(i,ny-1,k-1)) / (2.0*dx);
+        }
+    }
+
+    for(int i = 1; i < nx - 1; i++)
+    {
+        for(int j = 1; j < ny - 1; j++)
+        {
+            (*Ez3D)(i,j,0) = -(-3.0 * (*phi3D)(i,j,0) + 4.0 * (*phi3D)(i,j,1) - (*phi3D)(i,j,2)) / (2.0*dx);
+            (*Ez3D)(i,j,nz-1) = -((*phi3D)(i,j,nz-3) - 4.0 * (*phi3D)(i,j,nz-2) + 3.0 * (*phi3D)(i,j,nz-1)) / (2.0*dx);
+
+            (*Ex3D)(i,j,0) = - ((*phi3D)(i+1,j,0) - (*phi3D)(i-1,j,0)) / (2.0*dx);
+            (*Ex3D)(i,j,nz-1) = - ((*phi3D)(i+1,j,nz-1) - (*phi3D)(i-1,j,nz-1)) / (2.0*dx);
+            (*Ey3D)(i,j,0) = - ((*phi3D)(i,j+1,0) - (*phi3D)(i,j-1,0)) / (2.0*dx);
+            (*Ey3D)(i,j,nz-1) = - ((*phi3D)(i,j+1,nz-1) - (*phi3D)(i,j-1,nz-1)) / (2.0*dx);
+        }
+    }
 
 }
 
