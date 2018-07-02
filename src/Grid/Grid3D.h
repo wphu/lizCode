@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Grid.h"
+#include "Array3D.h"
 
 using namespace std;
 
@@ -36,12 +37,12 @@ public:
     void geometry();
     void geometry_gap();
     void computeNcp();
-    int **iswall_3D;
-  	int **iswall_global_3D;
-    int **bndr_global_3D;
-    double **bndrVal_global_3D;
+    Array3D<int> iswall_3D;
+  	Array3D<int> iswall_global_3D;
+    Array3D<int> bndr_global_3D;
+    Array3D<double> bndrVal_global_3D;
     // The number of the current point in the discrete Poisson Eqution left coefficient matrix
-    int **numcp_global_3D;
+    Array3D<int> numcp_global_3D;
 
     double potential_wall;
 
