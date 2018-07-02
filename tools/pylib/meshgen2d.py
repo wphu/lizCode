@@ -452,19 +452,27 @@ class Grid2D:
 
 
 if __name__ == "__main__":
-    dx = 1.0e-5 #3.5e-6
-    dy = 1.0e-5 #3.5e-6
-    lx = 8.0e-3
+    dx = 0.5e-5 #3.5e-6
+    dy = 0.5e-5 #3.5e-6
+    lx = 24.0e-3
     ly = 5.2e-3
     nx = int(lx / dx)
     ny = int(ly / dy)
     ny_source = 20
     ny_base = 3
 
+    x1 = 20.0e-3
+    x2 = 2.0e-3
+    x3 = 10.0e-3
+    x4 = 2.0e-3
+    y1 = 2.0e-3
+    y2 = 1.0e-3
+
+
     print("nx, ny is : ", nx, ny)
 
 
-    ny_wall_boundary = int(2.0e-3 / dy) + ny_base
+    ny_wall_boundary = int(y1 / dy) + ny_base
     ny_wall_max = ny - ny_source - 5
 
     wall_potential = -60.0
@@ -473,9 +481,9 @@ if __name__ == "__main__":
 
     # left tile
     point0 = Point(0.0,     ny_base*dy)
-    point1 = Point(1.5e-3,  ny_base*dy)
-    point2 = Point(1.5e-3,  ny_base*dy + 2.0e-3)
-    point3 = Point(0.0,     ny_base*dy + 2.0e-3)
+    point1 = Point(x2,      ny_base*dy)
+    point2 = Point(x2,      ny_base*dy + y1)
+    point3 = Point(0.0,     ny_base*dy + y1)
 
     line0 = Straight_line(point0, point1)
     line1 = Straight_line(point1, point2)
@@ -490,10 +498,10 @@ if __name__ == "__main__":
     polygon_list.append(polygon0)
 
     # right tile
-    point4 = Point(6.5e-3,  ny_base*dy)
-    point5 = Point(8.0e-3,  ny_base*dy)
-    point6 = Point(8.0e-3,  ny_base*dy + 2.0e-3)
-    point7 = Point(6.5e-3,  ny_base*dy + 2.0e-3)
+    point4 = Point(x1 + x2, ny_base*dy)
+    point5 = Point(lx,      ny_base*dy)
+    point6 = Point(lx,      ny_base*dy + y1)
+    point7 = Point(x1 + x2, ny_base*dy + y1)
 
     line4 = Straight_line(point4, point5)
     line5 = Straight_line(point5, point6)
@@ -509,10 +517,10 @@ if __name__ == "__main__":
 
 
     # the probe in the gap
-    point8 = Point(3.5e-3,  ny_base*dy)
-    point9 = Point(4.5e-3,  ny_base*dy)
-    point10 = Point(4.5e-3,  ny_base*dy + 1.5e-3)
-    point11 = Point(3.5e-3,  ny_base*dy + 1.5e-3)
+    point8 = Point(x2 + x3,         ny_base*dy)
+    point9 = Point(x2 + x3 + x4,    ny_base*dy)
+    point10 = Point(x2 + x3 + x4,   ny_base*dy + y2)
+    point11 = Point(x2 + x3,        ny_base*dy + y2)
 
     line8 = Straight_line(point8, point9)
     line9 = Straight_line(point9, point10)

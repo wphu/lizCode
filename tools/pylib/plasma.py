@@ -51,3 +51,34 @@ print("==========================================")
 print("particle_flux:    ", particle_flux)
 print("==========================================")
 print(" ")
+
+
+# ===================== iter_langmuir_probe geometry paramters ==================
+'''
+x1 = 20.0e-3
+x2 = 2.0e-3
+x3 = 10.0e-3
+x4 = 2.0e-3
+y1 = 2.0e-3
+y2 = 1.0e-3
+'''
+
+x1 = 8.0e-3
+x2 = 2.0e-3
+x3 = 3.0e-3
+x4 = 2.0e-3
+y1 = 2.0e-3
+y2 = 1.0e-3
+
+Bangle = 5.0 * math.pi / 180.0
+
+# the height of intersection between the magnetic and left and right boudnary of the probe
+h0 = y1 - x3 * math.tan(Bangle)
+h1 = y1 - (x3 + x4) * math.tan(Bangle)
+
+print("==========================================")
+print("probe height:    ", y2)
+print("probe left  :    ", h0)
+print("probe right :    ", h1)
+print("==========================================")
+print(" ")
