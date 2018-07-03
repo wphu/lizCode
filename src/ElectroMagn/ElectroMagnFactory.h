@@ -5,6 +5,7 @@
 #include "ElectroMagn.h"
 #include "ElectroMagn1D.h"
 #include "ElectroMagn2D.h"
+#include "ElectroMagn3D.h"
 
 #include "PicParams.h"
 #include "SmileiMPI.h"
@@ -20,6 +21,9 @@ public:
         }
         else if ( params.geometry == "2d3v" ) {
             EMfields = new ElectroMagn2D(params, input_data, smpi);
+        }
+        else if ( params.geometry == "3d3v" ) {
+            EMfields = new ElectroMagn3D(params, input_data, smpi);
         }
         else {
             ERROR( "Unknwon geometry : " << params.geometry );

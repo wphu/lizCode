@@ -4,6 +4,7 @@
 #include "PartSource1D_Emit.h"
 #include "PartSource1D_Load.h"
 #include "PartSource2D_Load.h"
+#include "PartSource3D_Load.h"
 #include "InputData.h"
 //#include "PartSource2D_Emit.h"
 
@@ -71,8 +72,8 @@ public:
 
 	    // Loop over each binary PartSource group and parse info
 	    unsigned int numPartSource=ifile.nComponents("PartSource");
-	    for (unsigned int n_PartSource = 0; n_PartSource < numPartSource; n_PartSource++) {
-
+	    for (unsigned int n_PartSource = 0; n_PartSource < numPartSource; n_PartSource++) 
+		{
 			ifile.extract("PartSource_type",PartSource_type,"PartSource",n_PartSource);
 			if(params.geometry == "1d3v" && PartSource_type == "Emit")
 			{

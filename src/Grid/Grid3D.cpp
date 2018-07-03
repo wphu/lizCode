@@ -97,17 +97,21 @@ void Grid3D::geometry_gap( )
 
 void Grid3D::computeNcp()
 {
-    ncp=0;
-    for(int i=0; i<nx; i++)
+    ncp = 0;
+    for(int i = 0; i < nx; i++)
     {
-        for(int j=0; j<ny; j++)
+        for(int j = 0; j < ny; j++)
         {
-            if( bndr_global_3D[i][j]==0 || bndr_global_3D[i][j]==1
-             || bndr_global_3D[i][j]==2 || bndr_global_3D[i][j]==8)
+            for(int k = 0; k < nz; k++)
             {
-                ncp++;
-                numcp_global_3D[i][j]=ncp-1;
+                if( bndr_global_3D[i][j][k] == 0 || bndr_global_3D[i][j][k] == 1
+                 || bndr_global_3D[i][j][k] == 2 || bndr_global_3D[i][j][k] == 8)
+                {
+                    ncp++;
+                    numcp_global_3D[i][j][k] = ncp-1;
+                } 
             }
+            
         }
     }
 

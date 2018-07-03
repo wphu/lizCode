@@ -3,6 +3,7 @@
 
 #include "Diagnostic1D.h"
 #include "Diagnostic2D.h"
+#include "Diagnostic3D.h"
 
 //  --------------------------------------------------------------------------------------------------------------------
 //! Create appropriate IO environment for the geometry
@@ -20,6 +21,9 @@ public:
         }
         else if ( params.geometry == "2d3v" ) {
             diag = new Diagnostic2D(params, smpi, grid, EMfields, vecPSI);
+        }
+        else if ( params.geometry == "3d3v" ) {
+            diag = new Diagnostic3D(params, smpi, grid, EMfields, vecPSI);
         }
         else {
             ERROR( "Unknwon geometry : " << params.geometry );
