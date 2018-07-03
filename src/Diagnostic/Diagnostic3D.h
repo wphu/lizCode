@@ -7,7 +7,7 @@
 #include "PSI3D.h"
 #include "Grid3D.h"
 #include "Particles.h"
-#include "PSI3D.h"
+
 
 class Field;
 class PSI;

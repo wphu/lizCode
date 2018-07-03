@@ -32,7 +32,7 @@ public:
     void createPartsPattern( PicParams& params, ElectroMagn* fields, vector<Species*>& vecSpecies );
 
     // Create particles h5 file pattern
-    void createDiagsPattern( PicParams& params, Diagnostic3D* diag3D);
+    void createDiagsPattern( PicParams& params, Diagnostic* diag);
 
     void initVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies );
     // calculate velocity distribution function

@@ -22,7 +22,7 @@ public:
     {
     } ;
 
-    void allocate_dims(std::vector<int> dims_temp)
+    void allocate_dims(std::vector<unsigned int> dims_temp)
     {
         dims = dims_temp;
         if(dims.size() != 3) 
@@ -93,7 +93,7 @@ private:
     T ***data_3D;
 
     // vector containing the dimensions of the Array3D
-    std::vector<int> dims;
+    std::vector<unsigned int> dims;
 
     // All arrays may be viewed as a 1D array
     // Linearized diags

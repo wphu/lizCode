@@ -11,6 +11,8 @@
 
 using namespace std;
 
+class SmileiMPI;
+
 //! class Grid3D used to defined a 3D vector
 class Grid3D : public Grid
 {
@@ -22,11 +24,13 @@ public:
     //! Constructor for Grid3D: with the vector dimension as input argument
     Grid3D(
         PicParams &params,
+        SmileiMPI *smpi,
         string grid_type,
         string gap_kind,
         int ny_source_temp,
         int ny_gapHeight_temp,
         int nx_gapWeight_temp,
+        int ny_bevel_depth_temp,
         double potential_wall_temp);
 
     // Destructor for Grid3D

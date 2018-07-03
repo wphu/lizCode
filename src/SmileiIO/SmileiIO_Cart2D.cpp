@@ -103,8 +103,10 @@ void SmileiIO_Cart2D::createPartsPattern( PicParams& params, ElectroMagn* fields
 }
 
 
-void SmileiIO_Cart2D::createDiagsPattern(PicParams& params, Diagnostic2D* diag2D)
+void SmileiIO_Cart2D::createDiagsPattern(PicParams& params, Diagnostic* diag)
 {
+    Diagnostic2D* diag2D = static_cast<Diagnostic2D*>(diag);
+
     string diag_name;
     const char* h5_name;
     hid_t dataset_id;

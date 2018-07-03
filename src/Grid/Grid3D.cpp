@@ -1,4 +1,5 @@
 #include "Grid3D.h"
+#include "SmileiMPI_Cart3D.h"
 
 #include <iostream>
 #include <vector>
@@ -24,11 +25,13 @@ Grid3D::Grid3D() : Grid()
 // with the dimensions as input argument
 Grid3D::Grid3D(
     PicParams &params,
+    SmileiMPI *smpi,
     string grid_type,
     string gap_kind,
     int ny_source_temp,
     int ny_gapHeight_temp,
     int nx_gapWeight_temp,
+    int ny_bevel_depth_temp,
     double potential_wall_temp):
     Grid(params)
 {
@@ -104,11 +107,11 @@ void Grid3D::computeNcp()
         {
             for(int k = 0; k < nz; k++)
             {
-                if( bndr_global_3D[i][j][k] == 0 || bndr_global_3D[i][j][k] == 1
-                 || bndr_global_3D[i][j][k] == 2 || bndr_global_3D[i][j][k] == 8)
+                if( bndr_global_3D(i,j,k) == 0 || bndr_global_3D(i,j,k) == 1
+                 || bndr_global_3D(i,j,k) == 2 || bndr_global_3D(i,j,k) == 8)
                 {
                     ncp++;
-                    numcp_global_3D[i][j][k] = ncp-1;
+                    numcp_global_3D(i,j,k) = ncp-1;
                 } 
             }
             

@@ -100,15 +100,15 @@ void EF_Solver3D_SLU_DIST::initSLU()
             for(k=0; k<nz; k++)
             {
                 // normal points in the calculation region
-                if(grid3D->bndr_global_3D[i][j][k]==0) 
+                if(grid3D->bndr_global_3D(i,j,k)==0) 
                 {
                     // order: left, right, down, up, in, out
-                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
-                    hr = grid3D->numcp_global_3D[i+1][j][k] - grid3D->numcp_global_3D[i][j][k];
-                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
-                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
-                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
-                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
+                    hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
+                    hr = grid3D->numcp_global_3D(i+1,j,k) - grid3D->numcp_global_3D(i,j,k);
+                    hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
+                    hu = grid3D->numcp_global_3D(i,j+1,k) - grid3D->numcp_global_3D(i,j,k);
+                    hi = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,k-1);
+                    ho = grid3D->numcp_global_3D(i,j,k+1) - grid3D->numcp_global_3D(i,j,k);
 
                     nnz = nnz + 7;
                     
@@ -131,7 +131,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 }
 
                 // Dirchlet boudnary points
-                else if(grid3D->bndr_global_3D[i][j][k]==1) 
+                else if(grid3D->bndr_global_3D(i,j,k)==1) 
                 {
                     nnz++;
 
@@ -143,9 +143,9 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
  
                 // periodic boudnary points at left boudary in x direction
-                else if( grid3D->bndr_global_3D[i][j][k]==8 && i==0) 
+                else if( grid3D->bndr_global_3D(i,j,k)==8 && i==0) 
                 {
-                    hr = grid3D->numcp_global_3D[nx-1][j][k] - grid3D->numcp_global_3D[i][j][k];
+                    hr = grid3D->numcp_global_3D(nx-1,j,k) - grid3D->numcp_global_3D(i,j,k);
                     nnz = nnz + 2;
 
                     val[ii].push_back(1.0);
@@ -157,13 +157,13 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 }
 
                 // periodic boudnary points at right boudary in x direction
-                else if ( grid3D->bndr_global_3D[i][j][k] == 8 && i == nx-1 ) {
-                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
-                    hr = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[1][j][k];
-                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
-                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
-                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
-                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
+                else if ( grid3D->bndr_global_3D(i,j,k) == 8 && i == nx-1 ) {
+                    hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
+                    hr = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(1,j,k);
+                    hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
+                    hu = grid3D->numcp_global_3D(i,j+1,k) - grid3D->numcp_global_3D(i,j,k);
+                    hi = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,k-1);
+                    ho = grid3D->numcp_global_3D(i,j,k+1) - grid3D->numcp_global_3D(i,j,k);
 
                     nnz = nnz + 7;
 
@@ -186,9 +186,9 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 }
 
                // periodic boudnary points at lowwer boudary in y direction
-                else if( grid3D->bndr_global_3D[i][j][k]==8 && j==0) 
+                else if( grid3D->bndr_global_3D(i,j,k)==8 && j==0) 
                 {
-                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
+                    hu = grid3D->numcp_global_3D(i,j+1,k) - grid3D->numcp_global_3D(i,j,k);
 
                     nnz = nnz + 2;
 
@@ -201,14 +201,14 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 }
 
                 // periodic boudnary points at upper boudary in y direction
-                else if ( grid3D->bndr_global_3D[i][j][k] == 8 && j == ny-1 ) 
+                else if ( grid3D->bndr_global_3D(i,j,k) == 8 && j == ny-1 ) 
                 {
-                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
-                    hr = grid3D->numcp_global_3D[i+1][j][k] - grid3D->numcp_global_3D[i][j][k];
-                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
-                    hu = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][1][k];
-                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
-                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
+                    hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
+                    hr = grid3D->numcp_global_3D(i+1,j,k) - grid3D->numcp_global_3D(i,j,k);
+                    hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
+                    hu = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,1,k);
+                    hi = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,k-1);
+                    ho = grid3D->numcp_global_3D(i,j,k+1) - grid3D->numcp_global_3D(i,j,k);
 
                     nnz = nnz + 7;
 
@@ -231,9 +231,9 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 }
 
                // periodic boudnary points at lowwer boudary in z direction
-                else if( grid3D->bndr_global_3D[i][j][k]==8 && k==0) 
+                else if( grid3D->bndr_global_3D(i,j,k)==8 && k==0) 
                 {
-                    ho = grid3D->numcp_global_3D[i][j][k+1] - grid3D->numcp_global_3D[i][j][k];
+                    ho = grid3D->numcp_global_3D(i,j,k+1) - grid3D->numcp_global_3D(i,j,k);
                     nnz = nnz + 2;
 
                     val[ii].push_back(1.0);
@@ -245,14 +245,14 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 }
 
                 // periodic boudnary points at upper boudary in z direction
-                else if ( grid3D->bndr_global_3D[i][j][k] == 8 && k == nz-1 ) 
+                else if ( grid3D->bndr_global_3D(i,j,k) == 8 && k == nz-1 ) 
                 {
-                    hl = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i-1][j][k];
-                    hr = grid3D->numcp_global_3D[i+1][j][k] - grid3D->numcp_global_3D[i][j][k];
-                    hd = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j-1][k];
-                    hu = grid3D->numcp_global_3D[i][j+1][k] - grid3D->numcp_global_3D[i][j][k];
-                    hi = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][k-1];
-                    ho = grid3D->numcp_global_3D[i][j][k] - grid3D->numcp_global_3D[i][j][1];
+                    hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
+                    hr = grid3D->numcp_global_3D(i+1,j,k) - grid3D->numcp_global_3D(i,j,k);
+                    hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
+                    hu = grid3D->numcp_global_3D(i,j+1,k) - grid3D->numcp_global_3D(i,j,k);
+                    hi = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,k-1);
+                    ho = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,1);
 
                     nnz = nnz + 7;
 
@@ -403,17 +403,17 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
         {
             for(int k = 0; k < nz; k++)
             {
-                if(grid3D->bndr_global_3D[i][j][k] == 0 ) 
+                if(grid3D->bndr_global_3D(i,j,k) == 0 ) 
                 {
                     b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j,k);
                     ii++;
                 }
-                else if(grid3D->bndr_global_3D[i][j][k] == 1) 
+                else if(grid3D->bndr_global_3D(i,j,k) == 1) 
                 {
-                    b1[ii] = grid3D->bndrVal_global_3D[i][j][k];
+                    b1[ii] = grid3D->bndrVal_global_3D(i,j,k);
                     ii++;
                 }
-                else if(grid3D->bndr_global_3D[i][j][k] == 8 && ( i == 0 || j == 0 || k == 0)) 
+                else if(grid3D->bndr_global_3D(i,j,k) == 8 && ( i == 0 || j == 0 || k == 0)) 
                 {
                     b1[ii] = 0.0;
                     ii++;
@@ -449,16 +449,16 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
         {
             for(int k = 0; k < nz; k++)
             {
-                if (grid3D->bndr_global_3D[i][j][k] == 0 || grid3D->bndr_global_3D[i][j][k] == 1
-                 || grid3D->bndr_global_3D[i][j][k] == 2 || grid3D->bndr_global_3D[i][j][k] == 8) 
+                if (grid3D->bndr_global_3D(i,j,k) == 0 || grid3D->bndr_global_3D(i,j,k) == 1
+                 || grid3D->bndr_global_3D(i,j,k) == 2 || grid3D->bndr_global_3D(i,j,k) == 8) 
                 {
                     (*phi3D)(i,j,k) = b1[ii];
                     ii++;
                 }
 
-                if(grid3D->bndr_global_3D[i][j][k] == 5) 
+                if(grid3D->bndr_global_3D(i,j,k) == 5) 
                 {
-                    (*phi3D)(i,j,k) = grid3D->bndrVal_global_3D[i][j][k];
+                    (*phi3D)(i,j,k) = grid3D->bndrVal_global_3D(i,j,k);
                 }
             }
 

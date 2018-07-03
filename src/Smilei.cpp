@@ -184,7 +184,14 @@ int main (int argc, char* argv[])
 
     TITLE("Creating Diagnostic");
     Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
+    if(smpi->isMaster() && params.geometry == "3d3v")
+    {
+        sio->createDiagsPattern(params, diag);
+    }
+    
     smpi->barrier();
+
+
 
     TITLE("Creating Solver");
     timer[11].restart();

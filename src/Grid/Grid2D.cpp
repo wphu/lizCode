@@ -893,11 +893,11 @@ void Grid2D::computeNcp()
     {
         for(int j=0; j<ny; j++)
         {
-            if( bndr_global_3D[i][j]==0 || bndr_global_3D[i][j]==1
-             || bndr_global_3D[i][j]==2 || bndr_global_3D[i][j]==8)
+            if( bndr_global_2D[i][j]==0 || bndr_global_2D[i][j]==1
+             || bndr_global_2D[i][j]==2 || bndr_global_2D[i][j]==8)
             {
                 ncp++;
-                numcp_global_3D[i][j]=ncp-1;
+                numcp_global_2D[i][j]=ncp-1;
             }
         }
     }

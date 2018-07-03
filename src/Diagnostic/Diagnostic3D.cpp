@@ -36,10 +36,10 @@ Diagnostic(params)
 
     for(int i_species = 0; i_species < n_species; i_species++)
     {
-        particleFlux[i_species]         = new Field3D(dims_global, ("particleFlux"          + params.species_param[i_species].species_type).c_str());
-        heatFlux[i_species]             = new Field3D(dims_global, ("heatFlux"              + params.species_param[i_species].species_type).c_str());
-        particleFlux_global[i_species]  = new Field3D(dims_global, ("particleFlux_global"   + params.species_param[i_species].species_type).c_str());
-        heatFlux_global[i_species]      = new Field3D(dims_global, ("heatFlux_global"       + params.species_param[i_species].species_type).c_str());
+        particleFlux[i_species]         = Field3D(dims_global, ("particleFlux"          + params.species_param[i_species].species_type).c_str());
+        heatFlux[i_species]             = Field3D(dims_global, ("heatFlux"              + params.species_param[i_species].species_type).c_str());
+        particleFlux_global[i_species]  = Field3D(dims_global, ("particleFlux_global"   + params.species_param[i_species].species_type).c_str());
+        heatFlux_global[i_species]      = Field3D(dims_global, ("heatFlux_global"       + params.species_param[i_species].species_type).c_str());
     }
 }
 
@@ -76,7 +76,7 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
     // absorb particles which hit wall, and calcualte particle flux, heat flux, and average angles
     for(int i_species = 0; i_species < n_species; i_species++)
     {
-        s1 = vecSpecies[iSpec];
+        s1 = vecSpecies[i_species];
         p1 = &(s1->particles);
         s1->indexes_of_particles_to_absorb.clear();
         mass_ov_2 = 0.5 * s1->species_param.mass;
@@ -88,7 +88,7 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
     {
 		for(int i_species = 0; i_species < n_species; i_species++)
 		{
-            s1 = vecSpecies[iSpec];
+            s1 = vecSpecies[i_species];
 			wlt0 = s1->species_param.weight * dx * dy / (timestep * step_ave);
 		}
 	}

@@ -719,7 +719,7 @@ void SmileiMPI_Cart3D::sumField( Field* field )
 void SmileiMPI_Cart3D::scatterGrid( Grid* grid )
 {
     int procs_rk;
-    int iGlobal, jGlobal;
+    int iGlobal, jGlobal, kGlobal;
     int iGlobal_gather;
 
     Grid3D* grid3D = static_cast<Grid3D*>(grid);
@@ -728,31 +728,39 @@ void SmileiMPI_Cart3D::scatterGrid( Grid* grid )
     {
         for(int jProcs = 0; jProcs < number_of_procs[1]; jProcs++)
         {
-            procs_rk = iProcs * number_of_procs[1] + jProcs;
-            for(int i = 0; i < dims_gather[procs_rk*2]; i++)
+            for(int kProcs = 0; kProcs < number_of_procs[2]; kProcs++)
             {
-                for(int j = 0; j < dims_gather[procs_rk*2 + 1]; j++)
+                procs_rk = iProcs * number_of_procs[1] * number_of_procs[2] + jProcs * number_of_procs[2] + kProcs;
+                for(int i = 0; i < dims_gather[procs_rk*3]; i++)
                 {
-                    iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
-                    jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                    if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*2] - 1 - oversize[0]){
-                        iGlobal = abs((int)grid3D->globalDims_[0] - abs(iGlobal) - 1);
+                    for(int j = 0; j < dims_gather[procs_rk*3 + 1]; j++)
+                    {
+                        for(int k = 0; k < dims_gather[procs_rk*3 + 2]; k++)
+                        {
+                            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
+                            jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + j -oversize[2];
+                            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
+                                iGlobal = abs((int)grid3D->globalDims_[0] - abs(iGlobal) - 1);
+                            }
+                            if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*3+1] - 1 - oversize[1]){
+                                jGlobal = abs((int)grid3D->globalDims_[1] - abs(jGlobal) - 1);
+                            }
+                            if(kProcs == 0 && k < oversize[2] || kProcs == number_of_procs[2] -1 && k > dims_gather[procs_rk*3+2] - 1 - oversize[2]){
+                                kGlobal = abs((int)grid3D->globalDims_[2] - abs(kGlobal) - 1);
+                            }
+                            iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*3+1] * dims_gather[procs_rk*3+2] + j * dims_gather[procs_rk*3+2] + k;
+                            //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
+
+                            grid_global_gather[iGlobal_gather] = grid3D->iswall_global_3D(iGlobal, jGlobal, kGlobal);
+                        }
+
                     }
-                    if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*2+1] - 1 - oversize[1]){
-                        jGlobal = abs((int)grid3D->globalDims_[1] - abs(jGlobal) - 1);
-                    }
-                    iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*2+1] + j;
-                    //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
-
-                    grid_global_gather[iGlobal_gather] = grid3D->iswall_global_3D[iGlobal][jGlobal];
-
-
                 }
             }
-
         }
     }
-    MPI_Scatterv(grid_global_gather, &send_cnt[0], &send_disp[0], MPI_INT, &grid3D->iswall_3D[0][0], recv_cnt[smilei_rk], MPI_INT, 0, SMILEI_COMM_3D);
+    MPI_Scatterv(grid_global_gather, &send_cnt[0], &send_disp[0], MPI_INT, &(grid3D->iswall_3D(0,0,0)), recv_cnt[smilei_rk], MPI_INT, 0, SMILEI_COMM_3D);
     //TITLE("scatterGrid");
 
 } // END scatterGrid

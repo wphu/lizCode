@@ -59,8 +59,8 @@ public:
 	    double loadPos_end;
 		double loadPos_Ystart;
 	    double loadPos_Yend;
-		double load_Pos_Zstart;
-		double load_Pos_Zend;
+		double loadPos_Zstart;
+		double loadPos_Zend;
 
 	    bool intra, debye_length_required = false;
 	    int debug_every;

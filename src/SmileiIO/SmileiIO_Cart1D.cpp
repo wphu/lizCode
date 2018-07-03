@@ -73,8 +73,10 @@ void SmileiIO_Cart1D::createFieldsPattern( PicParams& params, ElectroMagn* field
 } // END createPattern
 
 // Create particles h5 file pattern
-void SmileiIO_Cart1D::createDiagsPattern( PicParams& params, Diagnostic1D* diag1D)
+void SmileiIO_Cart1D::createDiagsPattern( PicParams& params, Diagnostic* diag)
 {
+    Diagnostic1D* diag1D = static_cast<Diagnostic1D*>(diag);
+
     string diagName;
     const char* h5_name;
     hid_t dataset_id;
