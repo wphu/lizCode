@@ -80,6 +80,7 @@ isNorthern(smpi->isNorthern())
     nz_p = n_space[2]+1+2*oversize[2];
     nz_d = n_space[2]+2+2*oversize[2];
 
+
     // Allocation of the EM fields
     Ex_  = new Field3D(dimPrim, "Ex" );
     Ey_  = new Field3D(dimPrim, "Ey" );

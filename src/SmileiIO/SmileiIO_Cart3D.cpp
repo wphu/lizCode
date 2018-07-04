@@ -193,11 +193,6 @@ void SmileiIO_Cart3D::readGrid(Grid* grid)
     herr_t      grid_status;
     string      grid_dataset_name;
 
-    hsize_t     count[3];              /* size of subset in the file */
-    hsize_t     offset[3];             /* subset offset in the file */
-    hsize_t     stride[3];
-    hsize_t     block[3];
-
     int ii;
     int grid_ndim = 3;
     hsize_t grid_dims_global[3];
@@ -206,9 +201,9 @@ void SmileiIO_Cart3D::readGrid(Grid* grid)
     grid_file_name  = "data/grid.h5";
     grid_file_id    = H5Fopen( grid_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-    grid_dims_global[0] = 1;
-    grid_dims_global[1] = grid3D->globalDims_[0];
-    grid_dims_global[2] = grid3D->globalDims_[1];
+    grid_dims_global[0] = grid3D->globalDims_[0];
+    grid_dims_global[1] = grid3D->globalDims_[1];
+    grid_dims_global[2] = grid3D->globalDims_[2];
 
 
     // =============read grid============================================

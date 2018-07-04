@@ -21,7 +21,7 @@ Solver3D(params)
     dx = params.cell_length[0];
     dy = params.cell_length[1];
     dz = params.cell_length[2];
-    dxyz = dx * dy;
+    dxx = dx * dx;
 
     nprow = params.number_of_procs[0];
     npcol = params.number_of_procs[1];
@@ -82,16 +82,19 @@ void EF_Solver3D_SLU_DIST::initSLU()
     vector< vector<double> > val;
     vector< vector<int> >    row;
 
-    int i,j,k,ii,ll,kk,v,hu,hd,hr,hl,i_ncp,i_nnz,nz_col,i_val;
+    int i,j,k,ii,ll,kk,v,hu,hd,hr,hl,hi,ho,i_ncp,i_nnz,nz_col,i_val;
 
-    val.resize(grid3D->ncp*5);
-    row.resize(grid3D->ncp*5);
+    val.resize(grid3D->ncp);
+    row.resize(grid3D->ncp);
 
     nnz=0;
     ii=0;
     v=0;
-    nx=grid3D->nx;
-    ny=grid3D->ny;
+    nx = grid3D->nx;
+    ny = grid3D->ny;
+    nz = grid3D->nz;
+
+    MESSAGE("Begining structure temporary A ==============");
 
     for(i=0; i<nx; i++)
     {
@@ -102,7 +105,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
                 // normal points in the calculation region
                 if(grid3D->bndr_global_3D(i,j,k)==0) 
                 {
-                    // order: left, right, down, up, in, out
+                    // order: west(hl), east(hr), north(hd), south(hu), bottom(hi), up(ho)
                     hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
                     hr = grid3D->numcp_global_3D(i+1,j,k) - grid3D->numcp_global_3D(i,j,k);
                     hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
@@ -273,11 +276,17 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
                     ii++;
                 }
+                else
+                {
+                    
+                }
 
             }
         }
 
     }
+
+    MESSAGE("Temporary A has been structrued");
 
     // convert the temp "val row col" to A (compressed column format, i.e. Harwell-Boeing format)
     //a = new double[nnz];
@@ -405,7 +414,7 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
             {
                 if(grid3D->bndr_global_3D(i,j,k) == 0 ) 
                 {
-                    b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j,k);
+                    b1[ii] = - dxx * const_ephi0_inv * (*rho3D)(i,j,k);
                     ii++;
                 }
                 else if(grid3D->bndr_global_3D(i,j,k) == 1) 
@@ -418,9 +427,9 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
                     b1[ii] = 0.0;
                     ii++;
                 }
-                else if(grid3D->bndr_global_3D[i][j] == 8 && ( i == nx - 1 || j == ny - 1 || k == nz - 1)) 
+                else if(grid3D->bndr_global_3D(i,j,k) == 8 && ( i == nx - 1 || j == ny - 1 || k == nz - 1)) 
                 {
-                    b1[ii] = - dxy * const_ephi0_inv * (*rho3D)(i,j,k);
+                    b1[ii] = - dxx * const_ephi0_inv * (*rho3D)(i,j,k);
                     ii++;
                 }
                 else 

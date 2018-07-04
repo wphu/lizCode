@@ -53,13 +53,18 @@ public:
         else if ( params.geometry == "3d3v" ) 
         {
             #ifdef SuperLU_serial
-            solver = new EF_Solver2D_SLU(params, grid, smpi);
+            //solver = new EF_Solver3D_SLU(params, grid, smpi);
             #else
-            solver = new EF_Solver2D_SLU_DIST(params, grid, smpi);
+            solver = new EF_Solver3D_SLU_DIST(params, grid, smpi);
             #endif
         }
         else 
         {
+        }
+
+        if(solver == NULL)
+        {
+            ERROR("Creating solver failed =================");
         }
 
         return solver;

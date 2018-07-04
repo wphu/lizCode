@@ -22,6 +22,7 @@ void Profile::init(ProfileStructure & pp, string geometry)
 
     if      (geometry == "1d3v") dim = 1;
     else if (geometry == "2d3v") dim = 2;
+    else if (geometry == "3d3v") dim = 3;
     else {
         ERROR( "Unsupported geometry : " << geometry);
     }

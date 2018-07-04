@@ -121,10 +121,13 @@ public:
     	        if(grid->gridType == "from_file")
                 {
                     sio->readGrid(grid);
+                    DEBUG(0, "Reading grid ends ================");
                 }
                 grid->compute();
+                DEBUG(1, "Grid compute ends ================");
             }
             smpi->scatterGrid(grid);
+            DEBUG(2, "Scatter grid ends ================");
         }
         else 
         {

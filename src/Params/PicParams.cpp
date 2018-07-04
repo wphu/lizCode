@@ -96,7 +96,7 @@ PicParams::PicParams(InputData &ifile) {
 
     // geometry of the simulation
     ifile.extract("dim", geometry);
-    if (geometry!="1d3v" && geometry!="2d3v") {
+    if (geometry!="1d3v" && geometry!="2d3v" && geometry!="3d3v") {
         ERROR("Geometry " << geometry << " does not exist");
     }
     setDimensions();

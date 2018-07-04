@@ -133,8 +133,8 @@ void EF_Solver2D_SLU::initSLU()
 
     int i,j,k,ii,ll,kk,v,hu,hd,hr,hl,i_ncp,i_nnz,nz_col,i_val;
 
-    val.resize(grid2D->ncp*5);
-    row.resize(grid2D->ncp*5);
+    val.resize(grid2D->ncp);
+    row.resize(grid2D->ncp);
 
     nnz=0;
     ii=0;

@@ -44,7 +44,7 @@ Grid3D::Grid3D(
 
     dims_[0] = params.n_space[0]+1+2*params.oversize[0];
     dims_[1] = params.n_space[1]+1+2*params.oversize[1];
-    dims_[1] = params.n_space[2]+1+2*params.oversize[2];
+    dims_[2] = params.n_space[2]+1+2*params.oversize[2];
 
     globalDims_[0]=params.n_space_global[0]+1;
     globalDims_[1]=params.n_space_global[1]+1;
@@ -67,7 +67,8 @@ Grid3D::Grid3D(
     {
         geometry_gap();
     }
-    computeNcp();
+
+    DEBUG(0, "Grid3D construction function end ==============");
 }
 
 
@@ -88,6 +89,7 @@ void Grid3D::allocateDims( )
 //>>>no gap geometry, with source in x direction
 void Grid3D::geometry( )
 {
+    computeNcp();
 }
 
 

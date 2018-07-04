@@ -1,5 +1,5 @@
-#export SuperLU_type=mpi
-export SuperLU_type=serial
+export SuperLU_type=mpi
+#export SuperLU_type=serial
 
 export lizHomePath=/home/huwanpeng/codes/lizCode
 
@@ -8,7 +8,7 @@ export lizHomePath=/home/huwanpeng/codes/lizCode
 export mpich_dir=/opt/deepin15.6/mpich
 export hdf5_dir=/opt/deepin15.6/hdf5-mpich
 export SuperLU_dir=/opt/deepin15.6/SuperLU_4.3
-#export SuperLU_DIST_dir=/home/wphu/opt/SuperLU_DIST_5.3.0
+export SuperLU_DIST_dir=/opt/deepin15.6/SuperLU_DIST_5.3.0
 export anaconda3_dir=/opt/anaconda3
 
 #source ${intel_compiler_dir}/bin/compilervars.sh intel64
