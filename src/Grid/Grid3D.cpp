@@ -58,6 +58,7 @@ Grid3D::Grid3D(
     iswall_global_3D.allocate_dims(globalDims_);
     bndr_global_3D.allocate_dims(globalDims_);
     bndrVal_global_3D.allocate_dims(globalDims_);
+    numcp_global_3D.allocate_dims(globalDims_);
 
     if(gridType == "rectangle")
     {
@@ -80,6 +81,10 @@ Grid3D::~Grid3D()
 
 }
 
+void Grid3D::compute()
+{
+    computeNcp();
+}
 
 void Grid3D::allocateDims( )
 {
@@ -89,7 +94,7 @@ void Grid3D::allocateDims( )
 //>>>no gap geometry, with source in x direction
 void Grid3D::geometry( )
 {
-    computeNcp();
+
 }
 
 

@@ -146,7 +146,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
  
                 // periodic boudnary points at left boudary in x direction
-                else if( grid3D->bndr_global_3D(i,j,k)==8 && i==0) 
+                else if( grid3D->bndr_global_3D(i,j,k) == 8 && i == 0) 
                 {
                     hr = grid3D->numcp_global_3D(nx-1,j,k) - grid3D->numcp_global_3D(i,j,k);
                     nnz = nnz + 2;
@@ -161,31 +161,50 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
                 // periodic boudnary points at right boudary in x direction
                 else if ( grid3D->bndr_global_3D(i,j,k) == 8 && i == nx-1 ) {
-                    hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
-                    hr = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(1,j,k);
-                    hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
-                    hu = grid3D->numcp_global_3D(i,j+1,k) - grid3D->numcp_global_3D(i,j,k);
-                    hi = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,k-1);
-                    ho = grid3D->numcp_global_3D(i,j,k+1) - grid3D->numcp_global_3D(i,j,k);
+                    if(j == 0 || j == ny - 1)
+                    {
+                        hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
+                        hr = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(1,j,k);
 
-                    nnz = nnz + 7;
+                        nnz = nnz + 3;
 
-                    val[ii].push_back(-4.0);
-                    row[ii].push_back(ii);
-                    val[ii-hl].push_back(1.0);
-                    row[ii-hl].push_back(ii);
-                    val[ii+hr].push_back(1.0);
-                    row[ii+hr].push_back(ii);
-                    val[ii-hd].push_back(1.0);
-                    row[ii-hd].push_back(ii);
-                    val[ii-hu].push_back(1.0);
-                    row[ii-hu].push_back(ii);
-                    val[ii-hi].push_back(1.0);
-                    row[ii-hi].push_back(ii);
-                    val[ii+ho].push_back(1.0);
-                    row[ii+ho].push_back(ii);
+                        val[ii].push_back(-2.0);
+                        row[ii].push_back(ii);
+                        val[ii-hl].push_back(1.0);
+                        row[ii-hl].push_back(ii);
+                        val[ii-hr].push_back(1.0);
+                        row[ii-hr].push_back(ii);
 
-                    ii++;
+                        ii++;
+                    }
+                    else
+                    {
+                        hl = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i-1,j,k);
+                        hr = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(1,j,k);
+                        hd = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j-1,k);
+                        hu = grid3D->numcp_global_3D(i,j+1,k) - grid3D->numcp_global_3D(i,j,k);
+                        hi = grid3D->numcp_global_3D(i,j,k) - grid3D->numcp_global_3D(i,j,k-1);
+                        ho = grid3D->numcp_global_3D(i,j,k+1) - grid3D->numcp_global_3D(i,j,k);
+
+                        nnz = nnz + 7;
+
+                        val[ii].push_back(-4.0);
+                        row[ii].push_back(ii);
+                        val[ii-hl].push_back(1.0);
+                        row[ii-hl].push_back(ii);
+                        val[ii-hr].push_back(1.0);
+                        row[ii-hr].push_back(ii);
+                        val[ii-hd].push_back(1.0);
+                        row[ii-hd].push_back(ii);
+                        val[ii+hu].push_back(1.0);
+                        row[ii+hu].push_back(ii);
+                        val[ii-hi].push_back(1.0);
+                        row[ii-hi].push_back(ii);
+                        val[ii+ho].push_back(1.0);
+                        row[ii+ho].push_back(ii);
+
+                        ii++;
+                    }
                 }
 
                // periodic boudnary points at lowwer boudary in y direction

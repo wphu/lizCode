@@ -41,6 +41,7 @@ public:
     void geometry();
     void geometry_gap();
     void computeNcp();
+    void compute();
     Array3D<int> iswall_3D;
   	Array3D<int> iswall_global_3D;
     Array3D<int> bndr_global_3D;
