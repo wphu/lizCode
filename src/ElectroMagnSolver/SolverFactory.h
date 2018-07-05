@@ -9,6 +9,7 @@
 #include "MF_Solver2D_Cowan.h"
 #include "EF_Solver2D_SLU.h"
 #include "EF_Solver2D_SLU_DIST.h"
+#include "EF_Solver3D_SLU.h"
 #include "EF_Solver3D_SLU_DIST.h"
 #include "InputData.h"
 #include "PicParams.h"
@@ -53,7 +54,7 @@ public:
         else if ( params.geometry == "3d3v" ) 
         {
             #ifdef SuperLU_serial
-            //solver = new EF_Solver3D_SLU(params, grid, smpi);
+            solver = new EF_Solver3D_SLU(params, grid, smpi);
             #else
             solver = new EF_Solver3D_SLU_DIST(params, grid, smpi);
             #endif

@@ -1,6 +1,6 @@
-#ifdef SuperLU_mpi
+#ifdef SuperLU_serial
 
-#include "EF_Solver3D_SLU_DIST.h"
+#include "EF_Solver3D_SLU.h"
 
 #include "ElectroMagn.h"
 #include "Field3D.h"
@@ -12,50 +12,46 @@
 using namespace std;
 
 
-EF_Solver3D_SLU_DIST::EF_Solver3D_SLU_DIST(PicParams& params, Grid* grid, SmileiMPI* smpi):
+EF_Solver3D_SLU::EF_Solver3D_SLU(PicParams& params, Grid* grid, SmileiMPI* smpi):
 Solver3D(params)
 {
     SmileiMPI_Cart3D* smpi3D = static_cast<SmileiMPI_Cart3D*>(smpi);
-
 
     dx = params.cell_length[0];
     dy = params.cell_length[1];
     dz = params.cell_length[2];
     dxx = dx * dx;
 
-    nprow = params.number_of_procs[0];
-    npcol = params.number_of_procs[1];
+    grid3D = static_cast<Grid3D*>(grid);
 
-    // Now ensure that one compute node is used to solve SuperLU
-    if(nprow * npcol > 20)
+    if(smpi3D->isMaster())
     {
-        nprow = 2;
-        npcol = 2;
+        initSLU();
     }
 
-    grid3D = static_cast<Grid3D*>(grid);
-    initSLU();
+
 }
 
 
-EF_Solver3D_SLU_DIST::~EF_Solver3D_SLU_DIST()
+EF_Solver3D_SLU::~EF_Solver3D_SLU()
 {
 }
 
-void EF_Solver3D_SLU_DIST::operator() ( ElectroMagn* fields )
+void EF_Solver3D_SLU::operator() ( ElectroMagn* fields )
 {
 
 }
 
 
 
-void EF_Solver3D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
+void EF_Solver3D_SLU::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
 {
     SmileiMPI_Cart3D* smpi3D = static_cast<SmileiMPI_Cart3D*>(smpi);
     // Static-cast of the fields
     Field3D* Ex3D = static_cast<Field3D*>(fields->Ex_);
     Field3D* Ey3D = static_cast<Field3D*>(fields->Ey_);
     Field3D* Ez3D = static_cast<Field3D*>(fields->Ez_);
+
 
     Field3D* rho3D           = static_cast<Field3D*>(fields->rho_);
     Field3D* rho3D_global    = static_cast<Field3D*>(fields->rho_global);
@@ -65,10 +61,13 @@ void EF_Solver3D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field3D* Ez3D_global    = static_cast<Field3D*>(fields->Ez_global);
 
     smpi3D->barrier();
-    smpi3D->gather_rho_all(rho3D_global, rho3D);
+    smpi3D->gatherRho(rho3D_global, rho3D);
 
-    solve_SLU(rho3D_global, phi3D_global);
-    solve_Exyz(phi3D_global, Ex3D_global, Ey3D_global, Ez3D_global);
+    if(smpi3D->isMaster())
+    {
+        solve_SLU(rho3D_global, phi3D_global);
+        solve_Exyz(phi3D_global, Ex3D_global, Ey3D_global, Ez3D_global);
+    }
 
     smpi3D->barrier();
     smpi3D->scatterField(Ex3D_global, Ex3D);
@@ -77,7 +76,61 @@ void EF_Solver3D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
 }
 
 
-void EF_Solver3D_SLU_DIST::initSLU()
+void EF_Solver3D_SLU::initSLU_test()
+{
+
+    SuperMatrix A, L, U, B;
+    double   *a, *rhs;
+    double   s, u, p, e, r, l;
+    int      *asub, *xa;
+    int      *perm_r; /* row permutations from partial pivoting */
+    int      *perm_c; /* column permutation vector */
+    int      nrhs, info, i, m, n, nnz, permc_spec;
+    superlu_options_t options;
+    SuperLUStat_t stat;
+    /* Initialize matrix A. */
+    m = n = 5;
+    nnz = 12;
+    if ( !(a = doubleMalloc(nnz)) ) ABORT("Malloc fails for a[].");
+    if ( !(asub = intMalloc(nnz)) ) ABORT("Malloc fails for asub[].");
+    if ( !(xa = intMalloc(n+1)) ) ABORT("Malloc fails for xa[].");
+    s = 19.0; u = 21.0; p = 16.0; e = 5.0; r = 18.0; l = 12.0;
+    a[0] = s; a[1] = l; a[2] = l; a[3] = u; a[4] = l; a[5] = l;
+    a[6] = u; a[7] = p; a[8] = u; a[9] = e; a[10]= u; a[11]= r;
+    asub[0] = 0; asub[1] = 1; asub[2] = 4; asub[3] = 1;
+    asub[4] = 2; asub[5] = 4; asub[6] = 0; asub[7] = 2;
+    asub[8] = 0; asub[9] = 3; asub[10]= 3; asub[11]= 4;
+    xa[0] = 0; xa[1] = 3; xa[2] = 6; xa[3] = 8; xa[4] = 10; xa[5] = 12;
+
+    /* Create matrix A in the format expected by SuperLU. */
+    dCreate_CompCol_Matrix(&A, m, n, nnz, a, asub, xa, SLU_NC, SLU_D, SLU_GE);
+
+    /* Create right-hand side matrix B. */
+    nrhs = 1;
+    if ( !(rhs = doubleMalloc(m * nrhs)) ) ABORT("Malloc fails for rhs[].");
+    for (i = 0; i < m; ++i) rhs[i] = 1.0;
+    dCreate_Dense_Matrix(&B, m, nrhs, rhs, m, SLU_DN, SLU_D, SLU_GE);
+
+    if ( !(perm_r = intMalloc(m)) ) ABORT("Malloc fails for perm_r[].");
+    if ( !(perm_c = intMalloc(n)) ) ABORT("Malloc fails for perm_c[].");
+
+    /* Set the default input options. */
+    set_default_options(&options);
+    options.ColPerm = NATURAL;
+
+    /* Initialize the statistics variables. */
+    StatInit(&stat);
+
+    /* Solve the linear system. */
+    dgssv(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &info);
+
+    printf("LU factorization: dgssvx() returns info %d\n", info);
+
+
+}
+
+
+void EF_Solver3D_SLU::initSLU()
 {
     vector< vector<double> > val;
     vector< vector<int> >    row;
@@ -308,19 +361,15 @@ void EF_Solver3D_SLU_DIST::initSLU()
     MESSAGE("Temporary A has been structrued");
 
     // convert the temp "val row col" to A (compressed column format, i.e. Harwell-Boeing format)
-    //a = new double[nnz];
-    //asub = new int[nnz];
-    //xa = new int[grid3D->ncp+1];
-    if ( !(a = doubleMalloc_dist(nnz)) ) ABORT("Malloc fails for a[].");
-    if ( !(asub = intMalloc_dist(nnz)) ) ABORT("Malloc fails for asub[].");
-    if ( !(xa = intMalloc_dist(grid3D->ncp+1)) ) ABORT("Malloc fails for xa[].");
-
-
+    if ( !(a = doubleMalloc(nnz)) ) ABORT("Malloc fails for a[].");
+    if ( !(asub = intMalloc(nnz)) ) ABORT("Malloc fails for asub[].");
+    if ( !(xa = intMalloc(grid3D->ncp+1)) ) ABORT("Malloc fails for xa[].");
 
     i_ncp=0;
     i_nnz=0;
     nz_col=0;
     i_val=0;
+
 
     // new algorithm
     for(int i_col = 0; i_col < grid3D->ncp; i_col++)
@@ -338,86 +387,70 @@ void EF_Solver3D_SLU_DIST::initSLU()
             i_val++;
         }
     }
-    MESSAGE("A and b have been structrued");
-
     xa[grid3D->ncp]=nnz;
+    cout<<"A and b have been structrued"<<endl;
+
+    // ================================ call superlu methods to factorize LU ==================
+    /* Defaults */
+    lwork = 0;
+    nrhs  = 1;
+    equil = YES;
+    u     = 1.0;
+    trans = NOTRANS;
+
+    set_default_options(&options);
+    options.Equil = equil;
+    options.DiagPivotThresh = u;
+    options.Trans = trans;
 
     m = grid3D->ncp;
     n = grid3D->ncp;
     nrhs = 1;
+    if ( !(rhsb = doubleMalloc(m * nrhs)) ) ABORT("Malloc fails for rhsb[].");
+    if ( !(rhsx = doubleMalloc(m * nrhs)) ) ABORT("Malloc fails for rhsx[].");
 
-    /* ------------------------------------------------------------
-       INITIALIZE THE SUPERLU PROCESS GRID. 
-       ------------------------------------------------------------*/
-    superlu_gridinit(MPI_COMM_WORLD, nprow, npcol, &grid);
-
-    /* Bail out if I do not belong in the grid. */
-    iam = grid.iam;
-    if ( iam >= nprow * npcol )
-    {
-        //cout<<"iam >= nprow * npcol: "<<iam<<endl;
-        return;
-    }
-
-    /* Create compressed column matrix for A. */
-    dCreate_CompCol_Matrix_dist(&A, m, n, nnz, a, asub, xa, SLU_NC, SLU_D, SLU_GE);
-
-    /* Generate the exact solution and compute the right-hand side. 
-       The right-hand-side B and the result X are both stored in b1 */
-    if ( !(b1 = doubleMalloc_dist(m * nrhs)) ) ABORT("Malloc fails for b1[]");
-    if ( !(xtrue = doubleMalloc_dist(n*nrhs)) ) ABORT("Malloc fails for xtrue[]");
-    *trans = 'N';
+    dCreate_CompCol_Matrix(&A, m, n, nnz, a, asub, xa, SLU_NC, SLU_D, SLU_GE);
+    dCreate_Dense_Matrix(&B, m, nrhs, rhsb, m, SLU_DN, SLU_D, SLU_GE);
+    dCreate_Dense_Matrix(&X, m, nrhs, rhsx, m, SLU_DN, SLU_D, SLU_GE);
+    xact = doubleMalloc(n * nrhs);
     ldx = n;
-    ldb = m;
-    dGenXtrue_dist(n, nrhs, xtrue, ldx);
-    dFillRHS_dist(trans, nrhs, xtrue, ldx, &A, b1, ldb);
+    dGenXtrue(n, nrhs, xact, ldx);
+    dFillRHS(trans, nrhs, xact, ldx, &A, &B);
 
-    if ( !(berr = doubleMalloc_dist(nrhs)) )
-	ABORT("Malloc fails for berr[].");
-
-    set_default_options_dist(&options);
-    //options.IterRefine = NO;
-
-    if (!iam) 
-    {
-        print_sp_ienv_dist(&options);
-        print_options_dist(&options);
-    }
-
-    /* Initialize ScalePermstruct and LUstruct. */
-    ScalePermstructInit(m, n, &ScalePermstruct);
-    LUstructInit(n, &LUstruct);
+    if ( !(etree = intMalloc(n)) ) ABORT("Malloc fails for etree[].");
+    if ( !(perm_r = intMalloc(m)) ) ABORT("Malloc fails for perm_r[].");
+    if ( !(perm_c = intMalloc(n)) ) ABORT("Malloc fails for perm_c[].");
+    if ( !(R = (double *) SUPERLU_MALLOC(A.nrow * sizeof(double))) )
+        ABORT("SUPERLU_MALLOC fails for R[].");
+    if ( !(C = (double *) SUPERLU_MALLOC(A.ncol * sizeof(double))) )
+        ABORT("SUPERLU_MALLOC fails for C[].");
+    if ( !(ferr = (double *) SUPERLU_MALLOC(nrhs * sizeof(double))) )
+        ABORT("SUPERLU_MALLOC fails for ferr[].");
+    if ( !(berr = (double *) SUPERLU_MALLOC(nrhs * sizeof(double))) )
+        ABORT("SUPERLU_MALLOC fails for berr[].");
 
     /* Initialize the statistics variables. */
-    PStatInit(&stat);
+    StatInit(&stat);
 
-    MESSAGE("begin factorizing......");
+    /* ONLY PERFORM THE LU DECOMPOSITION */
+    B.ncol = 0;  /* Indicate not to solve the system */
 
-    /* Call the linear equation solver: factorize and solve. */
-    pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b1, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
-    
-    MESSAGE("end factorizing......");
-    
-    /* Check the accuracy of the solution. */
-    if ( !iam ) 
-    {
-	    dinf_norm_error_dist(n, nrhs, b1, ldb, xtrue, ldx, &grid);
-    }
+    cout<<"begin factorizing......"<<endl;
 
-    PStatPrint(&options, &stat, &grid);        /* Print the statistics. */
-    PStatFree(&stat);
+    dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
+           &L, &U, work, lwork, &B, &X, &rpg, &rcond, ferr, berr,
+           &mem_usage, &stat, &info);
 
-    MESSAGE("SuperLU_DIST init done!!!");
+    cout<<"end factorizing......"<<endl;
+
+    printf("LU factorization: dgssvx() returns info %d\n", info);
+    StatPrint(&stat);
+    StatFree(&stat);
 }
 
 
-void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
+void EF_Solver3D_SLU::solve_SLU(Field* rho, Field* phi)
 {
-    if ( iam >= nprow * npcol )
-    {
-        //cout<<"iam >= nprow * npcol: "<<iam<<endl;
-        return;
-    }
 
     Field3D* rho3D = static_cast<Field3D*>(rho);
     Field3D* phi3D = static_cast<Field3D*>(phi);
@@ -433,22 +466,22 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
             {
                 if(grid3D->bndr_global_3D(i,j,k) == 0 ) 
                 {
-                    b1[ii] = - dxx * const_ephi0_inv * (*rho3D)(i,j,k);
+                    rhsb[ii] = - dxx * const_ephi0_inv * (*rho3D)(i,j,k);
                     ii++;
                 }
                 else if(grid3D->bndr_global_3D(i,j,k) == 1) 
                 {
-                    b1[ii] = grid3D->bndrVal_global_3D(i,j,k);
+                    rhsb[ii] = grid3D->bndrVal_global_3D(i,j,k);
                     ii++;
                 }
                 else if(grid3D->bndr_global_3D(i,j,k) == 8 && ( i == 0 || j == 0 || k == 0)) 
                 {
-                    b1[ii] = 0.0;
+                    rhsb[ii] = 0.0;
                     ii++;
                 }
                 else if(grid3D->bndr_global_3D(i,j,k) == 8 && ( i == nx - 1 || j == ny - 1 || k == nz - 1)) 
                 {
-                    b1[ii] = - dxx * const_ephi0_inv * (*rho3D)(i,j,k);
+                    rhsb[ii] = - dxx * const_ephi0_inv * (*rho3D)(i,j,k);
                     ii++;
                 }
                 else 
@@ -458,18 +491,23 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
         }
     }//>>>end convert
 
+
+
     /* ------------------------------------------------------------
        NOW WE SOLVE THE LINEAR SYSTEM USING THE FACTORED FORM OF A.
-       The right-hand-side B and the result X are both stored in b
        ------------------------------------------------------------*/
     options.Fact = FACTORED; /* Indicate the factored form of A is supplied. */
-    PStatInit(&stat); /* Initialize the statistics variables. */
+    B.ncol = nrhs;  /* Set the number of right-hand side */
 
-    pdgssvx_ABglobal(&options, &A, &ScalePermstruct, b1, ldb, nrhs, &grid, &LUstruct, berr, &stat, &info);
+    /* Initialize the statistics variables. */
+    StatInit(&stat);
+    dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
+           &L, &U, work, lwork, &B, &X, &rpg, &rcond, ferr, berr,
+           &mem_usage, &stat, &info);
 
     //printf("Triangular solve: dgssvx() returns info %d\n", info);
 
-    //>>>convert SuperLU solution X to Field3D phi
+   //>>>convert SuperLU solution X to Field3D phi
     ii=0;
     for(int i=0; i<nx; i++)
     {
@@ -480,7 +518,7 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
                 if (grid3D->bndr_global_3D(i,j,k) == 0 || grid3D->bndr_global_3D(i,j,k) == 1
                  || grid3D->bndr_global_3D(i,j,k) == 2 || grid3D->bndr_global_3D(i,j,k) == 8) 
                 {
-                    (*phi3D)(i,j,k) = b1[ii];
+                    (*phi3D)(i,j,k) = rhsx[ii];
                     ii++;
                 }
 
@@ -494,22 +532,14 @@ void EF_Solver3D_SLU_DIST::solve_SLU(Field* rho, Field* phi)
         }//>>>end convert
     }
 
-    /* Check the accuracy of the solution. */
-    /*
-    if ( !iam ) 
-    {
-	    printf("Solve the system with a different B.\n");
-	    dinf_norm_error_dist(n, nrhs, b1, ldb, xtrue, ldx, &grid);
-    }
-    */
 
-    /* Print the statistics. */
-    //PStatPrint(&options, &stat, &grid);
+    StatFree(&stat);
+
 
 }
 
 
-void EF_Solver3D_SLU_DIST::solve_Exyz(Field* phi, Field* Ex, Field* Ey, Field* Ez)
+void EF_Solver3D_SLU::solve_Exyz(Field* phi, Field* Ex, Field* Ey, Field* Ez)
 {
     Field3D* phi3D = static_cast<Field3D*>(phi);
     Field3D* Ex3D = static_cast<Field3D*>(Ex);
@@ -574,31 +604,28 @@ void EF_Solver3D_SLU_DIST::solve_Exyz(Field* phi, Field* Ex, Field* Ey, Field* E
 }
 
 
-
-
-void EF_Solver3D_SLU_DIST::finishSLU()
+void EF_Solver3D_SLU::finishSLU()
 {
-   /* ------------------------------------------------------------
-       DEALLOCATE STORAGE.
-       ------------------------------------------------------------*/
-    PStatFree(&stat);
-    Destroy_CompCol_Matrix_dist(&A);
-    Destroy_LU(n, &grid, &LUstruct);
-    ScalePermstructFree(&ScalePermstruct);
-    LUstructFree(&LUstruct);
-    SUPERLU_FREE(b1);
-    SUPERLU_FREE(xtrue);
-    SUPERLU_FREE(berr);
+    SUPERLU_FREE (rhsb);
+    SUPERLU_FREE (rhsx);
+    SUPERLU_FREE (xact);
+    SUPERLU_FREE (etree);
+    SUPERLU_FREE (perm_r);
+    SUPERLU_FREE (perm_c);
+    SUPERLU_FREE (R);
+    SUPERLU_FREE (C);
+    SUPERLU_FREE (ferr);
+    SUPERLU_FREE (berr);
+    Destroy_CompCol_Matrix(&A);
+    Destroy_SuperMatrix_Store(&B);
+    Destroy_SuperMatrix_Store(&X);
+    if ( lwork == 0 ) {
+        Destroy_SuperNode_Matrix(&L);
+        Destroy_CompCol_Matrix(&U);
+    } else if ( lwork > 0 ) {
+        SUPERLU_FREE(work);
+    }
 
-    /* ------------------------------------------------------------
-       RELEASE THE SUPERLU PROCESS GRID.
-       ------------------------------------------------------------*/
-    superlu_gridexit(&grid);
-
-    /* ------------------------------------------------------------
-       TERMINATES THE MPI EXECUTION ENVIRONMENT.
-       ------------------------------------------------------------*/
-    MPI_Finalize();
 }
 
-#endif // for SuperLU_mpi
+#endif // for SuperLU_type == serial

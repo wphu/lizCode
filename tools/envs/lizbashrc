@@ -1,5 +1,5 @@
 export SuperLU_type=mpi
-#export SuperLU_type=serial
+export SuperLU_type=serial
 
 export lizHomePath=/home/huwanpeng/codes/lizCode
 
