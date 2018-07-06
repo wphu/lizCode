@@ -420,6 +420,7 @@ void PicParams::readSpecies(InputData &ifile) {
         //ifile.extract("temperature",tmpSpec.thermT);
         ifile.extract("temperature", tmpSpec.thermT, "Species",ispec);
 
+        ifile.extract("mean_velocity", tmpSpec.mean_velocity, "Species",ispec);
 
         // DSMC parameters
         ifile.extract("diameter",tmpSpec.diameter ,"Species",ispec);

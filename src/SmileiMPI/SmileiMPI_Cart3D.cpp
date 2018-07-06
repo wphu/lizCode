@@ -160,6 +160,10 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
 
     MPI_Cart_create( SMILEI_COMM_WORLD, ndims_, number_of_procs, periods_, reorder_, &SMILEI_COMM_3D );
     MPI_Cart_coords( SMILEI_COMM_3D, smilei_rk, ndims_, coords_ );
+    if(smilei_rk == 1)
+    {
+        cout<<"smilei_rk: "<<smilei_rk<<" coords_: "<<coords_[0]<<" "<<coords_[1]<<" "<<coords_[2]<<endl;
+    }
 
     for(int iDim=0 ; iDim<ndims_ ; iDim++) 
     {
@@ -775,6 +779,7 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
 
     Field3D* f3D =  static_cast<Field3D*>(field);
     Field3D* f3D_global =  static_cast<Field3D*>(field_global);
+
     nx = f3D_global->dims_[0];
     ny = f3D_global->dims_[1];
     nz = f3D_global->dims_[2];
@@ -796,7 +801,7 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
                         {
                             iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
                             jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + j -oversize[2];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + k -oversize[2];
                             if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
                                 iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
                             }
@@ -820,6 +825,14 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
 
         }
     }
+
+    /*
+    if(isMaster())
+    {
+        cout<<"111 "<<f3D->data_3D[5][5][5]<<endl;
+        cout<<"222 "<<f3D_global->data_3D[5][5][5]<<endl;
+    }
+    */
 
     //> Handle the boundary points and corner points,
     //> this is meaningful for periodic boundary condition,

@@ -34,9 +34,9 @@ SmileiIO_Cart3D::~SmileiIO_Cart3D()
 //> create hdf5 file, datespace, dateset and so on
 void SmileiIO_Cart3D::createFieldsPattern( PicParams& params, ElectroMagn* fields )
 {
-    fieldsGroup.dims_global[2] = params.n_space_global[1] + 1;
-    fieldsGroup.dims_global[1] = params.n_space_global[0] + 1;
-    fieldsGroup.dims_global[0] = 1;
+    fieldsGroup.dims_global[2] = params.n_space_global[2] + 1;
+    fieldsGroup.dims_global[1] = params.n_space_global[1] + 1;
+    fieldsGroup.dims_global[0] = params.n_space_global[0] + 1;
  
 
     fieldsGroup.ndims_[0] = fieldsGroup.dims_global[0];

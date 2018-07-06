@@ -23,11 +23,14 @@ Projector3D1Order::Projector3D1Order (PicParams& params, SmileiMPI* smpi) : Proj
     dx_ov_dt  = params.cell_length[0] / params.timestep;
     dy_inv_   = 1.0/params.cell_length[1];
     dy_ov_dt  = params.cell_length[1] / params.timestep;
+    dz_inv_   = 1.0/params.cell_length[2];
+    dz_ov_dt  = params.cell_length[2] / params.timestep;
 
     one_third = 1.0/3.0;
 
     i_domain_begin = smpi3D->getCellStartingGlobalIndex(0);
     j_domain_begin = smpi3D->getCellStartingGlobalIndex(1);
+    k_domain_begin = smpi3D->getCellStartingGlobalIndex(2);
 
     DEBUG("cell_length "<< params.cell_length[0]);
 
@@ -116,7 +119,10 @@ void Projector3D1Order::operator() (Field* rho, Particles &particles, int ipart,
         for (unsigned int jloc=0 ; jloc<2 ; jloc++) 
         {
             for(unsigned int kloc=0 ; kloc<2 ; kloc++)
-            (*rho3D)(i+iloc, j+jloc, k+kloc) += Sx[iloc]*Sy[jloc]*Sz[kloc]*rho_p;
+            {
+                (*rho3D)(i+iloc, j+jloc, k+kloc) += Sx[iloc]*Sy[jloc]*Sz[kloc]*rho_p;
+            }
+            
         }
     }
 

@@ -115,7 +115,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
                     nnz = nnz + 7;
                     
-                    val[ii].push_back(-4.0);
+                    val[ii].push_back(-6.0);
                     row[ii].push_back(ii);
                     val[ii-hl].push_back(1.0);
                     row[ii-hl].push_back(ii);
@@ -188,7 +188,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
                         nnz = nnz + 7;
 
-                        val[ii].push_back(-4.0);
+                        val[ii].push_back(-6.0);
                         row[ii].push_back(ii);
                         val[ii-hl].push_back(1.0);
                         row[ii-hl].push_back(ii);
@@ -234,7 +234,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
                     nnz = nnz + 7;
 
-                    val[ii].push_back(-4.0);
+                    val[ii].push_back(-6.0);
                     row[ii].push_back(ii);
                     val[ii-hl].push_back(1.0);
                     row[ii-hl].push_back(ii);
@@ -278,7 +278,7 @@ void EF_Solver3D_SLU_DIST::initSLU()
 
                     nnz = nnz + 7;
 
-                    val[ii].push_back(-4.0);
+                    val[ii].push_back(-6.0);
                     row[ii].push_back(ii);
                     val[ii-hl].push_back(1.0);
                     row[ii-hl].push_back(ii);
