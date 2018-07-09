@@ -120,6 +120,16 @@ void Projector3D1Order::operator() (Field* rho, Particles &particles, int ipart,
         {
             for(unsigned int kloc=0 ; kloc<2 ; kloc++)
             {
+                DEBUGEXEC
+                (
+                    if(i >= rho3D->dims_[0] || j >= rho3D->dims_[1] || k >= rho3D->dims_[2])
+                    {
+                        ERROR("Project Error, positions are: "<<particles.position(0, ipart)<<" "<<particles.position(1, ipart)<<" "<<particles.position(2, ipart));
+                        //ERROR("Project Error, ic, jc, kc are: "<<ic<<" "<<jc<<" "<<kc);
+                        //ERROR("Project Error, i, j, k are: "<<i<<" "<<j<<" "<<k);
+                        //ERROR("Project Error, i_domain_begin are: "<<i_domain_begin<<" "<<j_domain_begin<<" "<<k_domain_begin);
+                    }
+                )
                 (*rho3D)(i+iloc, j+jloc, k+kloc) += Sx[iloc]*Sy[jloc]*Sz[kloc]*rho_p;
             }
             

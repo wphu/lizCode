@@ -284,7 +284,7 @@ void SmileiMPI_Cart3D::exchangeParticles(Species* species, int ispec, PicParams&
     std::vector<int>* cubmin = &species->bmin;
     std::vector<int>* cubmax = &species->bmax;
 
-    std::vector<int>                 indexes_of_particles_to_exchange;
+    std::vector<int>  indexes_of_particles_to_exchange;
     std::vector<int>* species_indexes_of_particles_to_exchange = &species->indexes_of_particles_to_exchange;
 
     /********************************************************************************/
@@ -293,6 +293,8 @@ void SmileiMPI_Cart3D::exchangeParticles(Species* species, int ispec, PicParams&
     /********************************************************************************/
     indexes_of_particles_to_exchange.clear();
     indexes_of_particles_to_exchange = species->indexes_of_particles_to_exchange;
+    (*species_indexes_of_particles_to_exchange).clear();
+
 
     sort( indexes_of_particles_to_exchange.begin(), indexes_of_particles_to_exchange.end() );
 
@@ -544,7 +546,7 @@ void SmileiMPI_Cart3D::exchangeParticles(Species* species, int ispec, PicParams&
     // WARNING: very different behaviour depending on which dimension particles are coming from.
     /********************************************************************************/
     //We first evaluate how many particles arrive in each bin.
-    if (iDim==1) {
+    if (iDim == 1 || iDim == 2) {
         //1) Count particles coming from south and north
         for (int iNeighbor=0 ; iNeighbor<nbNeighbors_ ; iNeighbor++) {
             n_part_recv = buff_index_recv_sz[iNeighbor];
@@ -594,7 +596,7 @@ void SmileiMPI_Cart3D::exchangeParticles(Species* species, int ispec, PicParams&
         }
     }
     //iDim == 1) is the difficult case, when particles can arrive in any bin.
-    if (iDim==1)
+    if (iDim == 1 || iDim == 2)
     {
         for (int iNeighbor=0 ; iNeighbor<nbNeighbors_ ; iNeighbor++) {
             n_part_recv = buff_index_recv_sz[iNeighbor];
@@ -916,7 +918,7 @@ void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
                         {
                             iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
                             jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + j -oversize[2];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + k -oversize[2];
                             if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
                                 iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
                             }
