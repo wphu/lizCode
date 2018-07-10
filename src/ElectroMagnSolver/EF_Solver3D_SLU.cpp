@@ -63,7 +63,6 @@ void EF_Solver3D_SLU::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     smpi3D->barrier();
     smpi3D->gatherRho(rho3D_global, rho3D);
 
-    rho3D_global->put_to(0.0);
     if(smpi3D->isMaster())
     {
         solve_SLU(rho3D_global, phi3D_global);

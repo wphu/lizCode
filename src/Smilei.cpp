@@ -226,7 +226,7 @@ int main (int argc, char* argv[])
         vecSpecies[ispec]->Project(time_dual, ispec, EMfields, Proj, smpi, params);
     }
     EMfields->computeTotalRhoJ();
-    //(*solver)(EMfields, smpi);
+    (*solver)(EMfields, smpi);
     smpi->barrier();
 
 
@@ -342,7 +342,7 @@ int main (int argc, char* argv[])
             EMfields->restartRhoJ();
             EMfields->computeTotalRhoJ();
             EMfields->gatherFields(smpi);
-            //(*solver)(EMfields, smpi);
+            (*solver)(EMfields, smpi);
             timer[9].update();
 
             MESSAGE("Write IO");

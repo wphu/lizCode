@@ -99,7 +99,7 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
             number_of_procs[i] = params.number_of_procs[i];
         }
             
-        if (number_of_procs[0]*number_of_procs[1]!=smilei_sz) 
+        if (number_of_procs[0]*number_of_procs[1]*number_of_procs[2]!=smilei_sz) 
         {
             DEBUG(3,"Domain decomposition specified in the namelist don't match with the number of MPI process");
             DEBUG(3,"\tit will be computed to be as square as possible");
@@ -117,7 +117,7 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
         number_of_procs[0] = min( smilei_sz, max(1, (int)sqrt ( (double)smilei_sz*tmp*tmp) ) );
         number_of_procs[1] = (int)(smilei_sz / number_of_procs[0]);
 
-        while ( number_of_procs[0]*number_of_procs[1] != smilei_sz ) 
+        while ( number_of_procs[0]*number_of_procs[1]*number_of_procs[2] != smilei_sz ) 
         {
             if (number_of_procs[0]>=number_of_procs[1] ) 
             {
@@ -195,7 +195,7 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
         //                 different from domain on which E, B, J are defined
         min_local[i] = (cell_starting_global_index[i]                  )*params.cell_length[i];
         max_local[i] = (cell_starting_global_index[i]+params.n_space[i])*params.cell_length[i];
-        //PMESSAGE( 0, smilei_rk, "min_local / mac_local on " << smilei_rk << " = " << min_local[i] << " / " << max_local[i] << " selon la direction " << i );
+        PMESSAGE( 0, smilei_rk, "min_local / mac_local on " << smilei_rk << " = " << min_local[i] << " / " << max_local[i] << " selon la direction " << i );
 
         cell_starting_global_index[i] -= params.oversize[i];
     }
@@ -399,7 +399,7 @@ void SmileiMPI_Cart3D::exchangeParticles(Species* species, int ispec, PicParams&
     /********************************************************************************/
 
     // Number of properties per particles = nDim_Particles + 3 +6 + 1
-    int nbrOfProp = 5;
+    int nbrOfProp = 9;
     if(!isSameWeight)
     {
       // particles->weight(0)
@@ -612,7 +612,7 @@ void SmileiMPI_Cart3D::exchangeParticles(Species* species, int ispec, PicParams&
 
 
     // Inject corner particles at the end of the list, update bmax
-    //if (iDim==cuParticles.dimension()-1) cout << "Number of diag particles " << diagonalParticles.size() << endl;
+    if (iDim==2) cout << "Number of diag particles " << diagonalParticles.size() << endl;
     for (int iPart = 0 ; iPart<diagonalParticles.size() ; iPart++) {
         diagonalParticles.cp_particle(iPart, cuParticles);
         (*species_indexes_of_particles_to_exchange).push_back(cuParticles.size()-1);
@@ -632,12 +632,14 @@ MPI_Datatype SmileiMPI_Cart3D::createMPIparticles( Particles* particles, int nbr
     MPI_Aint address[nbrOfProp2];
     MPI_Get_address( &(particles->position(0,0)), &(address[0]) );
     MPI_Get_address( &(particles->position(1,0)), &(address[1]) );
-    //MPI_Get_address( &(particles->position_old(0,0)), &(address[2]) );
-    //MPI_Get_address( &(particles->position_old(1,0)), &(address[3]) );
-    MPI_Get_address( &(particles->momentum(0,0)), &(address[2]) );
-    MPI_Get_address( &(particles->momentum(1,0)), &(address[3]) );
-    MPI_Get_address( &(particles->momentum(2,0)), &(address[4]) );
-    iProp = 5;
+    MPI_Get_address( &(particles->position(2,0)), &(address[2]) );
+    MPI_Get_address( &(particles->position_old(0,0)), &(address[3]) );
+    MPI_Get_address( &(particles->position_old(1,0)), &(address[4]) );
+    MPI_Get_address( &(particles->position_old(2,0)), &(address[5]) );
+    MPI_Get_address( &(particles->momentum(0,0)), &(address[6]) );
+    MPI_Get_address( &(particles->momentum(1,0)), &(address[7]) );
+    MPI_Get_address( &(particles->momentum(2,0)), &(address[8]) );
+    iProp = 9;
     if(isImplicit)
     {
       MPI_Get_address( &(particles->al_imp(0,0)), &(address[iProp++]) );
