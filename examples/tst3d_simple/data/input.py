@@ -7,17 +7,17 @@ import math
 method = 'explicit'
 
 l0 = 1.0e-5
-nx = 50
-ny = 50
-nz = 50
+nx = 20
+ny = 20
+nz = 20
 Lsim = [nx*l0, ny*l0, nz*l0]
 
-t0 = 0.5e-12
+t0 = 2.0e-12
 ns = int(1.0e-9 / t0)
-Tsim = 2 #* ns			# duration of the simulation
-number_output = 2
+Tsim = 100 # * ns			# duration of the simulation
+number_output = 10
 
-number_of_procs = [2, 2, 1]
+number_of_procs = [2, 2, 2]
 
 
 #> Timestep to output some fields into hdf5 file
@@ -69,7 +69,7 @@ bc_em_type_y = ['periodic']
 bc_em_type_z = ['silver-muller']
 bc_em_value_x = [0.0, 0.0]
 
-B = 2.0
+B = 0.0
 angle = (180.0 - 5.0) * math.pi / 180.0
 Bx = -B * math.cos(angle)
 By = -B * math.sin(angle)
@@ -136,7 +136,7 @@ Species(
 	mass = 9.109382616e-31,
 	charge = -1.6021766208e-19,
 	nb_density = 1.0e18,
-	temperature = [20],
+	temperature = [20.0],
 	mean_velocity = [0.0, 0.0, 0.0],
 	time_frozen = 0.,
 	bc_part_type_west   = 'periodic',
@@ -159,7 +159,7 @@ Species(
 	mass = 2.0 * 1.67262158e-27,
 	charge = 1.6021766208e-19,
 	nb_density = 1.0e18,
-	temperature = [20],
+	temperature = [20.0],
 	mean_velocity = [vx, vy, vz],
 	time_frozen = 0.0,
 	bc_part_type_west   = 'periodic',

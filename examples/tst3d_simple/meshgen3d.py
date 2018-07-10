@@ -111,9 +111,9 @@ if __name__ == "__main__":
     dx = 1.0e-5 #3.5e-6
     dy = 1.0e-5 #3.5e-6
     dz = 1.0e-5
-    lx = 0.5e-3
-    ly = 0.5e-3
-    lz = 0.5e-3
+    lx = 0.2e-3
+    ly = 0.2e-3
+    lz = 0.2e-3
     nx = int(lx / dx)
     ny = int(ly / dy)
     nz = int(lz / dz)
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     # ============================= bndr_type and bndr_val ========================
     # bottom
     bndr_type[:, :, 0] = 1
-    bndr_val [:, :, 0] = -10.0
+    bndr_val [:, :, 0] = 0.0
 
     # up
     bndr_type[:, :, nz] = 1
