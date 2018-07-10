@@ -72,7 +72,7 @@ public:
 
 
     //! 3D reference access to the linearized array (with check in DEBUG mode)
-    inline T& operator () (int i, int j, int k)
+    inline T& operator () (unsigned int i, unsigned int j, unsigned int k)
     {
         return data_3D[i][j][k];
     };

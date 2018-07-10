@@ -96,11 +96,11 @@ void SmileiIO_Cart3D::createDiagsPattern(PicParams& params, Diagnostic* diag)
     // ======= create diagsGroup ================================
     for(int i_species = 0; i_species < diag3D->n_species; i_species++)
     {
-        diagsGroup.dataset_stringName.push_back(diag3D->particleFlux_global[i_species].name);
-        diagsGroup.dataset_data.push_back(diag3D->particleFlux_global[i_species].data_);
+        diagsGroup.dataset_stringName.push_back(diag3D->particleFlux_global[i_species]->name);
+        diagsGroup.dataset_data.push_back(diag3D->particleFlux_global[i_species]->data_);
 
-        diagsGroup.dataset_stringName.push_back(diag3D->heatFlux_global[i_species].name);
-        diagsGroup.dataset_data.push_back(diag3D->heatFlux_global[i_species].data_);
+        diagsGroup.dataset_stringName.push_back(diag3D->heatFlux_global[i_species]->name);
+        diagsGroup.dataset_data.push_back(diag3D->heatFlux_global[i_species]->data_);
     }
     diagsGroup.dataset_id.resize( diagsGroup.dataset_stringName.size() );
 

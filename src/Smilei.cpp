@@ -301,7 +301,7 @@ int main (int argc, char* argv[])
             // ================== Run Diagnostic =============================================
             // absorb particles and calculate particle flux, heat flux, and average angle for 2D and 3D
             timer[8].restart();
-            //diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
+            diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
 
             MESSAGE("Project Particle ");

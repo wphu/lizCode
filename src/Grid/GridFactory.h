@@ -126,8 +126,8 @@ public:
                 grid->compute();
                 DEBUG(1, "Grid compute ends ================");
             }
-            smpi->scatterGrid(grid);
-            DEBUG(2, "Scatter grid ends ================");
+            //smpi->scatterGrid(grid);
+            //DEBUG(2, "Scatter grid ends ================");
         }
         else 
         {

@@ -7,17 +7,17 @@ import math
 method = 'explicit'
 
 l0 = 1.0e-5
-nx = 150
-ny = 150
-nz = 249
+nx = 20
+ny = 20
+nz = 20
 Lsim = [nx*l0, ny*l0, nz*l0]
 
 t0 = 0.5e-12
 ns = int(1.0e-9 / t0)
-Tsim = 5 * ns			# duration of the simulation
+Tsim = 50 # * ns			# duration of the simulation
 number_output = 5
 
-number_of_procs = [8, 4, 1]
+number_of_procs = [2, 2, 1]
 
 
 #> Timestep to output some fields into hdf5 file
@@ -96,7 +96,7 @@ random_seed = 0
 
 gapHeight = 100
 gapWidth = 50
-sourceLength=5
+sourceLength=2
 bevel_depth = 20 * l0
 
 Grid(
@@ -130,7 +130,7 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 0,
+	n_part_per_cell = 100,
 	n_part_per_cell_for_weight = 100,
 	c_part_max = 1.0,
 	mass = 9.109382616e-31,
@@ -153,7 +153,7 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 0,
+	n_part_per_cell = 100,
 	n_part_per_cell_for_weight = 100,
 	c_part_max = 1.0,
 	mass = 2.0 * 1.67262158e-27,
@@ -176,7 +176,7 @@ Species(
 
 
 
-
+'''
 ### The initial particle source
 PartSource(
 	species1 = ["e"],
@@ -215,7 +215,7 @@ PartSource(
 	loadPos_Zstart 	= (gapHeight)*l0,
 	loadPos_Zend 	= nz*l0,
 )
-
+'''
 
 '''
 ### The every-time particle source

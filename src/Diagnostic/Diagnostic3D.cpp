@@ -1,5 +1,4 @@
 #include "Diagnostic3D.h"
-#include "Field3D.h"
 #include "PSI3D.h"
 #include "SmileiMPI_Cart3D.h"
 
@@ -36,10 +35,10 @@ Diagnostic(params)
 
     for(int i_species = 0; i_species < n_species; i_species++)
     {
-        particleFlux[i_species]         = Field3D(dims_global, ("particleFlux"          + params.species_param[i_species].species_type).c_str());
-        heatFlux[i_species]             = Field3D(dims_global, ("heatFlux"              + params.species_param[i_species].species_type).c_str());
-        particleFlux_global[i_species]  = Field3D(dims_global, ("particleFlux_global"   + params.species_param[i_species].species_type).c_str());
-        heatFlux_global[i_species]      = Field3D(dims_global, ("heatFlux_global"       + params.species_param[i_species].species_type).c_str());
+        particleFlux[i_species]         = new Field3D(dims_global, ("particleFlux"          + params.species_param[i_species].species_type).c_str());
+        heatFlux[i_species]             = new Field3D(dims_global, ("heatFlux"              + params.species_param[i_species].species_type).c_str());
+        particleFlux_global[i_species]  = new Field3D(dims_global, ("particleFlux_global"   + params.species_param[i_species].species_type).c_str());
+        heatFlux_global[i_species]      = new Field3D(dims_global, ("heatFlux_global"       + params.species_param[i_species].species_type).c_str());
     }
 }
 
@@ -59,6 +58,7 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 	int iAngle;
 	double flux_temp;
     double length1, length2, length12;
+    unsigned int ic, jc, kc;
     
     Grid3D* grid3D = static_cast<Grid3D*>(grid);
 
@@ -67,8 +67,8 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
     {
 		for(int i_species = 0; i_species < n_species; i_species++)
 		{
-            particleFlux[i_species].put_to(0.0);
-            heatFlux[i_species].put_to(0.0);
+            particleFlux[i_species]->put_to(0.0);
+            heatFlux[i_species]->put_to(0.0);
 		}
 	}
 
@@ -81,7 +81,46 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
         s1->indexes_of_particles_to_absorb.clear();
         mass_ov_2 = 0.5 * s1->species_param.mass;
 
+        for (int ibin = 0 ; ibin < (unsigned int)s1->bmin.size() ; ibin++) 
+        {
+            for (int iPart=(unsigned int)s1->bmin[ibin] ; iPart<(unsigned int)s1->bmax[ibin]; iPart++ ) 
+            {
+                ic = p1->position(0, iPart) * dx_inv_;
+                jc = p1->position(1, iPart) * dy_inv_;
+                kc = p1->position(2, iPart) * dz_inv_;
+                //cout<<"iPart"<<ic<<" "<<jc<<" "<<kc<<endl;
+                //vector<unsigned int> grid_dims = grid3D->iswall_global_3D.get_dims();
+                //cout<<"dims "<<grid_dims[0]<<" "<<grid_dims[1]<<" "<<grid_dims[2]<<endl;
+                if(grid3D->iswall_global_3D(ic,jc,kc) == 1 && grid3D->iswall_global_3D(ic,jc,kc+1) == 1 && grid3D->iswall_global_3D(ic,jc+1,kc) == 1 && grid3D->iswall_global_3D(ic,jc+1,kc+1) == 1
+                && grid3D->iswall_global_3D(ic+1,jc,kc) == 1 && grid3D->iswall_global_3D(ic+1,jc,kc+1) == 1 && grid3D->iswall_global_3D(ic+1,jc+1,kc) == 1 && grid3D->iswall_global_3D(ic+1,jc+1,kc+1) == 1)
+                {   
+                    //if(iLine_cross != 4) { cout<<"iLine_cross = "<<iLine_cross<<endl; }
+                    //cout<<"has find "<<endl;                   
+                    if( (itime % step_dump) > (step_dump - step_ave) || (itime % step_dump) == 0 )
+                    {
+                        v_square = pow(p1->momentum(0,iPart), 2) + pow(p1->momentum(1,iPart), 2) + pow(p1->momentum(2,iPart), 2);
+                        v_magnitude = sqrt(v_square);
+                        //particleFlux[i_species](ic,jc,kc) += 1.0;
+                        //heatFlux[i_species](ic,jc,kc) += mass_ov_2 * v_square;
+                    }
+                    //s1->indexes_of_particles_to_absorb.push_back(iPart);
+                    
+                }
+            }//iPart
+        }// ibin
+        
+
+        // copy PSI particles to psi_particles, because after MPi particle exchanging
+        // the PSI particles will be erased
+        for(int iPart=0; iPart<s1->indexes_of_particles_to_absorb.size(); iPart++)
+        {
+            int iPart_psi = s1->indexes_of_particles_to_absorb[iPart];
+            p1->cp_particle(iPart_psi, s1->psi_particles);
+        }
+        s1->erase_particles_from_bins(s1->indexes_of_particles_to_absorb);
+
     }
+
 
     // MPI gather diagnostic parameters to master
     if( (itime % step_dump) == 0 ) 
@@ -92,5 +131,5 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 			wlt0 = s1->species_param.weight * dx * dy / (timestep * step_ave);
 		}
 	}
-    
+ 
 }

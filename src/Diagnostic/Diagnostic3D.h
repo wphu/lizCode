@@ -7,6 +7,7 @@
 #include "PSI3D.h"
 #include "Grid3D.h"
 #include "Particles.h"
+#include "Field3D.h"
 
 
 class Field;
@@ -25,12 +26,11 @@ public :
     int n_species;
     vector<unsigned int> dims_global;
 
-    // particleFlux[iSpec][iLine][iSegment]
-    vector<Field3D> particleFlux;
-    vector<Field3D> heatFlux;
+    vector<Field3D*> particleFlux;
+    vector<Field3D*> heatFlux;
 
-    vector<Field3D> particleFlux_global;
-    vector<Field3D> heatFlux_global;
+    vector<Field3D*> particleFlux_global;
+    vector<Field3D*> heatFlux_global;
 
     
 
