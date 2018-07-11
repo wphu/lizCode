@@ -100,10 +100,10 @@ void Diagnostic3D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
                     {
                         v_square = pow(p1->momentum(0,iPart), 2) + pow(p1->momentum(1,iPart), 2) + pow(p1->momentum(2,iPart), 2);
                         v_magnitude = sqrt(v_square);
-                        //particleFlux[i_species](ic,jc,kc) += 1.0;
-                        //heatFlux[i_species](ic,jc,kc) += mass_ov_2 * v_square;
+                        (*particleFlux[i_species])(ic,jc,kc) += 1.0;
+                        (*heatFlux[i_species])    (ic,jc,kc) += mass_ov_2 * v_square;
                     }
-                    //s1->indexes_of_particles_to_absorb.push_back(iPart);
+                    s1->indexes_of_particles_to_absorb.push_back(iPart);
                     
                 }
             }//iPart

@@ -119,13 +119,13 @@ if __name__ == "__main__":
     nz = int(lz / dz)
     nz_source = 2
     nz_base = 3
-    n_gap_width = int(0.1e-3 / dx)
-    n_tile_half = int(0.05e-3 / dx)
+    n_gap_width = int(0.05e-3 / dx)
+    n_tile_half = int(0.08e-3 / dx)
 
     print("nx, ny, nz is : ", nx, ny, nz)
 
 
-    nz_wall_boundary = int(0.1e-3 / dz) + nz_base
+    nz_wall_boundary = int(0.07e-3 / dz) + nz_base
     nz_wall_max = nz - nz_source - 5
 
     wall_potential = -60.0

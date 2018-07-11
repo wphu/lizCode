@@ -360,6 +360,7 @@ void ElectroMagn3D::incrementAvgFields(unsigned int time_step)
     // reset the averaged fields for (time_step-1)%ntime_step_avg == 0
     if ( (time_step-1) % dump_step == 0 )
     {
+        phi_global_avg->put_to(0.0);
         for (unsigned int ispec=0; ispec<n_species; ispec++)
         {
             rho_s_avg[ispec]->put_to(0.0);
@@ -369,6 +370,11 @@ void ElectroMagn3D::incrementAvgFields(unsigned int time_step)
     // Calculate the sum values for global rho phi Ex and Ey
     if( (time_step % dump_step) > (dump_step - avg_step) || (time_step % dump_step) == 0 )
     {
+        for (unsigned int i=0 ; i<dim_global[0]*dim_global[1]*dim_global[2] ; i++) 
+        {
+            (*phi_global_avg)(i) += (*phi_global)(i);
+        }
+
         // Calculate the sum values for density of each species
         for (unsigned int ispec=0; ispec<n_species; ispec++) 
         {
@@ -383,6 +389,11 @@ void ElectroMagn3D::incrementAvgFields(unsigned int time_step)
     // calculate the averaged values
     if ( time_step % dump_step == 0 )
     {
+        for (unsigned int i=0 ; i<dim_global[0]*dim_global[1]*dim_global[2] ; i++) 
+        {
+            (*phi_global_avg)(i) /= avg_step;
+        }
+
         for (unsigned int ispec=0; ispec<n_species; ispec++) 
         {
             for (unsigned int ix=0 ; ix<dimPrim[0]*dimPrim[1]*dimPrim[2] ; ix++) 

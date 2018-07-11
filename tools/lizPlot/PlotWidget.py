@@ -96,7 +96,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         	ticks_val=np.linspace(self.data3d.min(),self.data3d.max()+1.0,5)
         else:
         	ticks_val=np.linspace(self.data3d.min(),self.data3d.max(),5)
-        self.cf = self.axes1.contourf(self.x,self.y,self.data3d[-1],cmap=cm.get_cmap('jet'),levels=levels)
+        self.cf = self.axes1.contourf(self.x,self.y,self.data3d[10],cmap=cm.get_cmap('jet'),levels=levels)
         self.fig.colorbar(self.cf,ticks=ticks_val)
 
 

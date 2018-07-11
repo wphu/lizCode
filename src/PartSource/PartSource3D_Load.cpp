@@ -48,6 +48,8 @@ PartSource3D (params, smpi)
     loadPos_end     = load_Pos_end;
     loadPos_Ystart  = load_Pos_Ystart;
     loadPos_Yend    = load_Pos_Yend;
+    loadPos_Zstart  = load_Pos_Zstart;
+    loadPos_Zend    = load_Pos_Zend;
     step_update     = load_step_update;
 
     YZArea = 1.0;
@@ -64,6 +66,11 @@ PartSource3D (params, smpi)
         loadBin_Ystart = 0;
         loadPos_Yend = 0.0;
         loadBin_Yend = 0;
+
+        loadPos_Zstart = 0.0;
+        loadBin_Zstart = 0;
+        loadPos_Zend = 0.0;
+        loadBin_Zend = 0;
     }
     // the left end of source region is in the MPI domain
     else if(smpi->getDomainLocalMin(0) <= loadPos_start && smpi->getDomainLocalMax(0) > loadPos_start
@@ -125,6 +132,11 @@ PartSource3D (params, smpi)
         loadBin_Ystart = 0;
         loadPos_Yend = 0.0;
         loadBin_Yend = 0;
+
+        loadPos_Zstart = 0.0;
+        loadBin_Zstart = 0;
+        loadPos_Zend = 0.0;
+        loadBin_Zend = 0;
     }
     // the down end of source region is in the MPI domain
     else if(smpi->getDomainLocalMin(1) <= loadPos_Ystart && smpi->getDomainLocalMax(1) > loadPos_Ystart
@@ -174,10 +186,72 @@ PartSource3D (params, smpi)
 
     }
 
-    // define the z-direction range of source region
-    // there is no MPI domain in z-direction, decom
-    loadBin_Zstart = loadPos_Zstart / params.cell_length[2];
-    loadBin_Zend   = loadPos_Yend   / params.cell_length[2];
+   // define the z-direction range of source region
+    // the MPI domain is not in the source region
+    if(smpi->getDomainLocalMax(2) <= loadPos_Zstart || smpi->getDomainLocalMin(2) >= loadPos_Zend) {
+        loadPos_start = 0.0;
+        loadBin_start = 0;
+        loadPos_end = 0.0;
+        loadBin_end = 0;
+
+        loadPos_Ystart = 0.0;
+        loadBin_Ystart = 0;
+        loadPos_Yend = 0.0;
+        loadBin_Yend = 0;
+
+        loadPos_Zstart = 0.0;
+        loadBin_Zstart = 0;
+        loadPos_Zend = 0.0;
+        loadBin_Zend = 0;
+    }
+    // the down end of source region is in the MPI domain
+    else if(smpi->getDomainLocalMin(2) <= loadPos_Zstart && smpi->getDomainLocalMax(2) > loadPos_Zstart
+    && smpi->getDomainLocalMax(2) <= loadPos_Zend) {
+        double temp = (loadPos_Zstart - smpi->getDomainLocalMin(2)) / params.cell_length[2];
+        loadBin_Zstart = temp + 0.001;
+        if(loadBin_Zstart < 0) { loadBin_Zstart = 0; }
+        loadPos_Zstart = smpi->getDomainLocalMin(2) + loadBin_Zstart*params.cell_length[2];
+        //numPart_in_each_bin[loadBin_start] /=
+        //( params.cell_length[0] / (( smpi->getDomainLocalMin(0) + (loadBin_start+1)*params.cell_length[0] ) - loadPos_start) );
+        loadPos_Zend = smpi->getDomainLocalMax(2);
+        loadBin_Zend = params.n_space[2] - 1;
+    }
+    // the up end of source region is in the MPI domain
+    else if(smpi->getDomainLocalMin(2) < loadPos_Zend && smpi->getDomainLocalMax(2) >= loadPos_Zend
+    && smpi->getDomainLocalMin(2) >= loadPos_Zstart) {
+        loadPos_Zstart = smpi->getDomainLocalMin(2);
+        loadBin_Zstart = 0;
+        loadBin_Zend = (loadPos_Zend - smpi->getDomainLocalMin(2)) / params.cell_length[2];
+        if(loadBin_Zend > params.n_space[2] - 1) { loadBin_Zend = params.n_space[2] - 1; }
+        //numPart_in_each_bin[loadBin_end] /=
+        //( params.cell_length[0] / (loadPos_end - ( smpi->getDomainLocalMin(0) + loadBin_end*params.cell_length[0] )) );
+        loadPos_Zend = smpi->getDomainLocalMin(2) + (loadBin_Zend+1)*params.cell_length[2];
+    }
+    // the whole MPI domain is in the source region
+    else if(smpi->getDomainLocalMin(2) >= loadPos_Zstart && smpi->getDomainLocalMax(2) <= loadPos_Zend) {
+        loadPos_Zstart = smpi->getDomainLocalMin(2);
+        loadBin_Zstart = 0;
+        loadPos_Zend = smpi->getDomainLocalMax(2);
+        loadBin_Zend = params.n_space[2] - 1;
+    }
+    // the whole MPI domain source region is in the bin
+    else if(smpi->getDomainLocalMin(2) < loadPos_Zstart && smpi->getDomainLocalMax(2) > loadPos_Zend) {
+        //loadBin_start = (loadPos_start - smpi->getDomainLocalMin(0)) / params.cell_length[0];
+        //numPart_in_each_bin[loadBin_start] /=
+        //( params.cell_length[0] / (( smpi->getDomainLocalMin(0) + (loadBin_start+1)*params.cell_length[0] ) - loadPos_start) );
+        //loadBin_end = (loadPos_end - smpi->getDomainLocalMin(0)) / params.cell_length[0];
+        //numPart_in_each_bin[loadBin_end] /=
+        //( params.cell_length[0] / (loadPos_end - ( smpi->getDomainLocalMin(0) + loadBin_start*params.cell_length[0] )) );
+        double temp = (loadPos_Zstart - smpi->getDomainLocalMin(2)) / params.cell_length[2];
+        loadBin_Zstart = temp + 0.001;
+        if(loadBin_Zstart < 0) { loadBin_Zstart = 0; }
+        loadPos_Zstart = smpi->getDomainLocalMin(2) + loadBin_Zstart*params.cell_length[2];
+        loadBin_Zend = (loadPos_Zend - smpi->getDomainLocalMin(2)) / params.cell_length[2];
+        if(loadBin_Zend > params.n_space[2] - 1) { loadBin_Zend = params.n_space[2] - 1; }
+        loadPos_Zend = smpi->getDomainLocalMin(2) + (loadBin_Zend+1)*params.cell_length[2];
+
+    }
+
 
 
     // load particles by number_density and Temperature
@@ -197,7 +271,9 @@ PartSource3D (params, smpi)
         MESSAGE("loadStep = "<<loadStep);
     }
 
-
+    PMESSAGE(0, "x loadBin_position: "<<loadBin_start<<" "<<loadBin_end);
+    PMESSAGE(0, "y loadBin_position: "<<loadBin_Ystart<<" "<<loadBin_Yend);
+    PMESSAGE(0, "z loadBin_position: "<<loadBin_Zstart<<" "<<loadBin_Zend);
 }
 
 PartSource3D_Load::~PartSource3D_Load()
@@ -221,12 +297,15 @@ void PartSource3D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
 
     if(everyTime == 0 && itime > 1) { return; }
     if(itime % step_update != 0){ return; }
-    if(loadKind == "nT" && loadBin_end != loadBin_start && loadBin_Yend != loadBin_Ystart)
+    if(loadKind == "nT" && loadBin_end != loadBin_start && loadBin_Yend != loadBin_Ystart && loadBin_Zend != loadBin_Zstart)
     {
         s1 = vecSpecies[species1];
         p1 = &(s1->particles);
 
         cell_length.resize(params.nDim_particle);
+        cell_length[0] = params.cell_length[0];
+        cell_length[1] = params.cell_length[1];
+        cell_length[2] = params.cell_length[2];
         max_jutt_cumul.resize(0);
         temp[0] = loadTemperature;
         temp[1] = loadTemperature;
@@ -253,6 +332,7 @@ void PartSource3D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
                 }
             }
             count_of_particles_to_insert[ibin] = numPart_in_each_bin[ibin];
+            //cout<<count_of_particles_to_insert[ibin]<<endl;
         }
         s1->erase_particles_from_bins(indexes_of_particles_to_erase);
 
@@ -264,6 +344,7 @@ void PartSource3D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
         }
         s1->insert_particles_to_bins(new_particles, count_of_particles_to_insert);
 
+
         // re-initialize paritcles in source region
         for(int ibin = loadBin_start; ibin <= loadBin_end; ibin++)
         {
@@ -273,14 +354,13 @@ void PartSource3D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
             {
                 for(int k = loadBin_Zstart; k <= loadBin_Zend; k++)
                 {
-                    iPart = s1->bmax[ibin] - (loadBin_Yend - j + 1) * (loadBin_Zend - k + 1) * numPart_in_each_cell ;
+                    //cout<<"i,j,k "<<ibin<<" "<<j<<" "<<k<<endl;
+                    //cout<<"i,j,k "<<loadBin_end<<" "<<loadBin_Yend<<" "<<loadBin_Zend<<endl;
+                    iPart = s1->bmax[ibin] - (loadBin_Yend - j) * (loadBin_Zend - loadBin_Zstart + 1) * numPart_in_each_cell - (loadBin_Zend - k + 1) * numPart_in_each_cell;
                     nPart = numPart_in_each_cell;
-                    cell_length[0] = params.cell_length[0];
-                    cell_length[1] = params.cell_length[1];
-                    cell_length[2] = params.cell_length[2];
                     indexes[0] = smpi->getDomainLocalMin(0) + ibin*params.cell_length[0];
                     indexes[1] = smpi->getDomainLocalMin(1) + j   *params.cell_length[1];
-                    indexes[1] = smpi->getDomainLocalMin(2) + k   *params.cell_length[2];
+                    indexes[2] = smpi->getDomainLocalMin(2) + k   *params.cell_length[2];
 
                     s1->initPosition(nPart, iPart, indexes, params.nDim_particle,
                                 cell_length, s1->species_param.initPosition_type);

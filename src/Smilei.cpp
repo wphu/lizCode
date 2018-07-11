@@ -264,7 +264,7 @@ int main (int argc, char* argv[])
             }
             timer[2].update();
 
-            //MESSAGE("Interpolate and Move ");
+            MESSAGE("Interpolate and Move ");
             // ================== Interpolate and Move ===============================
             int tid(0);
             timer[3].restart();

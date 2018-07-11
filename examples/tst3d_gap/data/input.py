@@ -73,17 +73,17 @@ B = 2.0
 angle = (180.0 - 5.0) * math.pi / 180.0
 Bx = -B * math.cos(angle)
 By = -B * math.sin(angle)
-Bz = 0.0
+Bz = -B * math.sin(angle)
 externB = [Bx, By, Bz]
 
 ion_sound_velocity = math.sqrt( (20.0 * 1.6021766208e-19) / (2.0 * 1.67262158e-27) )
 vx = -ion_sound_velocity * math.cos(angle)
-vy = -ion_sound_velocity * math.sin(angle)
-vz = 0.0
+vy = 0.0
+vz = -ion_sound_velocity * math.sin(angle)
 
-#vx = 0.0
-#vy = 0.0
-#vz = 0.0
+vx = 0.0
+vy = 0.0
+vz = 0.0
 
 
 
@@ -94,7 +94,7 @@ random_seed = 0
 
 
 
-gapHeight = 100
+gapHeight = 10
 gapWidth = 50
 sourceLength=2
 bevel_depth = 20 * l0
@@ -130,7 +130,7 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 100,
+	n_part_per_cell = 0,
 	n_part_per_cell_for_weight = 100,
 	c_part_max = 1.0,
 	mass = 9.109382616e-31,
@@ -153,7 +153,7 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 100,
+	n_part_per_cell = 0,
 	n_part_per_cell_for_weight = 100,
 	c_part_max = 1.0,
 	mass = 2.0 * 1.67262158e-27,
@@ -176,7 +176,7 @@ Species(
 
 
 
-'''
+
 ### The initial particle source
 PartSource(
 	species1 = ["e"],
@@ -215,9 +215,9 @@ PartSource(
 	loadPos_Zstart 	= (gapHeight)*l0,
 	loadPos_Zend 	= nz*l0,
 )
-'''
 
-'''
+
+
 ### The every-time particle source
 PartSource(
 	species1 = ["e"],
@@ -231,8 +231,10 @@ PartSource(
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
 	loadPos_end 	= nx*l0,
-	loadPos_Ystart 	= (ny-sourceLength)*l0,
+	loadPos_Ystart 	= 0.0,
 	loadPos_Yend 	= ny*l0,
+	loadPos_Zstart 	= (nz - sourceLength)*l0,
+	loadPos_Zend 	= nz*l0,
 
 )
 
@@ -249,8 +251,8 @@ PartSource(
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
 	loadPos_end 	= nx*l0,
-	loadPos_Ystart 	= (ny-sourceLength)*l0,
+	loadPos_Ystart 	= 0.0,
 	loadPos_Yend 	= ny*l0,
-
+	loadPos_Zstart 	= (nz - sourceLength)*l0,
+	loadPos_Zend 	= nz*l0,
 )
-'''
