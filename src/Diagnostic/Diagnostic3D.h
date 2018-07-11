@@ -42,6 +42,7 @@ protected :
     double dx, dy, dz;
     double dx_inv_, dy_inv_, dz_inv_;
     int i_domain_begin, j_domain_begin, k_domain_begin;
+    int dim_global;
 
 
 };

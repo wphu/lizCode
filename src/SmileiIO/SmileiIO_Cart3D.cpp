@@ -83,11 +83,23 @@ void SmileiIO_Cart3D::createDiagsPattern(PicParams& params, Diagnostic* diag)
 
     diagsGroup.dataset_stringName.resize(0);
 
-    // =======set stride and block, and close dataset and group=================
+    // ======= set dimension, offset, stride, and block =================
+    diagsGroup.dims_global[2] = params.n_space_global[2] + 1;
+    diagsGroup.dims_global[1] = params.n_space_global[1] + 1;
+    diagsGroup.dims_global[0] = params.n_space_global[0] + 1;
+ 
+
+    diagsGroup.ndims_[0] = diagsGroup.dims_global[0];
+    diagsGroup.ndims_[1] = diagsGroup.dims_global[1];
+    diagsGroup.ndims_[2] = diagsGroup.dims_global[2];
+
+    diagsGroup.offset[0] = 0;
+    diagsGroup.offset[1] = 0;
+    diagsGroup.offset[2] = 0;
+
     diagsGroup.stride[0] = 1;
     diagsGroup.stride[1] = 1;
     diagsGroup.stride[2] = 1;
-
 
     diagsGroup.block[0] = 1;
     diagsGroup.block[1] = 1;
