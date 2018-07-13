@@ -7,17 +7,17 @@ import math
 method = 'explicit'
 
 l0 = 1.0e-5
-nx = 20
-ny = 20
-nz = 20
+nx = 100
+ny = 100
+nz = 100
 Lsim = [nx*l0, ny*l0, nz*l0]
 
-t0 = 0.5e-12
+t0 = 1.0e-12
 ns = int(1.0e-9 / t0)
-Tsim = 50 # * ns			# duration of the simulation
+Tsim = 5 # * ns			# duration of the simulation
 number_output = 5
 
-number_of_procs = [2, 2, 1]
+number_of_procs = [2, 2, 2]
 
 
 #> Timestep to output some fields into hdf5 file
@@ -94,14 +94,11 @@ random_seed = 0
 
 
 
-gapHeight = 10
-gapWidth = 50
-sourceLength=2
-bevel_depth = 20 * l0
+gapHeight = 50+3
+sourceLength = 5
 
 Grid(
 	gridType = "from_file",
-	potential_wall = -60.0
 )
 
 
@@ -135,7 +132,7 @@ Species(
 	c_part_max = 1.0,
 	mass = 9.109382616e-31,
 	charge = -1.6021766208e-19,
-	nb_density = 1.0e19,
+	nb_density = 1.0e18,
 	temperature = [20],
 	mean_velocity = [0.0, 0.0, 0.0],
 	time_frozen = 0.,
@@ -158,7 +155,7 @@ Species(
 	c_part_max = 1.0,
 	mass = 2.0 * 1.67262158e-27,
 	charge = 1.6021766208e-19,
-	nb_density = 1.0e19,
+	nb_density = 1.0e18,
 	temperature = [20],
 	mean_velocity = [vx, vy, vz],
 	time_frozen = 0.0,
@@ -184,7 +181,7 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 0,
 	loadStep = 100,
-	loadDensity = 1.0e19,
+	loadDensity = 1.0e18,
 	loadTemperature = 20.0,
 	mean_velocity = [0, 0 ,0],
 	#loadDn = 2.0e25,
@@ -204,7 +201,7 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 0,
 	loadStep = 100,
-	loadDensity = 1.0e19,
+	loadDensity = 1.0e18,
 	loadTemperature = 20.0,
 	mean_velocity = [vx, vy ,vz],
 	#loadDn = 2.0e25,
@@ -225,7 +222,7 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 1,
 	loadStep = 100,
-	loadDensity = 1.0e19,
+	loadDensity = 1.0e18,
 	loadTemperature = 20.0,
 	mean_velocity = [0, 0 ,0],
 	#loadDn = 2.0e25,
@@ -245,7 +242,7 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 1,
 	loadStep = 100,
-	loadDensity = 1.0e19,
+	loadDensity = 1.0e18,
 	loadTemperature = 20.0,
 	mean_velocity = [vx, vy ,vz],
 	#loadDn = 2.0e25,

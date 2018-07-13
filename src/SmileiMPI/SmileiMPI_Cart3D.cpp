@@ -195,7 +195,7 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
         //                 different from domain on which E, B, J are defined
         min_local[i] = (cell_starting_global_index[i]                  )*params.cell_length[i];
         max_local[i] = (cell_starting_global_index[i]+params.n_space[i])*params.cell_length[i];
-        PMESSAGE( 0, smilei_rk, "min_local / mac_local on " << smilei_rk << " = " << min_local[i] << " / " << max_local[i] << " selon la direction " << i );
+        //PMESSAGE( 0, smilei_rk, "min_local / mac_local on " << smilei_rk << " = " << min_local[i] << " / " << max_local[i] << " selon la direction " << i );
 
         cell_starting_global_index[i] -= params.oversize[i];
     }

@@ -271,9 +271,9 @@ PartSource3D (params, smpi)
         MESSAGE("loadStep = "<<loadStep);
     }
 
-    PMESSAGE(0, "x loadBin_position: "<<loadBin_start<<" "<<loadBin_end);
-    PMESSAGE(0, "y loadBin_position: "<<loadBin_Ystart<<" "<<loadBin_Yend);
-    PMESSAGE(0, "z loadBin_position: "<<loadBin_Zstart<<" "<<loadBin_Zend);
+    DEBUG(0, "x loadBin_position: "<<loadBin_start<<" "<<loadBin_end);
+    DEBUG(0, "y loadBin_position: "<<loadBin_Ystart<<" "<<loadBin_Yend);
+    DEBUG(0, "z loadBin_position: "<<loadBin_Zstart<<" "<<loadBin_Zend);
 }
 
 PartSource3D_Load::~PartSource3D_Load()

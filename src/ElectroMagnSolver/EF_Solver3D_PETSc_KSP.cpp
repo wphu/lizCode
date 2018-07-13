@@ -355,9 +355,9 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
     ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRV(ierr);
     ierr = MatSetSizes(A,PETSC_DECIDE,PETSC_DECIDE,ncp,ncp);CHKERRV(ierr);
     ierr = MatSetFromOptions(A);CHKERRV(ierr);
-    ierr = MatSetUp(A);CHKERRV(ierr);
-    //ierr = MatMPIAIJSetPreallocation(A,ncp,NULL,ncp,NULL);CHKERRV(ierr);
-    //ierr = MatSeqAIJSetPreallocation(A,ncp,NULL);CHKERRV(ierr);
+    //ierr = MatSetUp(A);CHKERRV(ierr);
+    ierr = MatMPIAIJSetPreallocation(A,7,NULL,7,NULL);CHKERRV(ierr);
+    ierr = MatSeqAIJSetPreallocation(A,7,NULL);CHKERRV(ierr);
     //ierr = MatSeqSBAIJSetPreallocation(A,ncp,ncp,NULL);CHKERRV(ierr);
     //ierr = MatMPISBAIJSetPreallocation(A,ncp,ncp,NULL,ncp,NULL);CHKERRV(ierr);
 
@@ -381,8 +381,6 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
     //MESSAGE("ncp "<<ncp);
     for(int j = 0; j < ncp; j++)
     {
-        if(j > ncp - 10) 
-        MESSAGE("j = "<<j);
         for(int i = 0; i < row[j].size(); i++)
         {
             I = row[j][i];
@@ -555,7 +553,6 @@ void EF_Solver3D_PETSc_KSP::solve_PETSc_KSP(Field* rho, Field* phi)
                  || grid3D->bndr_global_3D(i,j,k) == 2 || grid3D->bndr_global_3D(i,j,k) == 8) 
                 {
                     (*phi3D)(i,j,k) = rhsx[ii];
-                    //cout<<"result: "<<rhsx[ii]<<endl;
                     ii++;
                 }
 

@@ -15,7 +15,7 @@ n0 = 1.0e19
 Ex0 = 1.0e6
 
 x_step = 20
-level_num = 30
+level_num = 20
 
 amplification_factor = 80.0
 
@@ -37,7 +37,7 @@ x0 = int(nx / 2)
 x1 = 100
 
 ix = 3
-iy = 3
+iy = 20
 iz = 10
 direction = "x"
 
@@ -54,6 +54,7 @@ if direction == "y":
 if direction == "x":
 	val_2d = val[t, :, iy, :]
 
+print("potential 5,5:  ", val_2d[5,5])
 nx = val_2d.shape[0]
 ny = val_2d.shape[1]
 dx=1.0
