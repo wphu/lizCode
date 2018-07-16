@@ -6,25 +6,24 @@ import math
 
 method = 'explicit'
 
-l0 = 0.4e-5
-nx = 200
-ny = 300
+l0 = 1.0e-5
+nx = 1000
+ny = 2000
 Lsim = [nx*l0,ny*l0]
 
-t0 = 0.5e-12
+t0 = 1.0e-12
 ns = int(1.0e-9 / t0)
-Tsim = 5 * ns			# duration of the simulation
+Tsim = 5 # * ns			# duration of the simulation
 number_output = 5
 
 number_of_procs = [4, 6]
 
 
-#> number of timestep of incrementing averaged electromagnetic fields
-ntime_step_avg = ns
 
 #> Timestep to output some fields into hdf5 file
 dump_step = int( Tsim / number_output )
 timesteps_restore = dump_step
+ntime_step_avg = dump_step
 
 ion_step = 1
 
@@ -92,8 +91,7 @@ random_seed = 0
 
 
 Grid(
-	gridType = "rectangle",
-	potential_wall = 0.0
+	gridType = "from_file",
 )
 
 

@@ -195,7 +195,7 @@ int main (int argc, char* argv[])
     // ------------------------------------------------------------------------
     // Initialize the simulation times time_prim at n=0 and time_dual at n=+1/2
     // ------------------------------------------------------------------------
-    unsigned int stepStart = sio->stepStart, stepStop = params.n_time + 3;
+    unsigned int stepStart = sio->stepStart, stepStop = params.n_time;
     // time at integer time-steps (primal grid)
     double time_prim = stepStart * params.timestep;
     // time at half-integer time-steps (dual grid)
