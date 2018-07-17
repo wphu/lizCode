@@ -9,8 +9,12 @@
 #include "MF_Solver2D_Cowan.h"
 #include "EF_Solver2D_SLU.h"
 #include "EF_Solver2D_SLU_DIST.h"
+#include "EF_Solver3D_SLU.h"
+#include "EF_Solver3D_SLU_DIST.h"
+#include "EF_Solver3D_PETSc_KSP.h"
 #include "InputData.h"
 #include "PicParams.h"
+
 
 #include "Tools.h"
 
@@ -19,7 +23,8 @@ public:
     static Solver* create(PicParams& params, InputData &ifile, Grid* grid, SmileiMPI* smpi) {
         Solver* solver = NULL;
         int nx_source_left;
-        if ( params.geometry == "1d3v" ) {
+        if ( params.geometry == "1d3v" ) 
+        {
             nx_source_left = 0.0; // default
             ifile.extract("nx_source_left", nx_source_left);
             if(params.method == "explicit")
@@ -40,19 +45,33 @@ public:
             }
 
         }
-        else if ( params.geometry == "2d3v" ) {
+        else if ( params.geometry == "2d3v" ) 
+        {
             #ifdef SuperLU_serial
             solver = new EF_Solver2D_SLU(params, grid, smpi);
             #else
             solver = new EF_Solver2D_SLU_DIST(params, grid, smpi);
             #endif
-
-	    //if ()
-            //solver = new MF_Solver2D_Yee(params);
-	    //elseif()
-	    //solver = new MF_Solver1D_Cowan(params);
         }
-        else {}
+        else if ( params.geometry == "3d3v" ) 
+        {
+            /*
+            #ifdef SuperLU_serial
+            solver = new EF_Solver3D_SLU(params, grid, smpi);
+            #else
+            solver = new EF_Solver3D_SLU_DIST(params, grid, smpi);
+            #endif
+            */
+            solver = new EF_Solver3D_PETSc_KSP(params, grid, smpi);
+        }
+        else 
+        {
+        }
+
+        if(solver == NULL)
+        {
+            ERROR("Creating solver failed =================");
+        }
 
         return solver;
     }

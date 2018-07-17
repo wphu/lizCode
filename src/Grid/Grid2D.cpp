@@ -888,17 +888,17 @@ void Grid2D::geometry_iter_gap( )
 
 void Grid2D::computeNcp()
 {
-
     ncp=0;
     for(int i=0; i<nx; i++)
-      for(int j=0; j<ny; j++){
-        if( bndr_global_2D[i][j]==0 || bndr_global_2D[i][j]==1
-        || bndr_global_2D[i][j]==2 || bndr_global_2D[i][j]==8){
-          ncp++;
-          numcp_global_2D[i][j]=ncp-1;
-
+    {
+        for(int j=0; j<ny; j++)
+        {
+            if( bndr_global_2D[i][j]==0 || bndr_global_2D[i][j]==1
+             || bndr_global_2D[i][j]==2 || bndr_global_2D[i][j]==8)
+            {
+                ncp++;
+                numcp_global_2D[i][j]=ncp-1;
+            }
         }
-      }
-
-
+    }
 }

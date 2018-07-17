@@ -54,13 +54,13 @@ public:
     unsigned int ny_p;
 
     //! Number of nodes on the dual grid in the y-direction
-    unsigned int nz_d;
+    unsigned int ny_d;
 
     //! Number of nodes on the primal grid in the z-direction
     unsigned int nz_p;
 
     //! Number of nodes on the dual grid in the z-direction
-    unsigned int ny_d;
+    unsigned int nz_d;
 
     //! Spatial step dx for 3D3V cartesian simulations
     double dx;

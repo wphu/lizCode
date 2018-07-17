@@ -3,6 +3,8 @@ HDF5_DIR		?=
 SuperLU_DIR		?=
 PYTHONCONFIG	= python3-config
 ##################################################
+CFLAGS 			+= -std=c++11
+
 
 DESCRIBE:=$(shell git describe 2>/dev/null || echo '??')
 BRANCH:=$(shell git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '??')
@@ -29,9 +31,15 @@ CFLAGS 		       += -I$(SuperLU_DIST_dir)/SRC
 $(warning  $(CFLAGS))
 endif
 
+# for PETSc library
+include ${PETSC_DIR}/lib/petsc/conf/variables
+#include ${PETSC_DIR}/lib/petsc/conf/rules
+CFLAGS += -Dpetsc
+CFLAGS 		+= -I${petsc_dir}/include
+LDFLAGS 	+= -L${petsc_dir}/lib -lpetsc -lz
 
 
-CFLAGS 		+= -std=c++11
+# ============== hdf5 libary =========== 
 CFLAGS 		+= -I${hdf5_dir}/include
 LDFLAGS 	+= -L${hdf5_dir}/lib -lhdf5 -lz
 
@@ -52,7 +60,8 @@ PYHEADERS := $(PYSCRIPTS:.py=.pyh)
 SRCS := $(shell find . -name \*.cpp)
 OBJS := $(SRCS:.cpp=.o)
 DEPS := $(SRCS:.cpp=.d)
-
+PYCS := $(shell find . -name \*.pyc)
+PYCS += $(shell find ../tools -name \*.pyc)
 
 CFLAGS		+=$(shell $(PYTHONCONFIG) --includes)
 PATH_Python = $(shell $(PYTHONCONFIG) --prefix)
@@ -82,7 +91,7 @@ debug:
 	make config=debug
 
 clean:
-	rm -f $(OBJS) $(DEPS) $(PYHEADERS) $(EXEC)
+	rm -f $(OBJS) $(DEPS) $(PYHEADERS) $(EXEC) $(PYCS)
 
 distclean: clean
 	rm -f $(EXEC)

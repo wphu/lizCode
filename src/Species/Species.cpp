@@ -84,10 +84,12 @@ min_loc(smpi->getDomainLocalMin(0))
     // Arrays of the min and max indices of the particle bins
     bmin.resize(params.n_space[0]/clrw);
     bmax.resize(params.n_space[0]/clrw);
+    /*
     if (ndim == 3){
         bmin.resize(params.n_space[0]/clrw*params.n_space[1]);
         bmax.resize(params.n_space[0]/clrw*params.n_space[1]);
     }
+    */
 
     //Size in each dimension of the buffers on which each bin are projected
     //In 1D the particles of a given bin can be projected on 6 different nodes at the second order (oversize = 2)
@@ -1292,7 +1294,9 @@ int Species::createParticles(vector<unsigned int> n_space_to_create, vector<doub
                 x_cell[1] = cell_index[1] + (j+0.5)*cell_length[1];
                 x_cell[2] = cell_index[2] + (k+0.5)*cell_length[2];
 
-                n_part_in_cell(i,j,k) = round(ppcProfile->valueAt(x_cell));
+                //n_part_in_cell(i,j,k) = round(ppcProfile->valueAt(x_cell));
+                n_part_in_cell(i,j,k) = species_param.n_part_per_cell;
+                //cout<<"n_part_in_cell "<<n_part_in_cell(i,j,k)<<endl;
                 if( n_part_in_cell(i,j,k)<=0. ) {
                     n_part_in_cell(i,j,k) = 0.;
                     density(i,j,k) = 0.;
@@ -1303,7 +1307,8 @@ int Species::createParticles(vector<unsigned int> n_space_to_create, vector<doub
                 charge(i,j,k) = chargeProfile->valueAt(x_cell);
                 if( charge(i,j,k)>max_charge ) max_charge=charge(i,j,k);
                 // assign density its correct value in the cell
-                density(i,j,k) = densityProfile->valueAt(x_cell);
+                //density(i,j,k) = densityProfile->valueAt(x_cell);
+                density(i,j,k) = species_param.density;
                 if(density(i,j,k)!=0. && densityProfileType=="charge") {
                     if(charge(i,j,k)==0.) ERROR("Encountered non-zero charge density and zero charge at the same location");
                     density(i,j,k) /= charge(i,j,k);
@@ -1428,6 +1433,7 @@ int Species::createParticles(vector<unsigned int> n_space_to_create, vector<doub
                         for (unsigned int l=0; l<nE; l++) max_jutt_cumul[l]/=max_jutt_cumul[nE-1];
                     }
 
+                    /*
                     temp[0] = temperature[0](i,j,k);
                     vel[0]  = velocity[0](i,j,k);
                     temp[1] = temperature[1](i,j,k);
@@ -1435,6 +1441,18 @@ int Species::createParticles(vector<unsigned int> n_space_to_create, vector<doub
                     temp[2] = temperature[2](i,j,k);
                     vel[2]  = velocity[2](i,j,k);
                     nPart = n_part_in_cell(i,j,k);
+                    */
+
+                    temp[0] = species_param.thermT[0];
+                    vel[0]  = species_param.mean_velocity[0];
+                    temp[1] = species_param.thermT[0];
+                    vel[1]  = species_param.mean_velocity[1];
+                    temp[2] = species_param.thermT[0];
+                    vel[2]  = species_param.mean_velocity[2];
+                    nPart = n_part_in_cell(i,j,k);
+
+
+
 
                     indexes[0]=i*cell_length[0]+cell_index[0];
                     if (ndim > 1) {

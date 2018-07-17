@@ -96,7 +96,7 @@ PicParams::PicParams(InputData &ifile) {
 
     // geometry of the simulation
     ifile.extract("dim", geometry);
-    if (geometry!="1d3v" && geometry!="2d3v") {
+    if (geometry!="1d3v" && geometry!="2d3v" && geometry!="3d3v") {
         ERROR("Geometry " << geometry << " does not exist");
     }
     setDimensions();
@@ -320,6 +320,13 @@ void PicParams::readSpecies(InputData &ifile) {
                 ERROR("For species #" << ispec << ", bc_part_type_north not defined");
         }
 
+        if (nDim_particle > 2) {
+            if (!ifile.extract("bc_part_type_bottom",tmpSpec.bc_part_type_bottom,"Species",ispec) )
+                ERROR("For species #" << ispec << ", bc_part_type_bottom not defined");
+            if (!ifile.extract("bc_part_type_up",tmpSpec.bc_part_type_up,"Species",ispec) )
+                ERROR("For species #" << ispec << ", bc_part_type_up not defined");
+        }
+
         // for thermalizing BCs on particles check if thermT is correctly defined
         bool thermTisDefined=false;
         if ( (tmpSpec.bc_part_type_west=="thermalize") || (tmpSpec.bc_part_type_east=="thermalize") ){
@@ -420,6 +427,7 @@ void PicParams::readSpecies(InputData &ifile) {
         //ifile.extract("temperature",tmpSpec.thermT);
         ifile.extract("temperature", tmpSpec.thermT, "Species",ispec);
 
+        ifile.extract("mean_velocity", tmpSpec.mean_velocity, "Species",ispec);
 
         // DSMC parameters
         ifile.extract("diameter",tmpSpec.diameter ,"Species",ispec);

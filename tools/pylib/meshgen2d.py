@@ -403,6 +403,7 @@ class Grid2D:
         contourf0 = ax0.contourf(x, y, is_wall, level_num, cmap=cm.get_cmap('jet'))
 
         ax0.set_title(r"$\mathrm{is\_wall}$", color='#1f77b4', fontsize = label_fontsize)
+
         #ax0.axis('equal')
         ax0.set_aspect('equal', adjustable='box')
         ax0.set_xlabel('x ')
@@ -417,11 +418,13 @@ class Grid2D:
             ax0.plot(segment_x, segment_y)
 
         ax0.set_title(r"$\mathrm{bndr\_lines}$", color='#1f77b4', fontsize = label_fontsize)
+
         #ax0.axis('equal')
         #ax0.set_aspect('equal', adjustable='box')
         ax0.set_xlabel('x ')
         ax0.set_ylabel('y ')
         ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
+
 
         ##============ bndr_type ======================================================
         ax0=fig.add_subplot(2,2,3)
@@ -445,16 +448,16 @@ class Grid2D:
         ax0.set_ylabel('y ')
         ax0.annotate(r"$\mathbf{(d)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 
-
-
         pdf_file_name = "grid" + ".png"
         fig.savefig(pdf_file_name, dpi = 300)
 
 
 if __name__ == "__main__":
+
     dx = 0.5e-5 #3.5e-6
     dy = 0.5e-5 #3.5e-6
     lx = 24.0e-3
+
     ly = 5.2e-3
     nx = int(lx / dx)
     ny = int(ly / dy)
@@ -468,13 +471,11 @@ if __name__ == "__main__":
     y1 = 2.0e-3
     y2 = 1.0e-3
 
-
     print("nx, ny is : ", nx, ny)
 
 
-    ny_wall_boundary = int(y1 / dy) + ny_base
+    ny_wall_boundary = int(2.0e-3 / dy) + ny_base
     ny_wall_max = ny - ny_source - 5
-
     wall_potential = -60.0
 
     polygon_list = []
@@ -484,6 +485,7 @@ if __name__ == "__main__":
     point1 = Point(x2,      ny_base*dy)
     point2 = Point(x2,      ny_base*dy + y1)
     point3 = Point(0.0,     ny_base*dy + y1)
+
 
     line0 = Straight_line(point0, point1)
     line1 = Straight_line(point1, point2)
@@ -503,6 +505,7 @@ if __name__ == "__main__":
     point6 = Point(lx,      ny_base*dy + y1)
     point7 = Point(x1 + x2, ny_base*dy + y1)
 
+
     line4 = Straight_line(point4, point5)
     line5 = Straight_line(point5, point6)
     line6 = Straight_line(point6, point7)
@@ -521,6 +524,7 @@ if __name__ == "__main__":
     point9 = Point(x2 + x3 + x4,    ny_base*dy)
     point10 = Point(x2 + x3 + x4,   ny_base*dy + y2)
     point11 = Point(x2 + x3,        ny_base*dy + y2)
+
 
     line8 = Straight_line(point8, point9)
     line9 = Straight_line(point9, point10)

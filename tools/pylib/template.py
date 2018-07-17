@@ -31,29 +31,30 @@ font={	'family' : 'serif',
 	}
 
 mpl.rcParams['font.family'] = 'serif'
-mpl.rcParams['font.size'] = 18
-
 mpl.rcParams['mathtext.fontset'] = 'stix'
 mpl.rcParams['mathtext.it'] = 'serif'
 
 mpl.rcParams['axes.linewidth'] = 2.0
 mpl.rcParams['xtick.major.size'] = 2
 mpl.rcParams['ytick.major.size'] = 2
-
 mpl.rcParams['lines.linewidth'] = 3.0
 
 mpl.rcParams['grid.linestyle'] = ":"
 mpl.rcParams['grid.color'] = "black"
 
-def get_axis_limits(ax, x_scale=0.0, y_scale=1.08):
-    return ax.get_xlim()[0] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * x_scale, ax.get_ylim()[1] + ( ax.get_ylim()[1] - ax.get_ylim()[0] ) * (y_scale - 1.0)
-
-yformatter = ScalarFormatter()
-yformatter.set_powerlimits((-3,3))
-
+#for paper
+mpl.rcParams['font.size'] = 18
 label_fontsize = 21
 legend_fontsize = 15
 inset_label_fontsize = 15
+
+# for poster
+'''
+mpl.rcParams['font.size'] = 25
+label_fontsize = 25
+legend_fontsize = 25
+inset_label_fontsize = 25
+'''
 
 linestyles = ['-', '--', '-.', ':']
 markers = ['x', '^', 's', '*']
@@ -65,5 +66,12 @@ ylabel_x = -0.058
 
 # contants
 const_e = 1.602e-19
+
+def get_axis_limits(ax, x_scale=0.0, y_scale=1.08):
+    return ax.get_xlim()[0] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * x_scale, ax.get_ylim()[1] + ( ax.get_ylim()[1] - ax.get_ylim()[0] ) * (y_scale - 1.0)
+
+yformatter = ScalarFormatter()
+yformatter.set_powerlimits((-3,3))
+
 
 print("template.py is imported!")

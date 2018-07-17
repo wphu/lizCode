@@ -71,6 +71,9 @@ struct SpeciesStructure {
 
     //! thermalizing temperature [\f$m_e c^2\f$]
     std::vector<double> thermT;
+
+    std::vector<double> mean_velocity;
+
     //! thermal velocity [\f$c\f$]
     std::vector<double> thermalVelocity;
     //! thermal momentum [\f$m_e c\f$]

@@ -4,6 +4,7 @@
 #include "SmileiMPI.h"
 #include "SmileiMPI_Cart1D.h"
 #include "SmileiMPI_Cart2D.h"
+#include "SmileiMPI_Cart3D.h"
 
 #include "PicParams.h"
 
@@ -19,16 +20,24 @@ public:
     //! \param params : Parameters
     //! \param smpiData : Initial MPI environment (data broadcast)
     //  --------------------------------------------------------------------------------------------------------------------
-    static SmileiMPI* create(PicParams& params, SmileiMPI* smpiData) {
+    static SmileiMPI* create(PicParams& params, SmileiMPI* smpiData) 
+    {
         SmileiMPI* smpi = NULL;
         MESSAGE(1, "Geometry:" << params.geometry);
-        if ( params.geometry == "1d3v" ) {
+        if ( params.geometry == "1d3v" ) 
+        {
             smpi = new  SmileiMPI_Cart1D(smpiData);
         }
-        else if ( params.geometry == "2d3v" ) {
+        else if ( params.geometry == "2d3v" ) 
+        {
             smpi = new  SmileiMPI_Cart2D(smpiData);
         }
-        else {
+        else if ( params.geometry == "3d3v" ) 
+        {
+            smpi = new  SmileiMPI_Cart3D(smpiData);
+        }
+        else 
+        {
             ERROR( "Geometry " << params.geometry << " not implemented" );
         }
 
@@ -38,7 +47,10 @@ public:
         smpi->createTopology(params);
 
 	    // Creation of derivated datatypes for grid borders
-        if ( params.geometry == "2d3v" ) smpi->createType(params);
+        if ( params.geometry == "2d3v" || params.geometry == "3d3v" ) 
+        {
+            smpi->createType(params);
+        }
 
         return smpi;
     }

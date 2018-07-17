@@ -17,20 +17,17 @@ class Array4D
 
 public:
 
-    //! name of the Array4D
-    std::string name;
-
-    //! Constructor for Array4D: with no input argument
-    Array4D() {
+    // Constructor for Array4D: with no input argument
+    Array4D() 
+    {
         data_ = NULL;
     };
 
     //! Destructor for Array4D
-    ~Array4D() {
-        ;
+    ~Array4D() 
+    {
     } ;
 
-    //! Virtual method used to allocate Array4D
     void allocateDims(std::vector<unsigned int> dims)
     {
         dims_=dims;
@@ -57,18 +54,17 @@ public:
         globalDims_ = dims_[0]*dims_[1]*dims_[2]*dims_[3];
     };
 
-
-    //! vector containing the dimensions of the Array4D
-    //! \todo private/friend/modify SmileiMPI* (JD)
+    // vector containing the dimensions of the Array4D
     std::vector<unsigned int> dims_;
 
-
-    //! returns the dimension of the Array4D
+    // returns the dimension of the Array4D
 	inline std::vector<unsigned int> dims () {return dims_;}
-    //! All arrays may be viewed as a 1D array
-    //! Linearized diags
+
+    // All arrays may be viewed as a 1D array
+    // Linearized diags
     unsigned int globalDims_;
-    //! pointer to the linearized array
+
+    // pointer to the linearized array
     double* data_;
 
     // data_4D[nx][ny][nz][nv]
@@ -77,8 +73,14 @@ public:
     //! method used to put all entry of a Array4D at a given value val
     inline void put_to(double val)
     {
-        if (data_)
-            for (unsigned int i=0; i<globalDims_; i++) data_[i] = val;
+        if(data_)
+        {
+            for(unsigned int i=0; i<globalDims_; i++)
+            {
+                data_[i] = val;
+            }
+        }
+            
     }
 
 

@@ -43,6 +43,7 @@ public:
     void addField(Field* field);
     virtual void createFieldsGroup( ElectroMagn* fields );
     virtual void createPartsGroup( vector<Species*>& vecSpecies );
+    virtual void createDiagsPattern( PicParams& params, Diagnostic* diag){};
 
     //! Basic write field on its own file (debug)
     virtual void write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime){};

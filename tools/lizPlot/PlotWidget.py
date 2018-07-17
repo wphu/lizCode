@@ -83,7 +83,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
         self.axes1 = self.fig.add_subplot(111)
 
-        self.data3d = data4d[:,0,:,:]
+        self.data3d = data4d[0,:,:,:]
         self.title = title
         nx = self.data3d.shape[1]
         ny = self.data3d.shape[2]
@@ -96,7 +96,7 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         	ticks_val=np.linspace(self.data3d.min(),self.data3d.max()+1.0,5)
         else:
         	ticks_val=np.linspace(self.data3d.min(),self.data3d.max(),5)
-        self.cf = self.axes1.contourf(self.x,self.y,self.data3d[0],cmap=cm.get_cmap('jet'),levels=levels)
+        self.cf = self.axes1.contourf(self.x,self.y,self.data3d[10],cmap=cm.get_cmap('jet'),levels=levels)
         self.fig.colorbar(self.cf,ticks=ticks_val)
 
 

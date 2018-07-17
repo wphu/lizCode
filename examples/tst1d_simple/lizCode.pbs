@@ -18,3 +18,5 @@ echo "end time"; date
 cd $PBS_O_WORKDIR
 
 mpiexec -n 24 liz data/input.py
+#mpiexec -n 24 valgrind --tool=callgrind liz data/input.py
+#mpiexec -n 24 valgrind liz data/input.py

@@ -171,7 +171,7 @@ public:
 
     //> global dimensions (including ghost grid points) of each process stored in ROOT process for gathering
     //> and scattering, only dims_global_gather[0] is used for 1d.
-	int dims_global_gather[2];
+	int dims_global_gather[3];
 
 	//>>>variables for MPI_GaterV and MPI_scatter (grid, rho, phi)
 	int* grid_global_gather;

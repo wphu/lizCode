@@ -1,5 +1,6 @@
 #export SuperLU_type=mpi
-export SuperLU_type=serial
+#export SuperLU_type=serial
+export petsc=yes
 
 export lizHomePath=/home/huwanpeng/codes/lizCode
 
@@ -8,16 +9,21 @@ export lizHomePath=/home/huwanpeng/codes/lizCode
 export mpich_dir=/opt/deepin15.6/mpich
 export hdf5_dir=/opt/deepin15.6/hdf5-mpich
 export SuperLU_dir=/opt/deepin15.6/SuperLU_4.3
-#export SuperLU_DIST_dir=/home/wphu/opt/SuperLU_DIST_5.3.0
+export SuperLU_DIST_dir=/opt/deepin15.6/SuperLU_DIST_5.3.0
 export anaconda3_dir=/opt/anaconda3
+export petsc_dir=/opt/deepin15.6/petsc
+export petsc_arch=arch-linux2-c-debug
 
+
+
+>>>>>>> master-3D
 #source ${intel_compiler_dir}/bin/compilervars.sh intel64
 export PATH=${mpich_dir}/bin:$PATH
 export PATH=${anaconda3_dir}/bin:$PATH
 export LD_LIBRARY_PATH=${mpich_dir}/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=${anaconda3_dir}/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=${hdf5_dir}/lib:$LD_LIBRARY_PATH
-
+export LD_LIBRARY_PATH=${petsc_dir}/lib:$LD_LIBRARY_PATH
 
 # lizCode environments
 export PATH=${lizHomePath}/src:$PATH

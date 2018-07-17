@@ -184,11 +184,19 @@ int main (int argc, char* argv[])
 
     TITLE("Creating Diagnostic");
     Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
+    if(smpi->isMaster() && params.geometry == "3d3v")
+    {
+        sio->createDiagsPattern(params, diag);
+    }
+    
     smpi->barrier();
+
+
 
     TITLE("Creating Solver");
     timer[11].restart();
-    Solver* solver = SolverFactory::create(params, input_data, grid, smpi);
+    Solver* solver = NULL;
+    solver = SolverFactory::create(params, input_data, grid, smpi);
     timer[11].update();
     smpi->barrier();
 
@@ -217,6 +225,7 @@ int main (int argc, char* argv[])
         EMfields->restartRhoJs(ispec, 0);
         vecSpecies[ispec]->Project(time_dual, ispec, EMfields, Proj, smpi, params);
     }
+    EMfields->computeTotalRhoJ();
     (*solver)(EMfields, smpi);
     smpi->barrier();
 
@@ -255,6 +264,7 @@ int main (int argc, char* argv[])
             }
             timer[2].update();
 
+            //MESSAGE("Interpolate and Move ");
             // ================== Interpolate and Move ===============================
             int tid(0);
             timer[3].restart();
@@ -268,6 +278,7 @@ int main (int argc, char* argv[])
             }
             timer[3].update();
 
+            //MESSAGE("MPI Exchange Particle ");
             // ================== MPI Exchange Particle ============================================
             timer[4].restart();
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
@@ -285,13 +296,14 @@ int main (int argc, char* argv[])
             }
             timer[4].update();
 
+            //MESSAGE("Run Diagnostic ");
             // ================== Run Diagnostic =============================================
             // absorb particles and calculate particle flux, heat flux, and average angle for 2D and 3D
             timer[8].restart();
             diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
 
-
+            //MESSAGE("Project Particle ");
             // ================== Project Particle =========================================
             timer[6].restart();
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
@@ -302,6 +314,7 @@ int main (int argc, char* argv[])
             timer[6].update();
 
 
+            //MESSAGE("PSI ");
             // ================== Plasma Surface Interacton ==================================
             timer[7].restart();
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
@@ -322,6 +335,7 @@ int main (int argc, char* argv[])
             }
             timer[7].update();
 
+            //MESSAGE("Solve Eields");
             // ================== Solve Electromagnetic Fields ===============================
             timer[9].restart();
             EMfields->restartRhoJ();
@@ -330,6 +344,7 @@ int main (int argc, char* argv[])
             (*solver)(EMfields, smpi);
             timer[9].update();
 
+            //MESSAGE("Write IO");
             // ================== Write IO ====================================================
             timer[10].restart();
             if(params.ntime_step_avg)
