@@ -76,6 +76,12 @@ PicParams::PicParams(InputData &ifile) {
         MESSAGE("default method is used: explicit ");
     }
 
+    // poisson solver
+    ifile.extract("poisson_solver", poisson_solver);
+    if (poisson_solver != "SuperLU_serial" && poisson_solver != "SuperLU_mpi" && poisson_solver != "petsc") {
+        poisson_solver = "SuperLU_serial";
+        MESSAGE("default poisson_solver is used: SuperLU_serial ");
+    }
 
     imp_theta = 0.1;
     ifile.extract("imp_theta", imp_theta);

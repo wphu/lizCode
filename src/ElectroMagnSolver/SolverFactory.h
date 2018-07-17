@@ -47,22 +47,41 @@ public:
         }
         else if ( params.geometry == "2d3v" ) 
         {
-            #ifdef SuperLU_serial
-            solver = new EF_Solver2D_SLU(params, grid, smpi);
-            #else
-            solver = new EF_Solver2D_SLU_DIST(params, grid, smpi);
-            #endif
+            if(params.poisson_solver == "SuperLU_serial")
+            {
+                #ifdef SuperLU_serial
+                solver = new EF_Solver2D_SLU(params, grid, smpi);
+                #endif
+            }
+            
+            if(params.poisson_solver == "SuperLU_mpi")
+            {
+                #ifdef SuperLU_mpi
+                solver = new EF_Solver2D_SLU_DIST(params, grid, smpi);
+                #endif
+            }    
         }
         else if ( params.geometry == "3d3v" ) 
         {
-            /*
-            #ifdef SuperLU_serial
-            solver = new EF_Solver3D_SLU(params, grid, smpi);
-            #else
-            solver = new EF_Solver3D_SLU_DIST(params, grid, smpi);
-            #endif
-            */
-            solver = new EF_Solver3D_PETSc_KSP(params, grid, smpi);
+            if(params.poisson_solver == "SuperLU_serial")
+            {
+                #ifdef SuperLU_serial
+                solver = new EF_Solver3D_SLU(params, grid, smpi);
+                #endif
+            }
+            
+            if(params.poisson_solver == "SuperLU_mpi")
+            {
+                #ifdef SuperLU_mpi
+                solver = new EF_Solver3D_SLU_DIST(params, grid, smpi);
+                #endif
+            } 
+            if(params.poisson_solver == "petsc")
+            {
+                #ifdef petsc
+                solver = new EF_Solver3D_PETSc_KSP(params, grid, smpi);
+                #endif
+            }
         }
         else 
         {
@@ -70,7 +89,7 @@ public:
 
         if(solver == NULL)
         {
-            ERROR("Creating solver failed =================");
+            ERROR("Creating solver failed, poisson_solver is: "<<params.poisson_solver);
         }
 
         return solver;

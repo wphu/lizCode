@@ -199,6 +199,9 @@ public:
     // define the method of PIC: explicit or implicit
     std::string method;
 
+    // define poisson equation solver: SuperLU_serial, SuperLU_mpi, petsc
+    std::string poisson_solver;
+
     // theta of pushing particles for implicit method
     double imp_theta;
 

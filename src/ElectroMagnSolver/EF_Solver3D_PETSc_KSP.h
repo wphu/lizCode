@@ -8,7 +8,6 @@ ref: petsc-3.8.3/src/ksp/ksp/examples/tutorials/ex2.c
 #define EF_SOLVER3D_PETSC_KSP_H
 
 #include "Solver3D.h"
-#include "slu_ddefs.h"
 #include "Grid3D.h"
 #include "Field.h"
 #include "SmileiMPI_Cart3D.h"

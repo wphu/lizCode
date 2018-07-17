@@ -1,5 +1,5 @@
-#export SuperLU_type=mpi
-#export SuperLU_type=serial
+export SuperLU_mpi=yes
+export SuperLU_serial=yes
 export petsc=yes
 
 export lizHomePath=/home/huwanpeng/codes/lizCode

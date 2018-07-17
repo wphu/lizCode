@@ -5,6 +5,7 @@
 import math
 
 method = 'explicit'
+poisson_solver == 'petsc'
 
 l0 = 1.0e-5
 nx = 100

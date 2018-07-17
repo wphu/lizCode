@@ -14,15 +14,16 @@ VERSION:="$(DESCRIBE)-$(BRANCH)"
 CFLAGS += -D__VERSION=\"$(VERSION)\" -D__COMMITDATE=\""$(COMMITDATE)"\"
 
 ####################################################
-ifeq ($(SuperLU_type),serial)
+ifeq ($(SuperLU_serial),yes)
 CFLAGS 			   += -DSuperLU_serial
 LIB_Blas			= $(SuperLU_dir)/lib/libblas.a
 LIB_SuperLU 		= $(SuperLU_dir)/lib/libsuperlu_4.3.a
 LIBS 				= $(LIB_SuperLU) $(LIB_Blas)
 CFLAGS 			   += -I$(SuperLU_dir)/SRC
 $(warning  $(CFLAGS))
-else
-SuperLU_type		= mpi
+endif
+
+ifeq ($(SuperLU_mpi),yes)
 CFLAGS 			   += -DSuperLU_mpi
 LIB_Blas			= $(SuperLU_DIST_dir)/lib/libblas.a
 LIB_SuperLU_DIST 	= $(SuperLU_DIST_dir)/lib/libsuperlu_dist.a
@@ -32,11 +33,13 @@ $(warning  $(CFLAGS))
 endif
 
 # for PETSc library
+ifeq ($(petsc),yes)
 include ${PETSC_DIR}/lib/petsc/conf/variables
 #include ${PETSC_DIR}/lib/petsc/conf/rules
-CFLAGS += -Dpetsc
+CFLAGS 		+= -Dpetsc
 CFLAGS 		+= -I${petsc_dir}/include
 LDFLAGS 	+= -L${petsc_dir}/lib -lpetsc -lz
+endif
 
 
 # ============== hdf5 libary =========== 
