@@ -241,7 +241,7 @@ int main (int argc, char* argv[])
             itime++;
             time_prim += params.timestep;
             time_dual += params.timestep;
-            MESSAGE("timestep = "<<itime);
+            //MESSAGE("timestep = "<<itime);
 
             // ================== EmitLoad =========================================
             //> add Particle Source: emit from boundary or load in some region
@@ -264,7 +264,7 @@ int main (int argc, char* argv[])
             }
             timer[2].update();
 
-            MESSAGE("Interpolate and Move ");
+            //MESSAGE("Interpolate and Move ");
             // ================== Interpolate and Move ===============================
             int tid(0);
             timer[3].restart();
@@ -278,7 +278,7 @@ int main (int argc, char* argv[])
             }
             timer[3].update();
 
-            MESSAGE("MPI Exchange Particle ");
+            //MESSAGE("MPI Exchange Particle ");
             // ================== MPI Exchange Particle ============================================
             timer[4].restart();
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
@@ -287,7 +287,6 @@ int main (int argc, char* argv[])
                 {
                     for ( int iDim = 0 ; iDim<(int)params.nDim_particle ; iDim++ )
                     {
-                        MESSAGE("MPI iDim "<<iDim);
                         smpi->exchangeParticles(vecSpecies[ispec], ispec, params, tid, iDim);
                     }
                     vecSpecies[ispec]->sort_part(); // Should we sort test particles ?? (JD)
@@ -297,14 +296,14 @@ int main (int argc, char* argv[])
             }
             timer[4].update();
 
-            MESSAGE("Run Diagnostic ");
+            //MESSAGE("Run Diagnostic ");
             // ================== Run Diagnostic =============================================
             // absorb particles and calculate particle flux, heat flux, and average angle for 2D and 3D
             timer[8].restart();
             diag->run(smpi, grid, vecSpecies, EMfields, vecPSI, itime);
             timer[8].update();
 
-            MESSAGE("Project Particle ");
+            //MESSAGE("Project Particle ");
             // ================== Project Particle =========================================
             timer[6].restart();
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
@@ -315,7 +314,7 @@ int main (int argc, char* argv[])
             timer[6].update();
 
 
-            MESSAGE("PSI ");
+            //MESSAGE("PSI ");
             // ================== Plasma Surface Interacton ==================================
             timer[7].restart();
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
@@ -336,7 +335,7 @@ int main (int argc, char* argv[])
             }
             timer[7].update();
 
-            MESSAGE("Solve Eields");
+            //MESSAGE("Solve Eields");
             // ================== Solve Electromagnetic Fields ===============================
             timer[9].restart();
             EMfields->restartRhoJ();
@@ -345,7 +344,7 @@ int main (int argc, char* argv[])
             (*solver)(EMfields, smpi);
             timer[9].update();
 
-            MESSAGE("Write IO");
+            //MESSAGE("Write IO");
             // ================== Write IO ====================================================
             timer[10].restart();
             if(params.ntime_step_avg)

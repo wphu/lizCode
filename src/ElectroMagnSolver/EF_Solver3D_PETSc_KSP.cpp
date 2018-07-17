@@ -536,7 +536,7 @@ void EF_Solver3D_PETSc_KSP::solve_PETSc_KSP(Field* rho, Field* phi)
         print statement from all processes that share a communicator.
         An alternative is PetscFPrintf(), which prints to a file.
     */
-    ierr = PetscPrintf(PETSC_COMM_WORLD,"Norm of error %g iterations %D\n",(double)norm,its);CHKERRV(ierr);
+    //ierr = PetscPrintf(PETSC_COMM_WORLD,"Norm of error %g iterations %D\n",(double)norm,its);CHKERRV(ierr);
 
 
 

@@ -597,14 +597,6 @@ void Species::dynamics(double time_dual, unsigned int ispec, ElectroMagn* EMfiel
                 //(*LocInterp)(EMfields, particles, iPart, &Epart);
                 (*LocInterp)(EMfields, particles, iPart, &Epart, &Bpart);
 
-
-                Epart.x = 0.0;
-                Epart.y = 0.0;
-                Epart.z = 0.0;
-                Bpart.x = 0.0;
-                Bpart.y = 0.0;
-                Bpart.z = 0.0;
-
                 // Push the particle
                 //(*Push)(particles, iPart, Epart);
                 (*Push)(particles, iPart, Epart, Bpart);
