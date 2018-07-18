@@ -4,6 +4,11 @@ export petsc=yes
 
 export lizHomePath=/home/huwanpeng/codes/lizCode
 
+# google-perftools parameters
+#export CPUPROFILE=./liz.prof
+export CPUPROFILE_FREQUENCY=200
+export LD_PRELOAD=/usr/lib/libprofiler.so:$LD_PRELOAD
+
 # dependencies
 #export intel_compiler_dir=/home/wphu/opt/intel
 export mpich_dir=/opt/deepin15.6/mpich

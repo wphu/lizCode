@@ -70,8 +70,8 @@ LDFLAGS 	+= -L${PATH_Python}/lib $(shell $(PYTHONCONFIG) --ldflags)
 
 
 ifeq ($(config),debug)
-	CFLAGS 		+= -g -pg -Wall -D__DEBUG -O3# -shared-intel
-	LDFLAGS 	+= -Iprofiler
+	CFLAGS 		+= -g -D__DEBUG -O0# -shared-intel
+	LDFLAGS 	+= -g -lprofiler
 else
 	CFLAGS 		+= -O3#  -xHost -ipo
 endif

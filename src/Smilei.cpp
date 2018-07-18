@@ -18,13 +18,11 @@
 #include <ctime>
 #include <cstdlib>
 #include <unistd.h>
-
 #include <iostream>
 #include <iomanip>
 
 #include "InputData.h"
 #include "PicParams.h"
-
 #include "SmileiMPIFactory.h"
 #include "GridFactory.h"
 #include "SpeciesFactory.h"
@@ -38,9 +36,12 @@
 #include "PSIFactory.h"
 #include "ElectroMagnBC_Factory.h"
 #include "DiagnosticFactory.h"
-
 #include "Timer.h"
-#include <omp.h>
+
+
+#ifdef  __DEBUG
+#include <gperftools/profiler.h>
+#endif
 
 using namespace std;
 
@@ -235,6 +236,13 @@ int main (int argc, char* argv[])
     //                     HERE STARTS THE PIC LOOP
     // ------------------------------------------------------------------
     TITLE("Time-Loop is started: number of time-steps n_time = " << params.n_time);
+
+    #ifdef  __DEBUG
+    long long mpi_rk = smpi->getRank();
+    string prof_name = "./liz.prof_" + to_string( mpi_rk );
+    ProfilerStart(prof_name.c_str());
+    #endif
+
     if(params.method == "explicit")
     {
         while(itime <= stepStop)
@@ -515,6 +523,11 @@ int main (int argc, char* argv[])
 
         }//END of the time loop
     }
+
+    #ifdef  __DEBUG
+    ProfilerStop();
+    #endif
+
 
     sio->endStoreP(params, smpi, vecSpecies, itime);
     smpi->barrier();
