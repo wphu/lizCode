@@ -93,7 +93,7 @@ int main (int argc, char* argv[])
     smpi->barrier();
 
     // Count timer
-    vector<Timer> timer(12);
+    vector<Timer> timer(13);
     timer[0].init(smpi, "Total time");
     timer[1].init(smpi, "EmitLoad");
     timer[2].init(smpi, "Collide");
@@ -105,7 +105,8 @@ int main (int argc, char* argv[])
     timer[8].init(smpi, "Diagnostic");
     timer[9].init(smpi, "Fields Solve");
     timer[10].init(smpi,"Write IO");
-    timer[11].init(smpi,"SuperLU factorize");
+    timer[11].init(smpi,"poisson solver init, like: SuperLU factorize, petsc_ksp init");
+    timer[12].init(smpi,"particle sort");
 
     timer[0].restart();
 
@@ -289,7 +290,9 @@ int main (int argc, char* argv[])
                     {
                         smpi->exchangeParticles(vecSpecies[ispec], ispec, params, tid, iDim);
                     }
+                    timer[12].restart();
                     vecSpecies[ispec]->sort_part(); // Should we sort test particles ?? (JD)
+                    timer[12].update();
                     timestep_control[ispec] = 0;
                 }
                 vecSpecies[ispec]->clearExchList();

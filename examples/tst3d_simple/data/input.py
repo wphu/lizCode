@@ -5,7 +5,9 @@
 import math
 
 method = 'explicit'
-poisson_solver == 'petsc'
+# poisson solver: 'petsc', 'SuperLU_serial', 'SuperLU_mpi'
+poisson_solver = 'petsc'
+petsc_ksp_process_number = 8
 
 l0 = 1.0e-5
 nx = 20

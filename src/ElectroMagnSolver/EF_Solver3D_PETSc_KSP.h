@@ -35,6 +35,17 @@ public:
     void solve_Exyz(Field* phi, Field* Ex, Field* Ey, Field* Ez);
     //>>>SuperLU parameters
 
+    bool is_in_pestc_ksp_mpicomm()
+    {
+        if(petsc_ksp_mpi_rank < petsc_ksp_mpi_size)
+        {
+            return true;
+        }
+        else 
+        {
+            return false;
+        }
+    }
 
     // geometry parameters
     int nx, ny, nz;
@@ -48,6 +59,8 @@ protected:
     double *rhsb;
     double *rhsx;
     int nnz;
+    int petsc_ksp_mpi_rank;
+    int petsc_ksp_mpi_size;
 
     // ======================== variables for PETSc_KSP ===================
     Vec            x,b,u;    /* approx solution, RHS, exact solution */
@@ -62,6 +75,7 @@ protected:
     PetscScalar    v;
     PetscInt       *indices_global;
     VecScatter     ctx;
+
 
 
 

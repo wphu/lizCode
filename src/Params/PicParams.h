@@ -202,6 +202,8 @@ public:
     // define poisson equation solver: SuperLU_serial, SuperLU_mpi, petsc
     std::string poisson_solver;
 
+    int petsc_ksp_process_number;
+
     // theta of pushing particles for implicit method
     double imp_theta;
 

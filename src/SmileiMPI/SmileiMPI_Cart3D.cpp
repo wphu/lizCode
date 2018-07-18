@@ -117,18 +117,9 @@ void SmileiMPI_Cart3D::createTopology(PicParams& params)
         number_of_procs[0] = min( smilei_sz, max(1, (int)sqrt ( (double)smilei_sz*tmp*tmp) ) );
         number_of_procs[1] = (int)(smilei_sz / number_of_procs[0]);
 
-        while ( number_of_procs[0]*number_of_procs[1]*number_of_procs[2] != smilei_sz ) 
+        if ( number_of_procs[0]*number_of_procs[1]*number_of_procs[2] != smilei_sz ) 
         {
-            if (number_of_procs[0]>=number_of_procs[1] ) 
-            {
-                number_of_procs[0]++;
-                number_of_procs[1] = (int)(smilei_sz / number_of_procs[0]);
-            }
-            else 
-            {
-                number_of_procs[1]++;
-                number_of_procs[0] = (int)(smilei_sz / number_of_procs[1]);
-            }
+            ERROR("number_of_procs[0]*number_of_procs[1]*number_of_procs[2] != smilei_sz");
         }
 
     }

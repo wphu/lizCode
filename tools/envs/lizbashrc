@@ -14,9 +14,6 @@ export anaconda3_dir=/opt/anaconda3
 export petsc_dir=/opt/deepin15.6/petsc
 export petsc_arch=arch-linux2-c-debug
 
-
-
->>>>>>> master-3D
 #source ${intel_compiler_dir}/bin/compilervars.sh intel64
 export PATH=${mpich_dir}/bin:$PATH
 export PATH=${anaconda3_dir}/bin:$PATH

@@ -24,9 +24,34 @@ Solver3D(params)
 
     grid3D = static_cast<Grid3D*>(grid);
 
-    init_PETSc_KSP();
+    MPI_Comm_rank( MPI_COMM_WORLD, &petsc_ksp_mpi_rank );
 
+    // create sub communicator ofr petsc_ksp parallel solver using params.petsc_ksp_process_number
+    petsc_ksp_mpi_size = params.petsc_ksp_process_number;
+    MPI_Group group_world;
+    MPI_Group petsc_ksp_group;
+    MPI_Comm  petsc_ksp_comm;
+    int *process_ranks;
 
+    // make a list of processes in the new communicator
+    process_ranks = new int[petsc_ksp_mpi_size];
+    for(int i = 0; i < petsc_ksp_mpi_size; i++)
+    {
+        process_ranks[i] = i;
+    }
+    // get the group under MPI_COMM_WORLD
+    MPI_Comm_group(MPI_COMM_WORLD, &group_world);
+    // create the new group
+    MPI_Group_incl(group_world, petsc_ksp_mpi_size, process_ranks, &petsc_ksp_group);
+    // create the new communicator
+    MPI_Comm_create(MPI_COMM_WORLD, petsc_ksp_group, &petsc_ksp_comm);
+    
+    PETSC_COMM_WORLD = petsc_ksp_comm;
+
+    if( is_in_pestc_ksp_mpicomm() )
+    {
+        init_PETSc_KSP();
+    }
 
 }
 
@@ -61,9 +86,12 @@ void EF_Solver3D_PETSc_KSP::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
 
     smpi3D->barrier();
     smpi3D->gatherAllRho(rho3D_global, rho3D);
-
-    solve_PETSc_KSP(rho3D_global, phi3D_global);
-    solve_Exyz(phi3D_global, Ex3D_global, Ey3D_global, Ez3D_global);
+    if( is_in_pestc_ksp_mpicomm() )
+    {
+        solve_PETSc_KSP(rho3D_global, phi3D_global);
+        solve_Exyz(phi3D_global, Ex3D_global, Ey3D_global, Ez3D_global);
+    }
+    
 
     smpi3D->barrier();
     smpi3D->scatterField(Ex3D_global, Ex3D);

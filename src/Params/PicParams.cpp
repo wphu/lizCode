@@ -83,6 +83,7 @@ PicParams::PicParams(InputData &ifile) {
         MESSAGE("default poisson_solver is used: SuperLU_serial ");
     }
 
+
     imp_theta = 0.1;
     ifile.extract("imp_theta", imp_theta);
 
@@ -237,6 +238,25 @@ PicParams::PicParams(InputData &ifile) {
     // --------------------
     if ( !ifile.extract("number_of_procs", number_of_procs) )
         number_of_procs.resize(nDim_field, 0);
+
+    if( !ifile.extract("petsc_ksp_process_number", petsc_ksp_process_number) )
+    {
+        petsc_ksp_process_number = 1;
+        for(int i = 0; i < number_of_procs.size(); i++)
+        {
+            petsc_ksp_process_number *= number_of_procs[i];
+        }
+    }
+    int total_number_process = 1;
+    for(int i = 0; i < number_of_procs.size(); i++)
+    {
+        total_number_process *= number_of_procs[i];
+    }
+    if(petsc_ksp_process_number > total_number_process)
+    {
+        petsc_ksp_process_number = total_number_process;
+        MESSAGE("petsc_ksp_process_number > total_number_process, and is set to total_number_process");
+    }
 
     // -------------------------------------------------------
     // Compute usefull quantities and introduce normalizations

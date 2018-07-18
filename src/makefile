@@ -34,8 +34,6 @@ endif
 
 # for PETSc library
 ifeq ($(petsc),yes)
-include ${PETSC_DIR}/lib/petsc/conf/variables
-#include ${PETSC_DIR}/lib/petsc/conf/rules
 CFLAGS 		+= -Dpetsc
 CFLAGS 		+= -I${petsc_dir}/include
 LDFLAGS 	+= -L${petsc_dir}/lib -lpetsc -lz
@@ -72,9 +70,10 @@ LDFLAGS 	+= -L${PATH_Python}/lib $(shell $(PYTHONCONFIG) --ldflags)
 
 
 ifeq ($(config),debug)
-	CFLAGS += -g -pg -Wall -D__DEBUG -O3# -shared-intel
+	CFLAGS 		+= -g -pg -Wall -D__DEBUG -O3# -shared-intel
+	LDFLAGS 	+= -Iprofiler
 else
-	CFLAGS += -O3#  -xHost -ipo
+	CFLAGS 		+= -O3#  -xHost -ipo
 endif
 
 

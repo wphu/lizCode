@@ -1,5 +1,5 @@
 #PBS -S /bin/bash
-#PBS -N tst2d_gap
+#PBS -N tst3d_simple
 #PBS -l nodes=1:ppn=32
 #PBS -m b
 #PBS -m e
