@@ -238,9 +238,15 @@ int main (int argc, char* argv[])
     TITLE("Time-Loop is started: number of time-steps n_time = " << params.n_time);
 
     #ifdef  __DEBUG
+    /*
     long long mpi_rk = smpi->getRank();
     string prof_name = "./liz.prof_" + to_string( mpi_rk );
     ProfilerStart(prof_name.c_str());
+    */
+
+    string prof_name = "./liz.prof";
+    ProfilerStart(prof_name.c_str());
+    
     #endif
 
     if(params.method == "explicit")
