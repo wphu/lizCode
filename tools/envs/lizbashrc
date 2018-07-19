@@ -1,4 +1,4 @@
-export SuperLU_mpi=yes
+#export SuperLU_mpi=yes
 export SuperLU_serial=yes
 export petsc=yes
 

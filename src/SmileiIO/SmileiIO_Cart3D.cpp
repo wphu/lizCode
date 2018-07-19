@@ -155,6 +155,17 @@ void SmileiIO_Cart3D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         data_file_name = "data/data" + to_string(ndims_t_temp) + ".h5";
         data_file_id = H5Fcreate( data_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
+        // ============= write attributes, n_dim: number of dimension ======================
+        hid_t attrs_dataspace_id, attrs_id;
+        int n_dim = 3;
+        hsize_t attrs_dims[1];
+        attrs_dims[0] = 1;
+        attrs_dataspace_id = H5Screate_simple(1, attrs_dims, NULL);
+        attrs_id           = H5Acreate2(data_file_id, "n_dim", H5T_STD_I32BE, attrs_dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+        H5Awrite(attrs_id, H5T_NATIVE_INT, &n_dim);
+        H5Sclose(attrs_dataspace_id);
+        H5Aclose(attrs_id);
+
         // =============write fields============================================
         fieldsGroup.group_id = H5Gcreate(data_file_id, "/Fields", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);
         for(int i = 0; i < fieldsGroup.dataset_stringName.size(); i++)

@@ -36,16 +36,25 @@ class ApplicationWindow(QMainWindow):
         hSplitter = QSplitter(self.main_widget)
         layout.addWidget(hSplitter)
 
+        #number of space dimension
+        self.n_dim = 1
 
         #> the left part: the hdf5 tree view
         self.filename_data = "data/data0.h5"
         self.filename_grid = "data/grid.h5"
+
         self.tree_widget = HDFTreeWidget(self.main_widget)
         self.tree_model = HDFTreeModel([])
         if os.path.exists(self.filename_data):
             self.tree_model.openFile(self.filename_data, 'r+')
+            h5_file = h5.File(self.filename_data)
+            self.n_dim = h5_file.attrs['n_dim']
+            print("n_dim: ", self.n_dim)
         if os.path.exists(self.filename_grid):
             self.tree_model.openFile(self.filename_grid, 'r+')
+            h5_file = h5.File(self.filename_grid)
+            self.n_dim = h5_file.attrs['n_dim']
+            print("n_dim: ", self.n_dim)
         self.tree_widget.setModel(self.tree_model)
         hSplitter.addWidget(self.tree_widget)
 
@@ -53,7 +62,13 @@ class ApplicationWindow(QMainWindow):
         self.sigOpen.connect(self.tree_widget.openFiles)
         
         #> plotWidget
-        self.plot_widget = PlotWidget(self.main_widget)
+        if self.n_dim == 1:
+            self.plot_widget = PlotWidget1D(self.main_widget)
+        elif self.n_dim == 2:
+            self.plot_widget = PlotWidget2D(self.main_widget)
+        elif self.n_dim == 3:
+            self.plot_widget = PlotWidget3D(self.main_widget)
+
         hSplitter.addWidget(self.plot_widget)
 
         hSplitter.setStretchFactor(0, 2)
