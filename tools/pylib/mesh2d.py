@@ -395,14 +395,14 @@ class Grid2D:
         fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
 
         ##============ is_wall ======================================================
-        nx = is_wall.shape[0]
-        ny = is_wall.shape[1]
+        nx = self.is_wall.shape[1]
+        ny = self.is_wall.shape[2]
         dx=1.0
         dy=1.0
         x, y=np.mgrid[slice(0.0,dx*nx,dx), slice(0.0,dy*ny,dy)]
 
         ax0=fig.add_subplot(2,2,1)
-        contourf0 = ax0.contourf(x, y, is_wall, level_num, cmap=cm.get_cmap('jet'))
+        contourf0 = ax0.contourf(x, y, self.is_wall[0], level_num, cmap=cm.get_cmap('jet'))
 
         ax0.set_title(r"$\mathrm{is\_wall}$", color='#1f77b4', fontsize = label_fontsize)
 
@@ -430,7 +430,7 @@ class Grid2D:
 
         ##============ bndr_type ======================================================
         ax0=fig.add_subplot(2,2,3)
-        contourf0 = ax0.contourf(x, y, bndr_type, level_num, cmap=cm.get_cmap('jet'))
+        contourf0 = ax0.contourf(x, y, self.bndr_type[0], level_num, cmap=cm.get_cmap('jet'))
 
         ax0.set_title(r"$\mathrm{bndr\_type}$", color='#1f77b4', fontsize = label_fontsize)
         #ax0.axis('equal')
@@ -441,7 +441,7 @@ class Grid2D:
 
         ##============ bndr_val ======================================================
         ax0=fig.add_subplot(2,2,4)
-        contourf0 = ax0.contourf(x, y, bndr_val, level_num, cmap=cm.get_cmap('jet'))
+        contourf0 = ax0.contourf(x, y, self.bndr_val[0], level_num, cmap=cm.get_cmap('jet'))
 
         ax0.set_title(r"$\mathrm{bndr\_val}$", color='#1f77b4', fontsize = label_fontsize)
         #ax0.axis('equal')

@@ -382,16 +382,16 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         data_file_name = "data/data" + to_string(ndims_t_temp) + ".h5";
         data_file_id = H5Fcreate( data_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-        // ============= write n_dim: number of dimension ======================
-        hid_t n_dim_dataspace_id, n_dim_dataset_id;
+        // ============= write attributes, n_dim: number of dimension ======================
+        hid_t attrs_dataspace_id, attrs_id;
         int n_dim = 1;
-        hsize_t n_dim_dims[1];
-        n_dim_dims[0] = 1;
-        n_dim_dataspace_id = H5Screate_simple(1, n_dim_dims, NULL);
-        n_dim_dataset_id   = H5Dcreate2(data_file_id, "n_dim", H5T_NATIVE_INT, n_dim_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        H5Dwrite(n_dim_dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &n_dim);
-        H5Sclose(n_dim_dataspace_id);
-        H5Dclose(n_dim_dataset_id);
+        hsize_t attrs_dims[1];
+        attrs_dims[0] = 1;
+        attrs_dataspace_id = H5Screate_simple(1, attrs_dims, NULL);
+        attrs_id           = H5Acreate2(data_file_id, "n_dim", H5T_STD_I32BE, attrs_dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+        H5Awrite(attrs_id, H5T_NATIVE_INT, &n_dim);
+        H5Sclose(attrs_dataspace_id);
+        H5Aclose(attrs_id);
 
         // =============write fields============================================
         fieldsGroup.group_id = H5Gcreate(data_file_id, "/Fields", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);

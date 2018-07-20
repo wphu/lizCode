@@ -7,8 +7,8 @@ import math
 method = 'explicit'
 
 l0 = 1.0e-5
-nx = 1000
-ny = 2000
+nx = 100
+ny = 200
 Lsim = [nx*l0,ny*l0]
 
 t0 = 1.0e-12

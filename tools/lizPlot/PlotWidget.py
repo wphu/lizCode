@@ -135,7 +135,80 @@ class MyStaticMplCanvas2D(MyMplCanvas):
         self.ani = animation.FuncAnimation(self.fig, self.update_figure, self.data3d.shape[0], blit=False, interval=500, repeat=False)
         self.ani.save('movie.gif', writer='imagemagick')
 
-     
+class MyStaticMplCanvas3D(MyMplCanvas):
+    """Simple canvas with a sine plot."""
+    def compute_initial_figure(self, data4d = None, title = None):
+        self.fig.clear()
+        self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
+        self.axes1 = self.fig.add_subplot(111)
+
+        self.data4d = data4d
+        self.title = title
+
+        self.i_time = 0
+        # i_direction = 0 for xy plane,  1 for yz plane, 2 for zx plane
+        self.i_direction = 0
+        self.i_position = 0
+        self.data2d = self.data4d[self.i_time,:,:,self.i_position]
+        nx = self.data2d.shape[0]
+        ny = self.data2d.shape[1]
+        dx = 1.0
+        dy = 1.0
+        self.x,self.y=np.mgrid[slice(dx,dx*(nx+1),dx), slice(dy,dy*(ny+0.5),dy)]
+        levels=MaxNLocator(nbins=100).tick_values(self.data2d.min(),self.data2d.max())
+
+        if(self.data2d.min() == self.data2d.max()):
+        	ticks_val=np.linspace(self.data2d.min(),self.data2d.max()+1.0,5)
+        else:
+        	ticks_val=np.linspace(self.data2d.min(),self.data2d.max(),5)
+        self.cf = self.axes1.contourf(self.x,self.y,self.data2d,cmap=cm.get_cmap('jet'),levels=levels)
+        self.fig.colorbar(self.cf,ticks=ticks_val)
+
+
+
+        self.axes1.axis([self.x.min(),self.x.max(),self.y.min(),self.y.max()])
+        self.axes1.set_yticks(np.arange(0,self.y.max(),100))
+        self.axes1.set_title(self.title)
+        self.axes1.set_xlabel('x(mm)')
+        self.axes1.set_ylabel('y(mm)')
+        self.axes1.set_aspect('equal', adjustable='box')
+
+    def update_figure(self, i_time, i_direction, i_position):
+        self.fig.clear()
+        self.fig.subplots_adjust(top=0.85, bottom=0.2, left=0.2)
+        self.axes1 = self.fig.add_subplot(111)
+
+        if i_direction == 0:
+            self.data2d = self.data4d[i_time,:,:,i_position]
+        if i_direction == 1:
+            self.data2d = self.data4d[i_time,i_position,:,:]
+        if i_direction == 2:
+            self.data2d = self.data4d[i_time,:,i_position,:]
+
+        levels=MaxNLocator(nbins=100).tick_values(self.data2d.min(),self.data2d.max())
+
+        if(self.data2d.min() == self.data2d.max()):
+        	ticks_val=np.linspace(self.data2d.min(),self.data2d.max()+1.0,5)
+        else:
+        	ticks_val=np.linspace(self.data2d.min(),self.data2d.max(),5)
+
+        self.cf = self.axes1.contourf(self.x,self.y,self.data2d,cmap=cm.get_cmap('jet'),levels=levels)
+        self.fig.colorbar(self.cf,ticks=ticks_val)
+
+
+
+        self.axes1.axis([self.x.min(),self.x.max(),self.y.min(),self.y.max()])
+        self.axes1.set_yticks(np.arange(0,self.y.max(),100))
+        self.axes1.set_title(self.title)
+        self.axes1.set_xlabel('x(mm)')
+        self.axes1.set_ylabel('y(mm)')
+        self.axes1.set_aspect('equal', adjustable='box')
+
+    def save_animation(self):
+        self.ani = animation.FuncAnimation(self.fig, self.update_figure, self.data3d.shape[0], blit=False, interval=500, repeat=False)
+        self.ani.save('movie.gif', writer='imagemagick')
+
+   
 class PlotWidget1D(QWidget):
     """docstring for PlotWidget"""
     def __init__(self, parent = None):
@@ -366,12 +439,12 @@ class PlotWidget3D(QWidget):
         self.tab_widget = QTabWidget(self)
         self.plotVboxlayout.addWidget(self.tab_widget)
         
+        self.i_time = 0
+        self.i_direction = 0
+        self.i_position = 0
+
         # matplotlib figure tab
-        #self.matplotlib_widget = MatplotlibWidget(self.tab_widget,self.data4d[0,0,:,:])
-        if self.data4d.shape[2] == 1:
-            self.sc = MyStaticMplCanvas1D(self, self.data4d, title = self.dataName)
-        else:
-            self.sc = MyStaticMplCanvas2D(self, self.data4d, title = self.dataName)
+        self.sc = MyStaticMplCanvas3D(self, self.data4d, title = self.dataName)
         self.sc.draw()
         self.tab_widget.addTab(self.sc, "Figures")
         
@@ -399,22 +472,22 @@ class PlotWidget3D(QWidget):
         self.button_zx_plane.clicked.connect(self.zx_plane_selected)
 
         # slider widget for one direction of space dimension
-        self.position_selection_widget = QWidget(self)
-        self.position_selection_layout = QHBoxLayout(self.position_selection_widget)
+        self.position_widget = QWidget(self)
+        self.position_layout = QHBoxLayout(self.position_widget)
 
-        self.direction_label = QLabel("space direction")
-        self.direction_plainTextEdit = QTextEdit("0")
-        self.direction_plainTextEdit.setMaximumHeight(20)
-        self.direction_plainTextEdit.setMaximumWidth(100)
-        self.direction_slider = QSlider(QtCore.Qt.Horizontal)
-        self.direction_slider.setMinimum(0)
-        self.direction_slider.setMaximum(self.data4d.shape[3] - 1)
-        self.direction_slider.setTickPosition(QSlider.TicksBelow)
-        self.direction_slider.setTickInterval(1)
-        self.direction_slider.valueChanged.connect(self.positionChange)
-        self.position_selection_layout.addWidget(self.direction_label)
-        self.position_selection_layout.addWidget(self.direction_plainTextEdit)
-        self.position_selection_layout.addWidget(self.direction_slider)
+        self.position_label = QLabel("space direction")
+        self.position_plainTextEdit = QTextEdit("0")
+        self.position_plainTextEdit.setMaximumHeight(20)
+        self.position_plainTextEdit.setMaximumWidth(100)
+        self.position_slider = QSlider(QtCore.Qt.Horizontal)
+        self.position_slider.setMinimum(0)
+        self.position_slider.setMaximum(self.data4d.shape[3] - 1)
+        self.position_slider.setTickPosition(QSlider.TicksBelow)
+        self.position_slider.setTickInterval(1)
+        self.position_slider.valueChanged.connect(self.positionChange)
+        self.position_layout.addWidget(self.position_label)
+        self.position_layout.addWidget(self.position_plainTextEdit)
+        self.position_layout.addWidget(self.position_slider)
 
         # The slider widget for time dimension
         self.sp_widget = QWidget(self)
@@ -447,51 +520,60 @@ class PlotWidget3D(QWidget):
 
         #self.plotVboxlayout.addWidget(self.sc)
         self.plotVboxlayout.addWidget(self.direction_selection_widget)
-        self.plotVboxlayout.addWidget(self.position_selection_widget)
+        self.plotVboxlayout.addWidget(self.position_widget)
         self.plotVboxlayout.addWidget(self.sp_widget)
         self.plotVboxlayout.addWidget(self.save_widget)
 
     def reloadData(self, prefix, dataSetFullName):
         self.prefix = prefix
         self.dataName = dataSetFullName.rsplit('/')[-1]
-        self.data4d = collect(dataSetFullName, prefix=self.prefix)
-        self.sc.compute_initial_figure(self.data4d, self.dataName)
-        self.sc.draw()
-        self.set_data_widget(self.data4d[0,0,:,:])
-        self.sp.setMaximum(self.data4d.shape[0]-1)
+        self.sc.data4d = collect(dataSetFullName, prefix=self.prefix)
+        self.sp.setMaximum(self.sc.data4d.shape[0] - 1)
         self.sp.setValue(0)
-
-
-
-    def timeChange(self):
-        t = self.sp.value()
-        self.sc.update_figure(t)
-        self.sc.draw()
-        self.set_data_widget(self.data4d[t,0,:,:])
-        self.plainTextEdit.setText(str(self.sp.value()))
+        self.xy_plane_selected()
 
     def xy_plane_selected(self):
         #self.button_xy_plane.toggle()
         self.button_xy_plane.setChecked(True)
         self.button_yz_plane.setChecked(False)
         self.button_zx_plane.setChecked(False)
+        self.i_direction = 0
+        self.i_time = 0
+        self.i_position = 0
+        self.position_slider.setMaximum(self.data4d.shape[3] - 1)
+        self.position_slider.setValue(0)
+        self.update()
+
 
     def yz_plane_selected(self):
         self.button_xy_plane.setChecked(False)
         self.button_yz_plane.setChecked(True)
         self.button_zx_plane.setChecked(False)
+        self.i_direction = 1
+        self.i_time = 0
+        self.i_position = 0
+        self.position_slider.setMaximum(self.data4d.shape[1] - 1)
+        self.position_slider.setValue(0)
+        self.update()
 
     def zx_plane_selected(self):
         self.button_xy_plane.setChecked(False)
         self.button_yz_plane.setChecked(False)
         self.button_zx_plane.setChecked(True)
+        self.i_direction = 2
+        self.i_time = 0
+        self.i_position = 0
+        self.position_slider.setMaximum(self.data4d.shape[2] - 1)
+        self.position_slider.setValue(0)
+        self.update()
+
+    def timeChange(self):
+        self.i_time = self.sp.value()
+        self.update()
 
     def positionChange(self):
-        t = self.sp.value()
-        self.sc.update_figure(t)
-        self.sc.draw()
-        self.set_data_widget(self.data4d[t,0,:,:])
-        self.plainTextEdit.setText(str(self.sp.value()))
+        self.i_position = self.position_slider.value()
+        self.update()
 
     def set_data_widget(self, data2d):
         self.data_widget.setRowCount(data2d.shape[0])
@@ -501,8 +583,14 @@ class PlotWidget3D(QWidget):
                 newItem = QTableWidgetItem( str( round(data2d[i,j]) ) )
                 self.data_widget.setItem(i, j, newItem)
 
+    def update(self):
+        self.sc.update_figure(self.i_time, self.i_direction, self.i_position)
+        self.sc.draw()
+        self.set_data_widget(self.sc.data2d)
+        self.plainTextEdit.setText(str(self.sp.value()))
+
     def save_fig(self):
-        filename = "fig" + str(self.sp.value()) + ".pdf"
+        filename = "fig" + str(self.sp.value()) + ".png"
         self.sc.fig.savefig(filename)
 
     def save_animation(self):
