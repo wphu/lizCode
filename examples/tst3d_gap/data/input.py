@@ -235,6 +235,7 @@ PartSource(
 	loadPos_Yend 	= ny*l0,
 	loadPos_Zstart 	= (nz - sourceLength)*l0,
 	loadPos_Zend 	= nz*l0,
+	step_update		= 5,
 
 )
 
@@ -255,4 +256,5 @@ PartSource(
 	loadPos_Yend 	= ny*l0,
 	loadPos_Zstart 	= (nz - sourceLength)*l0,
 	loadPos_Zend 	= nz*l0,
+	step_update		= 5,
 )
