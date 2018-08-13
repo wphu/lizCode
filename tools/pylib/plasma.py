@@ -13,6 +13,7 @@ Bangle = (180.0 - 5.0) * math.pi / 180.0
 # mass of H: 1.67262158e-27, D: 2.0 * 1.67262158e-27, T: 3.0 * 1.67262158e-27
 me = 9.109382616e-31
 mi = 2.0 * 1.67262158e-27
+mr = me * mi / ( me + mi )
 qi = 1
 
 debye_length_e      = math.sqrt(const.epsilon_0 * Te / (ne * const.e))
@@ -49,6 +50,26 @@ print(" ")
 
 print("==========================================")
 print("particle_flux:    ", particle_flux)
+print("==========================================")
+print(" ")
+
+
+# ===================== classical plasma diffusion coeffiecience in magnetic ==================
+#coulomb logarithm from  ref: https://farside.ph.utexas.edu/teaching/plasma/Plasma/node39.html
+def fun_coulomb_log(ne, Te):
+    if Te < 10.0:
+        return 23.0 - math.log( math.pow(ne * 1.0e-6, 0.5) * math.pow(Te, -1.5) )
+    else:
+        return 24.0 - math.log( math.pow(ne * 1.0e-6, 0.5) * math.pow(Te, -1.0) )
+
+coulomb_log0 = math.log( math.sqrt( const.epsilon_0 * Te * const.e / ( ne * const.e * const.e ) ) 
+              / ( qi * const.e * qi * const.e / ( 4.0 * const.pi * const.epsilon_0 * Te * const.e) ) )
+
+coulomb_log0_fun = fun_coulomb_log(ne, Te)
+
+print("==========================================")
+print("coulomb logarithm:                  ", coulomb_log0)
+print("coulomb logarithm from function:    ", coulomb_log0_fun)
 print("==========================================")
 print(" ")
 
