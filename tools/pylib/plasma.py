@@ -1,8 +1,8 @@
 import math
 from scipy import constants as const
 
-Te = 25.0
-Ti = 50.0
+Te = 30.0
+Ti = 30.0
 
 ne = 2.0e18
 ni = 2.0e18

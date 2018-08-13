@@ -185,6 +185,12 @@ class MyStaticMplCanvas3D(MyMplCanvas):
         if i_direction == 2:
             self.data2d = self.data4d[i_time,:,i_position,:]
 
+        nx = self.data2d.shape[0]
+        ny = self.data2d.shape[1]
+        dx = 1.0
+        dy = 1.0
+        self.x,self.y=np.mgrid[slice(dx,dx*(nx+1),dx), slice(dy,dy*(ny+0.5),dy)]
+
         levels=MaxNLocator(nbins=100).tick_values(self.data2d.min(),self.data2d.max())
 
         if(self.data2d.min() == self.data2d.max()):
