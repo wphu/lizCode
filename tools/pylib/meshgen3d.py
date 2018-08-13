@@ -21,6 +21,8 @@ if __name__ == "__main__":
     nz_wall_boundary = int(0.5e-3 / dz) + nz_base
     nz_wall_max = nz - nz_source - 5
 
+    print("gap height is : ", nz_wall_boundary)
+
     wall_potential = -60.0
 
     is_wall     = np.zeros((nx+1, ny+1, nz+1), dtype = 'int')
