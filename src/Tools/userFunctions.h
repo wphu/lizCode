@@ -7,7 +7,6 @@ public:
 
     static double erfinv(double x);
     static double erfinv2(double x);
-    static bool is_nan(double dVal);
     static int isFiniteNumber(double d);
 
     //generate a gaussian random number R: mean=0, mean square=1.0

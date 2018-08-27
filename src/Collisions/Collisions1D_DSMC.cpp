@@ -369,7 +369,7 @@ void Collisions1D_DSMC::SELECT(int ibin, vector<Species*>& vecSpecies)
     				pow( 2.*BOLTZ*species_interaction[iSpeciesListL][iSpeciesListM].ref_temp/(species_interaction[iSpeciesListL][iSpeciesListM].reduced_mass*VRR),
     				species_interaction[iSpeciesListL][iSpeciesListM].visc_temp_index-0.5 ) /
                     species_interaction[iSpeciesListL][iSpeciesListM].gamma;
-    if( isnan(CVR) || isinf(CVR) )
+    if( std::isnan(CVR) || std::isinf(CVR) )
     {
         CVR = 0.0;
         cout<<"DSMC error !!!"<<endl;

@@ -202,7 +202,7 @@ public:
         double cosX = ( 2.0 + ke - 2.0 * pow(1.0+ke, ra) ) / ke;
         //double cosX = 1.0 - 2.0 * ra;
         double sinX = sqrt(1.0 - abs(cosX * cosX) );
-        while( cosX*cosX > 1.0 || isnan(sinX) )
+        while( cosX*cosX > 1.0 || std::isnan(sinX) )
         {
             ra = (double)rand() / RAND_MAX;
             cosX = ( 2.0 + ke - 2.0 * pow(1.0+ke, ra) ) / ke;

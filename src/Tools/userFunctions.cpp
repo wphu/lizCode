@@ -71,15 +71,6 @@ double userFunctions::erfinv2 (double x)
 }
 
 
-bool userFunctions::is_nan(double dVal)
-{
-    if (dVal==dVal) {
-        return false;
-    }
-    return true;
- }
-
-
 int userFunctions::isFiniteNumber(double d)
 {
     return (d<=DBL_MAX&&d>=-DBL_MAX);
