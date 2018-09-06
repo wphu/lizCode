@@ -468,12 +468,14 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
     ierr = KSPSetOperators(ksp,A,A);CHKERRV(ierr);
 
     // set KSP solver type: KSPGMRES, KSPCG, KSPCR, KSPCGS, KSPBCGS
-    // KSPCG, KSPCR is about 5 times faster than KSPGMRES, KSPCGS
-    ierr = KSPSetType(ksp, KSPCG); CHKERRV(ierr);
+    // KSPCG, KSPCR do not give right solution
+    ierr = KSPSetType(ksp, KSPGMRES); CHKERRV(ierr);
 
-    // set precondition: PCGAMG
+    // set precondition: PCGAMG, PCILU, PCJACOBI, PCBJACOBI, PCSOR, PCEISENSTAT, PCICC
+    //                   PCASM, PCBDDC, PCKSP, PCCOMPOSITE
+    // PCSOR is fastest
     //ierr = KSPGetPC(ksp, &pc); CHKERRV(ierr);
-    //ierr = PCSetType(pc, PCGAMG); CHKERRV(ierr);
+    //ierr = PCSetType(pc, PCSOR); CHKERRV(ierr);
 
     /*
         Set linear solver defaults for this problem (optional).
@@ -485,7 +487,7 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
         KSPSetFromOptions().  All of these defaults can be
         overridden at runtime, as indicated below.
     */
-    ierr = KSPSetTolerances(ksp,1.e-2/ncp,1.e-10,PETSC_DEFAULT,
+    ierr = KSPSetTolerances(ksp,1.0e-4,PETSC_DEFAULT,PETSC_DEFAULT,
                             PETSC_DEFAULT);CHKERRV(ierr);
 
     /*
@@ -572,7 +574,7 @@ void EF_Solver3D_PETSc_KSP::solve_PETSc_KSP(Field* rho, Field* phi)
         print statement from all processes that share a communicator.
         An alternative is PetscFPrintf(), which prints to a file.
     */
-    //ierr = PetscPrintf(PETSC_COMM_WORLD,"Norm of error %g iterations %D\n",(double)norm,its);CHKERRV(ierr);
+    ierr = PetscPrintf(PETSC_COMM_WORLD,"Norm of error %g iterations %D\n",(double)norm,its);CHKERRV(ierr);
 
 
 
