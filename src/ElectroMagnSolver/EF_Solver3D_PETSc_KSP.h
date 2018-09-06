@@ -67,6 +67,7 @@ protected:
     Vec            x_seq;    /* global vector x */
     Mat            A;        /* linear system matrix */
     KSP            ksp;      /* linear solver context */
+    PC             pc;       // PreCondition
     PetscRandom    rctx;     /* random number generator context */
     PetscReal      norm;     /* norm of solution error */
     PetscInt       I,J,Istart,Iend,its;

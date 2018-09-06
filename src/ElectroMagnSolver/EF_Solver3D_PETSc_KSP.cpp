@@ -467,6 +467,14 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
     */
     ierr = KSPSetOperators(ksp,A,A);CHKERRV(ierr);
 
+    // set KSP solver type: KSPGMRES, KSPCG, KSPCR,KSPCGS
+    // KSPCG, KSPCR is about 5 times faster than KSPGMRES, KSPCGS
+    ierr = KSPSetType(ksp, KSPCG); CHKERRV(ierr);
+
+    // set precondition
+    //ierr = KSPGetPC(ksp, &pc); CHKERRV(ierr);
+    //ierr = PCSetType(pc, PCGAMG); CHKERRV(ierr);
+
     /*
         Set linear solver defaults for this problem (optional).
         - By extracting the KSP and PC contexts from the KSP context,
