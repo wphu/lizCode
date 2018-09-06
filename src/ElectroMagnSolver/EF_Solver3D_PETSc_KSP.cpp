@@ -467,11 +467,11 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
     */
     ierr = KSPSetOperators(ksp,A,A);CHKERRV(ierr);
 
-    // set KSP solver type: KSPGMRES, KSPCG, KSPCR,KSPCGS
+    // set KSP solver type: KSPGMRES, KSPCG, KSPCR, KSPCGS, KSPBCGS
     // KSPCG, KSPCR is about 5 times faster than KSPGMRES, KSPCGS
     ierr = KSPSetType(ksp, KSPCG); CHKERRV(ierr);
 
-    // set precondition
+    // set precondition: PCGAMG
     //ierr = KSPGetPC(ksp, &pc); CHKERRV(ierr);
     //ierr = PCSetType(pc, PCGAMG); CHKERRV(ierr);
 
