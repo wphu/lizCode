@@ -357,6 +357,8 @@ void EF_Solver3D_SLU::initSLU()
     options.DiagPivotThresh = u;
     options.Trans = trans;
 
+    sp_ienv(2);
+
     m = grid3D->ncp;
     n = grid3D->ncp;
     nrhs = 1;

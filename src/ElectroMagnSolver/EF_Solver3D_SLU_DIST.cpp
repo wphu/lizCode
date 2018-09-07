@@ -27,11 +27,13 @@ Solver3D(params)
     npcol = params.number_of_procs[1];
 
     // Now ensure that one compute node is used to solve SuperLU
+    /*
     if(nprow * npcol > 20)
     {
         nprow = 2;
         npcol = 2;
     }
+    */
 
     grid3D = static_cast<Grid3D*>(grid);
     initSLU();
