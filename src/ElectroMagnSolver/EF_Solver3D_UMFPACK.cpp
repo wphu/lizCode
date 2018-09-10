@@ -313,11 +313,15 @@ void EF_Solver3D_UMFPACK::initUMFPACK()
     MESSAGE("Temporary A has been structrued, n = "<<grid3D->ncp<<" nnz = "<<nnz);
 
     n = grid3D->ncp;
-    Ap = new int[grid3D->ncp + 1];
-    Ai = new int[nnz];
+    Ap = new SuiteSparse_long[n + 1];
+    Ai = new SuiteSparse_long[nnz];
     Ax = new double[nnz];
     rhsb  = new double[n];
     rhsx  = new double[n];
+    for(int i = 0; i < n; i++)
+    {
+        rhsx[i] = 500.0;
+    }
 
     i_ncp=0;
     i_nnz=0;
@@ -349,10 +353,21 @@ void EF_Solver3D_UMFPACK::initUMFPACK()
     
     cout<<"begin factorizing......"<<endl;
 
-    (void) umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, null, null);
-    (void) umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, null, null);
-    umfpack_di_free_symbolic(&Symbolic);
-    (void) umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, rhsx, rhsb, Numeric, null, null);
+    //get the default control parameters
+    umfpack_dl_defaults (Control) ;
+
+    status = umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic, Control, Info);
+    umfpack_dl_report_info(Control, Info);
+    umfpack_dl_report_status(Control, status) ;
+    printf ("\nSymbolic factorization of A: ") ;
+    (void) umfpack_dl_report_symbolic (Symbolic, Control) ;
+
+    status = umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric, Control, Info);
+    umfpack_dl_report_info(Control, Info);
+    umfpack_dl_report_status(Control, status) ;
+    // print the numeric factorization
+    printf ("\nNumeric factorization of A: ") ;
+    (void) umfpack_dl_report_numeric (Numeric, Control) ;
 
     cout<<"end factorizing......"<<endl;
 
@@ -402,12 +417,11 @@ void EF_Solver3D_UMFPACK::solve_UMFPACK(Field* rho, Field* phi)
     }//>>>end convert
 
 
+    status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, rhsx, rhsb, Numeric, Control, Info);
+    umfpack_dl_report_info(Control, Info) ;
+    umfpack_dl_report_status(Control, status) ;
 
-    (void) umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, rhsx, rhsb, Numeric, null, null);
-
-    //printf("Triangular solve: dgssvx() returns info %d\n", info);
-
-   //>>>convert SuperLU solution X to Field3D phi
+   //>>>convert  solution X to Field3D phi
     ii=0;
     for(int i=0; i<nx; i++)
     {
@@ -504,7 +518,8 @@ void EF_Solver3D_UMFPACK::solve_Exyz(Field* phi, Field* Ex, Field* Ey, Field* Ez
 
 void EF_Solver3D_UMFPACK::finishUMFPACK()
 {
-    umfpack_di_free_numeric(&Numeric);
+    umfpack_dl_free_symbolic(&Symbolic);
+    umfpack_dl_free_numeric(&Numeric);
 }
 
 #endif // for SuperLU_type == serial

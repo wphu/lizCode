@@ -45,16 +45,19 @@ public:
 protected:
 
     // for umfpack
-    int             n;
-    int             nnz;
-    int             *Ap;
-    int             *Ai;
+    SuiteSparse_long             n;
+    SuiteSparse_long             nnz;
+    SuiteSparse_long             *Ap;
+    SuiteSparse_long             *Ai;
     double          *Ax;
     double          *rhsb;
     double          *rhsx;
     double          *null;
     void            *Symbolic;
     void            *Numeric;
+    double          Info[UMFPACK_INFO];
+    double          Control[UMFPACK_CONTROL];
+    SuiteSparse_long             status;
 
 
 
