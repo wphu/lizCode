@@ -78,7 +78,7 @@ PicParams::PicParams(InputData &ifile) {
 
     // poisson solver
     ifile.extract("poisson_solver", poisson_solver);
-    if (poisson_solver != "SuperLU_serial" && poisson_solver != "SuperLU_mpi" && poisson_solver != "petsc") {
+    if (poisson_solver != "SuperLU_serial" && poisson_solver != "SuperLU_mpi" && poisson_solver != "petsc" && poisson_solver != "umfpack") {
         poisson_solver = "SuperLU_serial";
         MESSAGE("default poisson_solver is used: SuperLU_serial ");
     }

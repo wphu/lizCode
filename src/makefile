@@ -39,6 +39,12 @@ CFLAGS 		+= -I${petsc_dir}/include
 LDFLAGS 	+= -L${petsc_dir}/lib -lpetsc -lz
 endif
 
+# for umfpack library
+ifeq ($(umfpack),yes)
+CFLAGS 		+= -Dumfpack
+CFLAGS 		+= -I${SuiteSparse_dir}/include
+LDFLAGS 	+= -L${SuiteSparse_dir}/lib -lumfpack
+endif
 
 # ============== hdf5 libary =========== 
 CFLAGS 		+= -I${hdf5_dir}/include

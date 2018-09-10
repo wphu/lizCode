@@ -12,6 +12,7 @@
 #include "EF_Solver3D_SLU.h"
 #include "EF_Solver3D_SLU_DIST.h"
 #include "EF_Solver3D_PETSc_KSP.h"
+#include "EF_Solver3D_UMFPACK.h"
 #include "InputData.h"
 #include "PicParams.h"
 
@@ -80,6 +81,12 @@ public:
             {
                 #ifdef petsc
                 solver = new EF_Solver3D_PETSc_KSP(params, grid, smpi);
+                #endif
+            }
+            if(params.poisson_solver == "umfpack")
+            {
+                #ifdef umfpack
+                solver = new EF_Solver3D_UMFPACK(params, grid, smpi);
                 #endif
             }
         }
