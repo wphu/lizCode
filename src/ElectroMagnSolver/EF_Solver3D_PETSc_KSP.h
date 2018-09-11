@@ -61,6 +61,7 @@ protected:
     int nnz;
     int petsc_ksp_mpi_rank;
     int petsc_ksp_mpi_size;
+    double petsc_ksp_tolerance_rtol;
 
     // ======================== variables for PETSc_KSP ===================
     Vec            x,b,u;    /* approx solution, RHS, exact solution */

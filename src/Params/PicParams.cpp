@@ -247,6 +247,14 @@ PicParams::PicParams(InputData &ifile) {
             petsc_ksp_process_number *= number_of_procs[i];
         }
     }
+
+    if( !ifile.extract("petsc_ksp_tolerance_rtol", petsc_ksp_tolerance_rtol) )
+    {
+        petsc_ksp_tolerance_rtol = 1.0e-5;
+        WARNING("petsc_ksp_tolerance_rtol is set as the default value: 1.0e-5");
+
+    }
+
     int total_number_process = 1;
     for(int i = 0; i < number_of_procs.size(); i++)
     {

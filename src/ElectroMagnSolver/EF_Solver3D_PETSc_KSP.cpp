@@ -21,6 +21,7 @@ Solver3D(params)
     dy = params.cell_length[1];
     dz = params.cell_length[2];
     dxx = dx * dx;
+    petsc_ksp_tolerance_rtol = params.petsc_ksp_tolerance_rtol;
 
     grid3D = static_cast<Grid3D*>(grid);
 
@@ -487,7 +488,7 @@ void EF_Solver3D_PETSc_KSP::init_PETSc_KSP()
         KSPSetFromOptions().  All of these defaults can be
         overridden at runtime, as indicated below.
     */
-    ierr = KSPSetTolerances(ksp,1.0e-4,PETSC_DEFAULT,PETSC_DEFAULT,
+    ierr = KSPSetTolerances(ksp,petsc_ksp_tolerance_rtol,PETSC_DEFAULT,PETSC_DEFAULT,
                             PETSC_DEFAULT);CHKERRV(ierr);
 
     /*

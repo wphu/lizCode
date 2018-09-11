@@ -203,6 +203,7 @@ public:
     std::string poisson_solver;
 
     int petsc_ksp_process_number;
+    double petsc_ksp_tolerance_rtol;
 
     // theta of pushing particles for implicit method
     double imp_theta;
