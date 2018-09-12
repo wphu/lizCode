@@ -79,7 +79,7 @@ ifeq ($(config),debug)
 	CFLAGS 		+= -g -D__DEBUG -O0# -shared-intel
 	LDFLAGS 	+= -g -lprofiler
 else
-	CFLAGS 		+= -O3#  -xHost -ipo
+	CFLAGS 		+= -Ofast#  -xHost -ipo
 endif
 
 
