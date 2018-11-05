@@ -372,7 +372,7 @@ void EF_Solver2D_SLU::initSLU()
 
     dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
            &L, &U, work, lwork, &B, &X, &rpg, &rcond, ferr, berr,
-           &mem_usage, &stat, &info);
+           &Glu,  &mem_usage, &stat, &info);
 
     cout<<"end factorizing......"<<endl;
 
@@ -428,7 +428,7 @@ void EF_Solver2D_SLU::solve_SLU(Field* rho, Field* phi)
     StatInit(&stat);
     dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
            &L, &U, work, lwork, &B, &X, &rpg, &rcond, ferr, berr,
-           &mem_usage, &stat, &info);
+           &Glu, &mem_usage, &stat, &info);
 
     //printf("Triangular solve: dgssvx() returns info %d\n", info);
 

@@ -9,7 +9,7 @@ export third_part_codes_path=/home/huwanpeng/opt
 # google-perftools parameters
 #export CPUPROFILE=./liz.prof
 export CPUPROFILE_FREQUENCY=200
-export LD_PRELOAD=/usr/lib/libprofiler.so:$LD_PRELOAD
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libprofiler.so:$LD_PRELOAD
 
 # dependencies
 export anaconda3_dir=${third_part_codes_path}/anaconda3

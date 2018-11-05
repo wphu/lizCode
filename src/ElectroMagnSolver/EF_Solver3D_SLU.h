@@ -51,6 +51,7 @@ protected:
     NCformat       *Astore;
     NCformat       *Ustore;
     SCformat       *Lstore;
+    GlobalLU_t	   Glu;
     double         *a;
     int            *asub, *xa;
     int            *perm_c; /* column permutation vector */

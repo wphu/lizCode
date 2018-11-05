@@ -1,5 +1,5 @@
 /* ================================================================
-now only support SuperLU-4.3 serial version
+Ref: SuperLU_5.2.1/EXAMPLE/dlinsolx1.c
 ==================================================================*/
 #ifdef SuperLU_serial
 
@@ -51,6 +51,7 @@ protected:
     NCformat       *Astore;
     NCformat       *Ustore;
     SCformat       *Lstore;
+    GlobalLU_t	   Glu;
     double         *a;
     int            *asub, *xa;
     int            *perm_c; /* column permutation vector */

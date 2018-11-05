@@ -14,21 +14,23 @@ VERSION:="$(DESCRIBE)-$(BRANCH)"
 CFLAGS += -D__VERSION=\"$(VERSION)\" -D__COMMITDATE=\""$(COMMITDATE)"\"
 
 ####################################################
+# for SuperLU library
 ifeq ($(SuperLU_serial),yes)
 CFLAGS 			   += -DSuperLU_serial
 LIB_Blas			= $(SuperLU_dir)/lib/libblas.a
-LIB_SuperLU 		= $(SuperLU_dir)/lib/libsuperlu_4.3.a
+LIB_SuperLU 		= $(SuperLU_dir)/lib/libsuperlu.a
 LIBS 				= $(LIB_SuperLU) $(LIB_Blas)
-CFLAGS 			   += -I$(SuperLU_dir)/SRC
+CFLAGS 			   += -I$(SuperLU_dir)/include
 $(warning  $(CFLAGS))
 endif
 
+# for SuperLU_DIST library
 ifeq ($(SuperLU_mpi),yes)
 CFLAGS 			   += -DSuperLU_mpi
 LIB_Blas			= $(SuperLU_DIST_dir)/lib/libblas.a
 LIB_SuperLU_DIST 	= $(SuperLU_DIST_dir)/lib/libsuperlu_dist.a
 LIBS 				= $(LIB_SuperLU_DIST) $(LIB_Blas)
-CFLAGS 		       += -I$(SuperLU_DIST_dir)/SRC
+CFLAGS 		       += -I$(SuperLU_DIST_dir)/include
 $(warning  $(CFLAGS))
 endif
 
