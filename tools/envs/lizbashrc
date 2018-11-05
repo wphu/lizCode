@@ -1,9 +1,10 @@
-export SuperLU_mpi=yes
-#export SuperLU_serial=yes
-export petsc=yes
+export SuperLU_mpi=no
+export SuperLU_serial=yes
+export petsc=no
 export umfpack=no
 
 export lizHomePath=/home/huwanpeng/codes/lizCode
+export third_part_codes_path=/home/huwanpeng/opt
 
 # google-perftools parameters
 #export CPUPROFILE=./liz.prof
@@ -11,15 +12,15 @@ export CPUPROFILE_FREQUENCY=200
 export LD_PRELOAD=/usr/lib/libprofiler.so:$LD_PRELOAD
 
 # dependencies
+export anaconda3_dir=${third_part_codes_path}/anaconda3
 #export intel_compiler_dir=/home/wphu/opt/intel
-export mpich_dir=/opt/deepin15.6/mpich
-export hdf5_dir=/opt/deepin15.6/hdf5-mpich
-export SuperLU_dir=/opt/deepin15.6/SuperLU_4.3
-export SuperLU_DIST_dir=/opt/deepin15.6/SuperLU_DIST_5.3.0
-export anaconda3_dir=/opt/anaconda3
-export petsc_dir=/opt/deepin15.6/petsc
+export mpich_dir=${third_part_codes_path}/mpich
+export hdf5_dir=${third_part_codes_path}/hdf5-mpich
+export SuperLU_dir=${third_part_codes_path}/superlu
+export SuperLU_DIST_dir=${third_part_codes_path}/superlu_dist
+export petsc_dir=${third_part_codes_path}/petsc
 export petsc_arch=arch-linux2-c-debug
-#export SuiteSparse_dir=/home/huwanpeng/source-codes/SuiteSparse
+#export SuiteSparse_dir=${third_part_codes_path}/SuiteSparse
 
 #source ${intel_compiler_dir}/bin/compilervars.sh intel64
 export PATH=${mpich_dir}/bin:$PATH
