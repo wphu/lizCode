@@ -215,6 +215,7 @@ else
     cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
     make
     make install
+    cp CBLAS/libblas.a ${install_path_header}/${install_path}/lib/libblas.a
     cd ../..
 fi
 
