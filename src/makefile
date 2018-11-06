@@ -14,24 +14,20 @@ VERSION:="$(DESCRIBE)-$(BRANCH)"
 CFLAGS += -D__VERSION=\"$(VERSION)\" -D__COMMITDATE=\""$(COMMITDATE)"\"
 
 ####################################################
-# for SuperLU library
 ifeq ($(SuperLU_serial),yes)
 CFLAGS 			   += -DSuperLU_serial
 LIB_Blas			= $(SuperLU_dir)/lib/libblas.a
 LIB_SuperLU 		= $(SuperLU_dir)/lib/libsuperlu.a
-LIBS 				= $(LIB_SuperLU) $(LIB_Blas)
+LDFLAGS 		   += $(LIB_SuperLU) $(LIB_Blas)
 CFLAGS 			   += -I$(SuperLU_dir)/include
-$(warning  $(CFLAGS))
 endif
 
-# for SuperLU_DIST library
 ifeq ($(SuperLU_mpi),yes)
 CFLAGS 			   += -DSuperLU_mpi
 LIB_Blas			= $(SuperLU_DIST_dir)/lib/libblas.a
 LIB_SuperLU_DIST 	= $(SuperLU_DIST_dir)/lib/libsuperlu_dist.a
-LIBS 				= $(LIB_SuperLU_DIST) $(LIB_Blas)
+LDFLAGS 		   += $(LIB_SuperLU_DIST) $(LIB_Blas)
 CFLAGS 		       += -I$(SuperLU_DIST_dir)/include
-$(warning  $(CFLAGS))
 endif
 
 # for PETSc library
@@ -48,11 +44,14 @@ CFLAGS 		+= -I${SuiteSparse_dir}/include
 LDFLAGS 	+= -L${SuiteSparse_dir}/lib -lumfpack
 endif
 
-# ============== hdf5 libary =========== 
+# hdf5 libary
 CFLAGS 		+= -I${hdf5_dir}/include
 LDFLAGS 	+= -L${hdf5_dir}/lib -lhdf5 -lz
 
-LDFLAGS 	+= $(LIBS)
+# gperftools
+CFLAGS 		+= -I${gperftools_dir}/include
+LDFLAGS 	+= -L${gperftools_dir}/lib -lprofiler
+
 
 ####################################################
 #add subdirs
@@ -79,9 +78,9 @@ LDFLAGS 	+= -L${PATH_Python}/lib $(shell $(PYTHONCONFIG) --ldflags)
 
 ifeq ($(config),debug)
 	CFLAGS 		+= -g -D__DEBUG -O0# -shared-intel
-	LDFLAGS 	+= -g -lprofiler
+	LDFLAGS 	+= -g 
 else
-	CFLAGS 		+= -Ofast#  -xHost -ipo
+	CFLAGS 		+= -O3#  -xHost -ipo
 endif
 
 

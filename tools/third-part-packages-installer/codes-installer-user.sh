@@ -328,3 +328,19 @@ fi
 export CFLAGS=""
 export CPPFLAGS=""
 
+# install gperftools
+CC=${compiler_c}
+package=gperftools-2.7
+install_path=gperftools
+if [ -d ${install_path_header}/${install_path} ];then
+    echo "${package} has been installed"
+else
+    tar -xvf ${package}.tar.gz
+    tar -xvf ${package}.tar
+    tar -xvf ${package}.gz
+    cd ${package}
+    ./configure --prefix=${install_path_header}/${install_path}
+    make
+    make install
+    cd ..
+fi

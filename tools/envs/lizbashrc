@@ -15,12 +15,13 @@ export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libprofiler.so:$LD_PRELOAD
 export anaconda3_dir=${third_part_codes_path}/anaconda3
 #export intel_compiler_dir=/home/wphu/opt/intel
 export mpich_dir=${third_part_codes_path}/mpich
-export hdf5_dir=${third_part_codes_path}/hdf5-mpich
+export hdf5_dir=${third_part_codes_path}/hdf5
 export SuperLU_dir=${third_part_codes_path}/superlu
 export SuperLU_DIST_dir=${third_part_codes_path}/superlu_dist
 export petsc_dir=${third_part_codes_path}/petsc
 export petsc_arch=arch-linux2-c-debug
 #export SuiteSparse_dir=${third_part_codes_path}/SuiteSparse
+export gperftools_dir=${third_part_codes_path}/gperftools
 
 #source ${intel_compiler_dir}/bin/compilervars.sh intel64
 export PATH=${mpich_dir}/bin:$PATH
