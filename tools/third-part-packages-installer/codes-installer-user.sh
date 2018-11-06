@@ -280,9 +280,9 @@ else
     tar -xvf ${package}.tar.gz
     tar -xvf ${package}.tar
     tar -xvf ${package}.gz
-    mkdir examples
-    mkdir lib
+    cd ${package}
     mkdir sundials-build
+    cd sundials-build
 
     cmake \
     -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path} \
@@ -291,11 +291,11 @@ else
     -DLAPACK_ENABLE=ON \
     -DOPENMP_ENABLE=ON \
     -DMPI_ENABLE=ON \
-    ./${package}
+    ../
 
     make
     make install
-    rm -rf ${install_path_header}/examples ${install_path_header}/lib ${install_path_header}/sundials-build
+    cd ../..
 fi
 
 
