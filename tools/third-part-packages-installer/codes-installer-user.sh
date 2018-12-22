@@ -1,10 +1,11 @@
-export install_path_header=/home/huwanpeng/opt
+export install_path_header=/home/huwanpeng/opt-gcc
 export compiler_c=gcc
 export compiler_cxx=g++
 export compiler_fortran=gfortran
 export compiler_mpicc=mpicc
 export compiler_mpicxx=mpicxx
 export source_codes_root_path=$(pwd)
+export compile_cores_number=10
 
 # install anaconda3
 bash ./Anaconda3-5.1.0-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
@@ -21,7 +22,7 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
@@ -42,7 +43,7 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
@@ -60,7 +61,7 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --enable-parallel --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
@@ -79,7 +80,7 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
@@ -99,7 +100,7 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
     #rm -rf ${package}
@@ -120,7 +121,7 @@ if [ -d ${install_path_header}/${install_path} ];then
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
     #rm -rf ${package}
@@ -140,7 +141,7 @@ if [ -d ${install_path_header}/${install_path} ];then
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
     #rm -rf ${package}
@@ -167,7 +168,7 @@ else
     cd build
     mkdir ${install_path_header}/${install_path}
     cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ../..
 fi
@@ -193,7 +194,7 @@ else
     cd build
     mkdir ${install_path_header}/${install_path}
     cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ../..
 fi
@@ -216,7 +217,7 @@ else
     cd build
     mkdir ${install_path_header}/${install_path}
     cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cp CBLAS/libblas.a ${install_path_header}/${install_path}/lib/libblas.a
     cd ../..
@@ -244,7 +245,7 @@ else
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_C_COMPILER=${compiler_mpicc} \
     -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ../..
 fi
@@ -263,8 +264,8 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     python2 ./configure --with-mpi-dir=${install_path_header}/mpich --download-fblaslapack --prefix=${install_path_header}/${install_path}
-    make PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug all
-    make PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug install
+    make  -j${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug all
+    make  -j${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug install
     cd ..
 fi
 
@@ -293,7 +294,7 @@ else
     -DMPI_ENABLE=ON \
     ../
 
-    make
+    make -j${compile_cores_number}
     make install
     cd ../..
 fi
@@ -316,7 +317,7 @@ else
     mv SuiteSparse ${package}
     rm -rf SuiteSparse
     cd ${package}
-    make BLAS="${install_path_header}/lapack/lib/libblas.a -lgfortran" LAPACK=${install_path_header}/lapack/lib/liblapack.a
+    make  -j${compile_cores_number} BLAS="${install_path_header}/lapack/lib/libblas.a -lgfortran" LAPACK=${install_path_header}/lapack/lib/liblapack.a
     #make BLAS="/home/huwanpeng/source-codes/lapack-3.8.0/librefblas.a -lgfortran" LAPACK=/home/huwanpeng/source-codes/lapack-3.8.0/liblapack.a
     echo $LD_LIBRARY_PATH
     mkdir ${install_path_header}/${install_path}
@@ -340,7 +341,7 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi

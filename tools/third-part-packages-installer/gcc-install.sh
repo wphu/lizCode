@@ -5,7 +5,7 @@ export compiler_fortran=gfortran
 export compiler_mpicc=mpicc
 export compiler_mpicxx=mpicxx
 export source_codes_root_path=$(pwd)
-
+export compile_cores_number=10
 
 # install gmp
 export CC=${compiler_c}
@@ -22,11 +22,11 @@ else
     tar -xvf ${package}.tar.lz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path}
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
-
+export LD_LIBRARY_PATH=${install_path_header}/${install_path}/lib:$LD_LIBRARY_PATH
 
 # install mpfr
 export CC=${compiler_c}
@@ -43,11 +43,11 @@ else
     tar -xvf ${package}.tar.lz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path} --with-gmp=${install_path_header}/gmp
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
-
+export LD_LIBRARY_PATH=${install_path_header}/${install_path}/lib:$LD_LIBRARY_PATH
 
 # install mpc
 export CC=${compiler_c}
@@ -64,11 +64,11 @@ else
     tar -xvf ${package}.tar.lz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path} --with-gmp=${install_path_header}/gmp --with-mpfr=${install_path_header}/mpfr
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
-
+export LD_LIBRARY_PATH=${install_path_header}/${install_path}/lib:$LD_LIBRARY_PATH
 
 # install gcc
 export CC=${compiler_c}
@@ -85,7 +85,12 @@ else
     tar -xvf ${package}.tar.lz
     cd ${package}
     ./configure --prefix=${install_path_header}/${install_path} --with-gmp=${install_path_header}/gmp --with-mpfr=${install_path_header}/mpfr --with-mpc=${install_path_header}/mpc --enable-threads=posix --disable-checking --enable--long-long --enable-languages=c,c++,fortran --disable-multilib
-    make
+    make -j${compile_cores_number}
     make install
     cd ..
 fi
+
+
+export LD_LIBRARY_PATH=/home/huwanpeng/opt-gcc/gcc/lib/../lib64:$LD_LIBRARY_PATH
+export LD_RUN_PATH=/home/huwanpeng/opt-gcc/gcc/lib/../lib64:$LD_RUN_PATH
+export PATH=/home/huwanpeng/opt-gcc/gcc/bin:$PATH
