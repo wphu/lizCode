@@ -4,7 +4,7 @@ export petsc=no
 export umfpack=no
 
 export lizHomePath=/home/huwanpeng/codes/lizCode
-export third_part_codes_path=/home/huwanpeng/opt
+export third_part_codes_path=/home/huwanpeng/opt-gcc
 
 # google-perftools parameters
 #export CPUPROFILE=./liz.prof

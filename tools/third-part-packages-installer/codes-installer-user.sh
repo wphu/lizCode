@@ -11,7 +11,8 @@ export compile_cores_number=10
 bash ./Anaconda3-5.1.0-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
 
 # install mpich3
-CC=${compiler_c}
+export CC=${compiler_c}
+export CXX=${compiler_cxx}
 package=mpich-3.2.1
 install_path=mpich
 if [ -d ${install_path_header}/${install_path} ];then
