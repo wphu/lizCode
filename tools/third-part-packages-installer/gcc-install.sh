@@ -94,3 +94,6 @@ fi
 export LD_LIBRARY_PATH=/home/huwanpeng/opt-gcc/gcc/lib/../lib64:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/home/huwanpeng/opt-gcc/gcc/lib/../lib64:$LD_RUN_PATH
 export PATH=/home/huwanpeng/opt-gcc/gcc/bin:$PATH
+export LD_LIBRARY_PATH=/home/wphu/opt-gcc-8.1.0/gmp/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/wphu/opt-gcc-8.1.0/mpc/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/wphu/opt-gcc-8.1.0/mpfr/lib:$LD_LIBRARY_PATH
