@@ -82,8 +82,8 @@ ifeq ($(config),debug)
 else
 	#CFLAGS 		+= -O3#  -xHost -ipo -no-pie
 	#LDFLAGS 	+= -no-pie
-	CFLAGS 		+= -Ofast -march=native #  -xHost -ipo
-	LDFLAGS 	+= -Ofast -march=native -no-pie
+	CFLAGS 		+= -Ofast #  -xHost -ipo
+	LDFLAGS 	+= -Ofast -no-pie
 endif
 
 
