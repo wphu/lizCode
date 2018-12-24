@@ -49,12 +49,12 @@ class ApplicationWindow(QMainWindow):
             self.tree_model.openFile(self.filename_data, 'r+')
             h5_file = h5.File(self.filename_data)
             self.n_dim = h5_file.attrs['n_dim']
-            print("n_dim: ", self.n_dim)
+            print("data file n_dim: ", self.n_dim)
         if os.path.exists(self.filename_grid):
             self.tree_model.openFile(self.filename_grid, 'r+')
             h5_file = h5.File(self.filename_grid)
             self.n_dim = h5_file.attrs['n_dim']
-            print("n_dim: ", self.n_dim)
+            print("grid file n_dim: ", self.n_dim)
         self.tree_widget.setModel(self.tree_model)
         hSplitter.addWidget(self.tree_widget)
 
