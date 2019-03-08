@@ -11,6 +11,10 @@ export compiler_mpicxx=mpicxx
 export source_codes_root_path=$(pwd)
 export compile_cores_number=10
 
+export LD_LIBRARY_PATH=${install_path_header}/gmp/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${install_path_header}/mpfr/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${install_path_header}/mpc/lib:$LD_LIBRARY_PATH
+
 # install gmp
 export CC=${compiler_c}
 #export CPPFLAGS="-I${install_path_header}/hdf5/include -I${install_path_header}/netcdf/include"
