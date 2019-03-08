@@ -1,3 +1,7 @@
+// before executing the script, execute the following command
+// sudo apt install gcc g++ gfortran m4 make cmake
+
+
 export install_path_header=/home/huwanpeng/opt-gcc
 export compiler_c=gcc
 export compiler_cxx=g++
@@ -26,7 +30,7 @@ else
     make install
     cd ..
 fi
-export LD_LIBRARY_PATH=${install_path_header}/${install_path}/lib:$LD_LIBRARY_PATH
+
 
 # install mpfr
 export CC=${compiler_c}
@@ -47,7 +51,7 @@ else
     make install
     cd ..
 fi
-export LD_LIBRARY_PATH=${install_path_header}/${install_path}/lib:$LD_LIBRARY_PATH
+
 
 # install mpc
 export CC=${compiler_c}
@@ -68,7 +72,7 @@ else
     make install
     cd ..
 fi
-export LD_LIBRARY_PATH=${install_path_header}/${install_path}/lib:$LD_LIBRARY_PATH
+
 
 # install gcc
 export CC=${compiler_c}
@@ -94,6 +98,3 @@ fi
 export LD_LIBRARY_PATH=/home/huwanpeng/opt-gcc/gcc/lib/../lib64:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/home/huwanpeng/opt-gcc/gcc/lib/../lib64:$LD_RUN_PATH
 export PATH=/home/huwanpeng/opt-gcc/gcc/bin:$PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc-8.1.0/gmp/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc-8.1.0/mpc/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc-8.1.0/mpfr/lib:$LD_LIBRARY_PATH

@@ -1,26 +1,37 @@
-export install_path_header=/home/wphu/opt-intel2018
+#:' for gcc compilers
+export PATH=/home/huwanpeng/opt-gcc/gcc/bin:$PATH
+export LD_LIBRARY_PATH=/home/huwanpeng/opt-gcc/gcc/lib64:$LD_LIBRARY_PATH
+
+export install_path_header=/home/huwanpeng/opt-gcc
+export compiler_c=gcc
+export compiler_cxx=g++
+export compiler_fortran=gfortran
+export compiler_mpicc=mpicc
+export compiler_mpicxx=mpicxx
+export source_codes_root_path=$(pwd)
+export compile_cores_number=10
+#'
+
+
+:' for intel compilers
+source /home/huwanpeng/opt-intel/intel/bin/compilervars.sh intel64
+
+export install_path_header=/home/huwanpeng/opt-intel
 export compiler_c=icc
 export compiler_cxx=icc
 export compiler_fortran=ifort
 export compiler_mpicc=mpicc
 export compiler_mpicxx=mpicxx
-export compiler_mpifortran=mpif90
 export source_codes_root_path=$(pwd)
 export compile_cores_number=10
+'
+
 
 # install anaconda3
-package=anaconda3
-install_path=anaconda3
-if [ -d ${install_path_header}/${install_path} ];then
-    echo "${package} has been installed"
-else
-    bash ./Anaconda3-5.1.0-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
-fi
+bash ./Anaconda3-5.1.0-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
 
 # install mpich3
-export CC=${compiler_c}
-export CXX=${compiler_cxx}
-export FC=${compiler_fortran}
+CC=${compiler_c}
 package=mpich-3.2.1
 install_path=mpich
 if [ -d ${install_path_header}/${install_path} ];then
@@ -40,8 +51,7 @@ export PATH=${install_path_header}/${install_path}/bin:$PATH
 
 
 # install hdf5
-export CC=${compiler_c}
-export FC=${compiler_fortran}
+CC=${compiler_c}
 export CFLAGS=-fPIC
 package=hdf5-1.8.20
 install_path=hdf5
@@ -60,8 +70,7 @@ fi
 export CFLAGS=""
 
 # install hdf5-mpich
-export CC=${compiler_mpicc}
-export FC=${compiler_mpifortran}
+CC=${compiler_mpicc}
 package=hdf5-1.8.20
 install_path=hdf5-mpich
 if [ -d ${install_path_header}/${install_path} ];then
@@ -80,8 +89,7 @@ fi
 
 
 # install fftw
-export CC=${compiler_c}
-export FC=${compiler_fortran}
+CC=${compiler_c}
 package=fftw-3.3.4
 install_path=fftw
 if [ -d ${install_path_header}/${install_path} ];then
@@ -99,8 +107,7 @@ fi
 
 
 # install netcdf(netcdf-c)
-export CC=${compiler_c}
-export FC=${compiler_fortran}
+CC=${compiler_c}
 export CPPFLAGS="-I${install_path_header}/hdf5/include"
 export LDFLAGS="-L${install_path_header}/hdf5/lib"
 package=netcdf-4.6.0
@@ -122,9 +129,8 @@ export CPPFLAGS=""
 export LDFLAGS=""
 
 # install netcdf-cxx
-export CC=${compiler_c}
-export FC=${compiler_fortran}
-export CXX=${compiler_cxx}
+CC=${compiler_c}
+CXX=${compiler_cxx}
 export CPPFLAGS="-I${install_path_header}/hdf5/include -I${install_path_header}/netcdf/include"
 export LDFLAGS="-L${install_path_header}/hdf5/lib -L${install_path_header}/netcdf/lib"
 package=netcdf-cxx4-4.3.0
@@ -145,7 +151,6 @@ export LDFLAGS=""
 
 # install netcdf-cxx
 export CC=${compiler_c}
-export FC=${compiler_fortran}
 export CPPFLAGS="-I${install_path_header}/hdf5/include -I${install_path_header}/netcdf/include"
 export LDFLAGS="-L${install_path_header}/hdf5/lib -L${install_path_header}/netcdf/lib"
 package=netcdf-cxx4-4.3.0
@@ -165,7 +170,7 @@ export CPPFLAGS=""
 export LDFLAGS=""
 
 # install lapack
-export FORTRAN=${compiler_fortran}
+FORTRAN=${compiler_fortran}
 export FFLAGS="-fPIC"
 OPTS="-O2 -frecursive"
 DRVOPTS=${OPTS}
@@ -193,8 +198,8 @@ export DRVOPTS=""
 export NOOPT=""
 
 # install OpenBLAS
-export FC=${compiler_fortran}
-export F77=${compiler_fortran}
+FC=${compiler_fortran}
+F77=${compiler_fortran}
 export FFLAGS=-fPIC
 package=OpenBLAS-0.2.20
 install_path=OpenBLAS
@@ -218,7 +223,6 @@ export FFLAGS=""
 
 # install SuperLU
 export CC=${compiler_c}
-export FC=${compiler_fortran}
 package=superlu_5.2.1
 install_path=superlu
 if [ -d ${install_path_header}/${install_path} ];then
@@ -268,8 +272,8 @@ fi
 
 
 # install PETSc
-export CC=${compiler_c}
-export FC=${compiler_fortran}
+CC=${compiler_c}
+FC=${compiler_fortran}
 package=petsc-3.8.3
 install_path=petsc
 if [ -d ${install_path_header}/${install_path} ];then
@@ -287,8 +291,8 @@ fi
 
 
 # sundials
-export CC=${compiler_c}
-export FC=${compiler_fortran}
+CC=${compiler_c}
+FC=${compiler_fortran}
 package=sundials-3.1.0
 install_path=sundials
 if [ -d ${install_path_header}/${install_path} ];then
@@ -317,8 +321,8 @@ fi
 
 
 # install umfpack included in SuiteSparse
-export CC=${compiler_c}
-export FC=${compiler_fortran}
+CC=${compiler_c}
+FC=${compiler_fortran}
 export CFLAGS="-fPIC"
 export CPPFLAGS="-fPIC"
 package=SuiteSparse-5.3.0
@@ -347,7 +351,7 @@ export CPPFLAGS=""
 
 # install gperftools
 export CC=${compiler_c}
-export FC=${compiler_fortran}
+export CXX=${compiler_cxx}
 package=gperftools-2.7
 install_path=gperftools
 if [ -d ${install_path_header}/${install_path} ];then
