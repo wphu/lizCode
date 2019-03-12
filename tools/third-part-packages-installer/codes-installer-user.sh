@@ -8,12 +8,6 @@ export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpfr/lib:$LD_LIBRARY_PATH
 
 
 #:' for gcc compilers
-export PATH=/home/wphu/opt-gcc/gcc/bin:$PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/gcc/lib64:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/gmp/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpc/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpfr/lib:$LD_LIBRARY_PATH
-
 export install_path_header=/home/wphu/opt-gcc
 export compiler_c=gcc
 export compiler_cxx=g++
