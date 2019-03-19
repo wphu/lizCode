@@ -305,7 +305,7 @@ fi
 # sundials
 export CC=${compiler_c}
 export FC=${compiler_fortran}
-package=sundials-3.1.0
+package=sundials-2.7.0
 install_path=sundials
 if [ -d ${install_path_header}/${install_path} ];then
     echo "${package} has been installed"
