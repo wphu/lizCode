@@ -4,6 +4,8 @@ export LD_LIBRARY_PATH=/home/wphu/opt-gcc/gcc/lib64:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/home/wphu/opt-gcc/gmp/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpc/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpfr/lib:$LD_LIBRARY_PATH
+
+before installing netcdf, first install: sudo apt install curl libcurl4-openssl-dev
 '
 
 
