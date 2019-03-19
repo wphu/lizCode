@@ -1,16 +1,16 @@
 :' for centos 6, set the following environments in the file ~/.bashrc
 export PATH=/home/wphu/opt-gcc/gcc/bin:$PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/gcc/lib64:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/gmp/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpc/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/home/wphu/opt-gcc/mpfr/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${HOME}/opt-gcc/gcc/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${HOME}/opt-gcc/gmp/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${HOME}/opt-gcc/mpc/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${HOME}/opt-gcc/mpfr/lib:$LD_LIBRARY_PATH
 
 before installing netcdf, first install: sudo apt install curl libcurl4-openssl-dev
 '
 
 
 #:' for gcc compilers
-export install_path_header=/home/wphu/opt-gcc
+export install_path_header=${HOME}/opt-gcc
 export compiler_c=gcc
 export compiler_cxx=g++
 export compiler_fortran=gfortran
@@ -22,9 +22,9 @@ export compile_cores_number=10
 
 
 :' for intel compilers
-source /home/huwanpeng/opt-intel/intel/bin/compilervars.sh intel64
+source ${HOME}/opt-intel/intel/bin/compilervars.sh intel64
 
-export install_path_header=/home/huwanpeng/opt-intel
+export install_path_header=${HOME}/opt-intel
 export compiler_c=icc
 export compiler_cxx=icc
 export compiler_fortran=ifort
