@@ -36,7 +36,7 @@ export compile_cores_number=10
 
 
 # install anaconda3
-bash ./Anaconda3-5.1.0-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
+bash ./Anaconda3-2018.12-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
 
 # install mpich3
 export CC=${compiler_c}
