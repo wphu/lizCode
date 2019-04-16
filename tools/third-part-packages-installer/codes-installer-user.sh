@@ -242,7 +242,6 @@ else
 fi
 export FFLAGS=""
 
-
 # install SuperLU
 export CC=${compiler_c}
 package=superlu_5.2.1
@@ -261,9 +260,14 @@ else
     cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
     make -j${compile_cores_number}
     make install
+    if [ -d ${install_path_header}/${install_path/lib64} ];then
+        mv ${install_path_header}/${install_path}/lib64 ${install_path_header}/${install_path}/lib
+    fi
     cp CBLAS/libblas.a ${install_path_header}/${install_path}/lib/libblas.a
     cd ../..
 fi
+
+
 
 # install SuperLU-DIST
 export CC=${compiler_mpicc}
@@ -305,9 +309,9 @@ else
     tar -xvf ${package}.tar
     tar -xvf ${package}.gz
     cd ${package}
-    python2 ./configure --with-mpi-dir=${install_path_header}/mpich --download-fblaslapack --prefix=${install_path_header}/${install_path}
-    make  MAKE_NP=${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug all
-    make  MAKE_NP=${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug install
+    python2 ./configure --with-mpi-dir=${install_path_header}/mpich  --download-fblaslapack --prefix=${install_path_header}/${install_path}
+    make  MAKE_NP=${compile_cores_number} all test
+    make  install
     cd ..
 fi
 
