@@ -209,6 +209,11 @@ else
     make install
     cd ../..
 fi
+
+if [ -d ${install_path_header}/${install_path/lib64} ];then
+    mv ${install_path_header}/${install_path}/lib64 ${install_path_header}/${install_path}/lib
+fi
+
 export FFLAGS=""
 export OPTS=""
 export DRVOPTS=""
