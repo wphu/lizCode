@@ -95,11 +95,11 @@ ax.set_xlim(0.0, nE1*dE1)
 ax.set_ylim(0.0, nE2*dE2)
 '''
 
-E1 = 100.0 * const.e
+E1 = 0.1 * const.e
 me = 9.109382616e-31
 V1 = math.sqrt(2.0 * E1 / me)
 
-E2 = 100.0 * const.e
+E2 = 0.1 * const.e
 me = 9.109382616e-31
 V2 = math.sqrt(2.0 * E2 / me)
 
@@ -111,9 +111,10 @@ dt = 1.0e-12
 nmax = 20
 
 print("cross_section_TBR: ",cross_section_TBR(E1, E2, nmax))
-print(-V1 * V2 * cross_section_TBR(E1, E2, nmax) * ne * ni * dt)
+print( - math.sqrt(V1 * V2) * cross_section_TBR(E1, E2, nmax) * math.sqrt(ne * ni) * dt )
 
-P = 1.0 - math.exp( -V1 * V2 * cross_section_TBR(E1, E2, nmax) * ne * ni * dt )
+#P = 1.0 - math.exp( -V1 * V2 * cross_section_TBR(E1, E2, nmax) * ne * ni * dt )
+P = 1.0 - math.exp( - math.sqrt(V1 * V2) * cross_section_TBR(E1, E2, nmax) * math.sqrt(ne * ni) * dt )
 print("recombination collision probability: ", P)
 
 

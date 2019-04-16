@@ -36,7 +36,12 @@ export compile_cores_number=10
 
 
 # install anaconda3
-bash ./Anaconda3-2018.12-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
+if [ -d ${install_path_header}/anaconda3 ];then
+    echo "anaconda3 has been installed"
+else
+    bash ./Anaconda3-2018.12-Linux-x86_64.sh -b -p ${install_path_header}/anaconda3
+fi
+
 
 # install mpich3
 export CC=${compiler_c}
@@ -184,9 +189,9 @@ export LDFLAGS=""
 # install lapack
 export FORTRAN=${compiler_fortran}
 export FFLAGS="-fPIC"
-OPTS="-O2 -frecursive"
-DRVOPTS=${OPTS}
-NOOPT="-O0 -frecursive"
+export OPTS="-O2 -frecursive"
+export DRVOPTS=${OPTS}
+export NOOPT="-O0 -frecursive"
 package=lapack-3.8.0
 install_path=lapack
 if [ -d ${install_path_header}/${install_path} ];then
@@ -199,7 +204,7 @@ else
     mkdir build
     cd build
     mkdir ${install_path_header}/${install_path}
-    cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path}
+    cmake ../ -DCMAKE_INSTALL_PREFIX=${install_path_header}/${install_path} -DBUILD_SHARED_LIBS=ON
     make -j${compile_cores_number}
     make install
     cd ../..
