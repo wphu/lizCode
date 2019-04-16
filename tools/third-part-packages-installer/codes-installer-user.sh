@@ -306,8 +306,8 @@ else
     tar -xvf ${package}.gz
     cd ${package}
     python2 ./configure --with-mpi-dir=${install_path_header}/mpich --download-fblaslapack --prefix=${install_path_header}/${install_path}
-    make  -j${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug all
-    make  -j${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug install
+    make  MAKE_NP=${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug all
+    make  MAKE_NP=${compile_cores_number} PETSC_DIR=${source_codes_root_path}/${package} PETSC_ARCH=arch-linux2-c-debug install
     cd ..
 fi
 
