@@ -1,0 +1,10 @@
+IFS=" " read -a directories <queue
+echo "directories: ${directories[@]}"
+
+for directory in ${directories[@]}
+do
+	cd ${directory}  && \
+	mpiexec -n 5 liz data/input.py && \
+	cd .. 
+done
+
