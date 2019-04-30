@@ -17,7 +17,7 @@ export compiler_fortran=gfortran
 export compiler_mpicc=mpicc
 export compiler_mpicxx=mpicxx
 export source_codes_root_path=$(pwd)
-export compile_cores_number=10
+export compile_cores_number=20
 #'
 
 
@@ -336,6 +336,7 @@ else
     -DEXAMPLES_INSTALL_PATH=${install_path_header}/${install_path}/examples \
     -DCMAKE_LINKER=${install_path_header}/${install_path}/lib \
     -DLAPACK_ENABLE=ON \
+    -DLAPACK_LIBRARIES="${install_path_header}/lapack/lib/libblas.a;${install_path_header}/lapack/lib/liblapack.a" \
     -DOPENMP_ENABLE=ON \
     -DMPI_ENABLE=ON \
     ../
