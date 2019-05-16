@@ -113,7 +113,10 @@ nmax = 20
 print("cross_section_TBR: ",cross_section_TBR(E1, E2, nmax))
 print( - math.sqrt(V1 * V2) * cross_section_TBR(E1, E2, nmax) * math.sqrt(ne * ni) * dt )
 
+# The formular of probability of TB recombination collision below formular (14), the dimension in exp() is not 1.
 #P = 1.0 - math.exp( -V1 * V2 * cross_section_TBR(E1, E2, nmax) * ne * ni * dt )
+
+# So the formular is changed as below:
 P = 1.0 - math.exp( - math.sqrt(V1 * V2) * cross_section_TBR(E1, E2, nmax) * math.sqrt(ne * ni) * dt )
 print("recombination collision probability: ", P)
 

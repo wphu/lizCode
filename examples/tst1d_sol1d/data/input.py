@@ -467,6 +467,13 @@ if isRecycling:
 		crossSection_fileName = "crossSection/Charge_exchange_H+-H.dat"
 	)
 
+	Collisions(
+		collisions_type = "Recombination_TB",
+		species1 = ["e"],
+		species2 = ["D1"],
+		species3 = ["D"],
+	)
+	
 
 # For C ==========
 if isIC:

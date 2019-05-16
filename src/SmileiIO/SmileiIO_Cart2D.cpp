@@ -231,7 +231,7 @@ void SmileiIO_Cart2D::calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* f
 
 
 
-//! write potential, rho and so on into hdf5 file every some timesteps
+// write potential, rho and so on into hdf5 file every some timesteps
 void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
 {
     const char* h5_name;
@@ -420,6 +420,39 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
 } // END write
 
+// read electric fields from hdf5 file for initial condition, or constant external field
+void SmileiIO_Cart2D::read( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime)
+{
+    hid_t group_id, dataset_id;
+    herr_t status;
+    const char* h5_name;
+    int iDiag;
+    int n_dim_data = 3;
+
+    if(smpi->isMaster() )
+    {
+        data_file_name = params.read_data_file_name;
+        data_file_id = H5Fopen( data_file_name.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+
+        group_id = H5Gopen(data_file_id, "/Fields", H5P_DEFAULT);
+
+        // =============read fields Ex ============================================
+        dataset_id = H5Dopen(group_id, "Ex_global_avg", H5P_DEFAULT);
+        status = H5Dread (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, fields->Ex_global);
+        status = H5Dclose( dataset_id );
+
+        // =============read fields Ey ============================================
+        dataset_id = H5Dopen(group_id, "Ey_global_avg", H5P_DEFAULT);
+        status = H5Dread (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, fields->Ey_global);
+        status = H5Dclose( dataset_id );
+
+        status = H5Gclose(group_id);
+        status = H5Fclose(data_file_id);
+    }
+    smpi->barrier();
+    smpi->scatterField(fields->Ex_global, fields->Ex_);
+    smpi->scatterField(fields->Ey_global, fields->Ey_);
+} // END read
 
 void SmileiIO_Cart2D::writeGrid(Grid* grid)
 {

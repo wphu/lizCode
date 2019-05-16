@@ -45,8 +45,12 @@ public:
     virtual void createPartsGroup( vector<Species*>& vecSpecies );
     virtual void createDiagsPattern( PicParams& params, Diagnostic* diag){};
 
-    //! Basic write field on its own file (debug)
+    // Basic write field on its own file (debug)
     virtual void write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime){};
+ 
+    // read electric fields from hdf5 file for initial condition, or constant external field
+    virtual void read( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, Diagnostic* diag, int itime){};
+ 
     //virtual void calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies){};
 
     // store Particles to restart

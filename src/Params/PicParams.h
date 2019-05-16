@@ -31,7 +31,8 @@ struct ProfileStructure {
 // ---------------------------------------------------------------------------------------------------------------------
 //! This structure contains the properties of each species
 // ---------------------------------------------------------------------------------------------------------------------
-struct SpeciesStructure {
+struct SpeciesStructure 
+{
 
     //! kind of species possible values: "ion" "eon" "test"
     std::string species_type;
@@ -161,9 +162,10 @@ struct SpeciesStructure {
 // ---------------------------------------------------------------------------------------------------------------------
 //! PicParams class: holds all the properties of the simulation that are read from the input file
 // ---------------------------------------------------------------------------------------------------------------------
-class PicParams {
+class PicParams 
+{
 
-public:
+ public:
     //! Creator for PicParams
     PicParams(InputData &);
 
@@ -198,6 +200,9 @@ public:
 
     // define the method of PIC: explicit or implicit
     std::string method;
+
+    // read data from h5 file as initial condition, or constant external field
+    std::string read_data_file_name;
 
     // define poisson equation solver: SuperLU_serial, SuperLU_mpi, petsc
     std::string poisson_solver;

@@ -237,8 +237,9 @@ public:
 		        if (sgroup2.size()==0) ERROR("No valid `species2` requested in collisions #" << n_collisions);
 				if (sgroup3.size()==0) ERROR("No valid `species3` requested in collisions #" << n_collisions);
 
-				if( !ifile.extract("crossSection_fileName",crossSection_fileName,"Collisions",n_collisions) ) {
-					ERROR("No valid `cross sectrion file` requested in collisions #" << n_collisions);
+				if( !ifile.extract("crossSection_fileName",crossSection_fileName,"Collisions",n_collisions) ) 
+				{
+					WARNING("No valid `cross sectrion file` requested in collisions #" << n_collisions);
 				}
 
 		        // Print collisions parameters

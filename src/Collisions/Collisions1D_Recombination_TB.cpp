@@ -29,17 +29,31 @@ Collisions1D_Recombination_TB::Collisions1D_Recombination_TB(PicParams& params, 
     species_group1  = sg1;
     species_group2  = sg2;
     species_group3  = sg3;
-    crossSection_fileName = CS_fileName;
+    //crossSection_fileName = CS_fileName;
 
     // Calculate total number of bins
     nbins = vecSpecies[0]->bmin.size();
     totbins = nbins;
 
-    readCrossSection();
-    energy_ionization_threshold = crossSection[0][0];
+    //readCrossSection();
+
 
     // only for hydrogen isotope
     nmax = 20;
+
+    // calculate E_bound, formular (14)
+    double Ry = 13.6 * const_e;
+    double numerator = 0;
+    double denominator = 0;
+    for(int i = 1; i <= nmax; i++)
+    {
+        numerator += i * i * i * i;
+    }
+    for(int i = 1; i <= nmax; i++)
+    {
+        denominator += i * i * i * i * i * i;
+    }
+    E_bound = Ry * numerator / denominator;
 
 }
 
@@ -90,13 +104,14 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     bmin1 = s1->bmin;                bmin2 = s2->bmin;                  bmin3 = s3->bmin;
     bmax1 = s1->bmax;                bmax2 = s2->bmax;                  bmax3 = s3->bmax;
 
-    count_of_particles_to_insert_s1.resize(nbins);
+    
     count_of_particles_to_insert_s3.resize(nbins);
+    count_of_particles_to_erase_s1.resize(nbins);
     count_of_particles_to_erase_s2.resize(nbins);
     for(int ibin=0; ibin<nbins; ibin++)
     {
-        count_of_particles_to_insert_s1[ibin] = 0;
         count_of_particles_to_insert_s3[ibin] = 0;
+        count_of_particles_to_erase_s1[ibin] = 0;
         count_of_particles_to_erase_s2[ibin] = 0;
     }
 
@@ -106,6 +121,7 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     for(unsigned int ibin=0 ; ibin<nbins ; ibin++)
     {
         n1[ibin] = bmax1[ibin] - bmin1[ibin];
+        density1[ibin] = n1[ibin] * W1;
     }
 
     n2.resize(nbins);
@@ -121,7 +137,7 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     totNCollision = 0;
     for (unsigned int ibin=0 ; ibin<nbins ; ibin++) {
         //MESSAGE("nbins000"<<"  "<<ibin<<"  "<<bmin2[ibin]<<" "<<bmax2[ibin]);
-        //>calculate the particle number of species1 in each cell, and the indexs of particles in the cell
+        // calculate the particle number of species1 in each cell, and the indexs of particles in the cell
         index1.resize( n1[ibin] );
 
         for(int iPart = 0; iPart < n1[ibin]; iPart++)
@@ -130,7 +146,7 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
         }
         random_shuffle(index1.begin(), index1.end());
 
-        //>calculate the particle number of species2 in each cell, and the indexs of particles in the cell
+        // calculate the particle number of species2 in each cell, and the indexs of particles in the cell
         index2.resize( n2[ibin] );
 
         for(int iPart = 0; iPart < n2[ibin]; iPart++)
@@ -152,9 +168,9 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
         for(int i = 0; i < npairs; i++)
         {
             i11 = index1[2*i];
-            i12 = index2[2*i+1];
+            i12 = index1[2*i+1];
 
-            // !!!Collision  only erase the i11 particle
+            // Collision  only erase the i11 particle
             if(n1[ibin] % 2 == 1 && i == npairs - 1)
             {
                 i11 = index1[2*i];
@@ -172,12 +188,13 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
             ke12 = 0.5 * m1 * v12_square;
 
             // post-collision energy of i11 electron
-            ke12_post = ke12 - energy_ionization_threshold * const_e;
-
+            ke12_post = ke11 + ke12 + E_bound;
             v12_post = sqrt( 2.0 * ke12_post / m1 );
 
-            P_collision = 1.0 - exp( v11_magnitude * v12_magnitude * cross_section(ke11, ke12)
-                          * n1[ibin] * n2[ibin] * timestep );
+            ke_radiative = -E_bound;
+
+            P_collision = 1.0 - exp( sqrt(v11_magnitude * v12_magnitude) * cross_section(ke11, ke12)
+                          * sqrt(density1[ibin] * density2[ibin]) * timestep );
 
             // Generate a random number between 0 and 1
             double ran_p = (double)rand() / RAND_MAX;
@@ -189,9 +206,9 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
                 indexes_of_particles_to_erase_s2.push_back(i2);
 
                 // Calculate the scatter velocity of i12 electron
-                momentum_unit[0] = p1->momentum(0,i12) / v11_magnitude_primary;
-                momentum_unit[1] = p1->momentum(1,i12) / v11_magnitude_primary;
-                momentum_unit[2] = p1->momentum(2,i12) / v11_magnitude_primary;
+                momentum_unit[0] = p1->momentum(0,i12) / v12_magnitude;
+                momentum_unit[1] = p1->momentum(1,i12) / v12_magnitude;
+                momentum_unit[2] = p1->momentum(2,i12) / v12_magnitude;
                 calculate_scatter_velocity(v12_post, m1, m2, momentum_unit, momentum_temp);
                 p1->momentum(0,i12) = momentum_temp[0];
                 p1->momentum(1,i12) = momentum_temp[1];
@@ -221,7 +238,8 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     new_particles3.clear();
 }
 
-double Collisions1D_Recombination_TB::maxCV(Particles* particles, double eMass){
+double Collisions1D_Recombination_TB::maxCV(Particles* particles, double eMass)
+{
     int nPart = particles->size();
     double v_square;
     double v_magnitude;
@@ -300,5 +318,60 @@ void Collisions1D_Recombination_TB::calculate_scatter_velocity( double v_magnitu
 
 double Collisions1D_Recombination_TB::cross_section(double ke1, double ke2)
 {
+    double cs = 0.0;
+    for(int i = 0; i <= nmax; i++)
+    {
+        cs += cross_section_each(ke1, ke2, i);
+    }
+    return cs;
+}
 
+double Collisions1D_Recombination_TB::cross_section_sub(double E1, double E2, int n)
+{
+    double A = 0.3440;
+    double a[4]  = {-0.014353, 0.75206, -0.29548, 0.056884};
+    double Ry = 13.6 * const_e;
+    double En = Ry / (n*n);
+    double e1 = 1.0 + E1 / En;
+    double e2 = 1.0 + E2 / En;
+    double e12 = e1 - e2;
+
+    double cs = 1.0 / (e1 * e1) + 1.0 / (e12 * e12) - 1.0 / (e1 * e12);
+    // this formula below may be wrong in the ref
+    // cs = 1.0 / (e1 * e1) + 1.0 / (e12 * e12) - 1.0 / (e1 * e12) - 1.0 / (e1 * e2)
+    double sum0 = 0.0;
+    for(int i = 0; i < 4; i++)
+    {
+        sum0 += (a[i] / pow(e2, i));
+    }
+        
+    cs += (sum0 * log(e1) / (n * pow(e2, 3)));
+    cs *= (A * pow(n, 4) / (En * e1));
+    return cs;
+}
+
+
+double Collisions1D_Recombination_TB::cross_section_each(double E1,double E2, int n)
+{
+    double Ry = 13.6 * const_e;
+    double En = Ry / (n*n);
+    double me = 9.109382616e-31;
+    // a0: Bohr radius
+    double a0 = 5.2917721067e-11;
+    double E1_prime = E1 + E2 + En;
+    double cs = 0.0;
+
+    if(E1 >= E2)
+    {
+        cs = 0.5 * cross_section_sub(E1_prime, E2, n);
+    }
+    else
+    {
+        cs = 0.5 * cross_section_sub(E1_prime, E1, n);
+    }   
+    cs *= 2.0;
+
+    double coefficient = 4.0 * pow(Ry, 1.5) * sqrt(2.0 * me) * n * n * const_pi * const_pi * pow(a0, 3) * E1_prime / (E1 *E2);
+    cs *= coefficient;
+    return cs;
 }

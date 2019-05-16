@@ -76,6 +76,8 @@ PicParams::PicParams(InputData &ifile) {
         MESSAGE("default method is used: explicit ");
     }
 
+    ifile.extract("read_data_file_name", read_data_file_name);
+
     // poisson solver
     ifile.extract("poisson_solver", poisson_solver);
     if (poisson_solver != "SuperLU_serial" && poisson_solver != "SuperLU_mpi" && poisson_solver != "petsc" && poisson_solver != "umfpack") {
