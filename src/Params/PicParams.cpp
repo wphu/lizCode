@@ -78,6 +78,9 @@ PicParams::PicParams(InputData &ifile) {
 
     ifile.extract("read_data_file_name", read_data_file_name);
 
+    self-consistent-electric-field = true;
+    ifile.extract("self-consistent-electric-field", self-consistent-electric-field);
+
     // poisson solver
     ifile.extract("poisson_solver", poisson_solver);
     if (poisson_solver != "SuperLU_serial" && poisson_solver != "SuperLU_mpi" && poisson_solver != "petsc" && poisson_solver != "umfpack") {
