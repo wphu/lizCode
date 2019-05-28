@@ -12,6 +12,8 @@ Pusher::Pusher(PicParams& params, int ispec)
     nDim_          = params.nDim_particle;
     cell_length    = params.cell_length;
 
+    velocity_transport = params.velocity_transport;
+
 }
 
 Pusher::~Pusher()

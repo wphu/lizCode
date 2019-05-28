@@ -8,7 +8,6 @@ matplotlib.use('Agg')
 from matplotlib.ticker import MaxNLocator
 from matplotlib import cm
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 
 from matplotlib.ticker import ScalarFormatter

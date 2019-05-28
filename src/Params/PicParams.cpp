@@ -85,6 +85,11 @@ PicParams::PicParams(InputData &ifile) {
         MESSAGE("default poisson_solver is used: SuperLU_serial ");
     }
 
+    if (!ifile.extract("velocity_transport", velocity_transport)) {
+        velocity_transport = 0.0;
+        MESSAGE("default velocity_transport is 0.0 ");
+    }
+
 
     imp_theta = 0.1;
     ifile.extract("imp_theta", imp_theta);

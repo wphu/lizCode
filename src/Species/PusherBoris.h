@@ -27,6 +27,9 @@ public:
     // methods for implicit push
     virtual void firstPush (Particles &particles, int ipart, LocalFields Epart){};
     virtual void secondPush (Particles &particles, int ipart, LocalFields Epart){};
+
+    // add a displacement for particles due to classical or anomalous transport
+    virtual void push_tranportV(Particles &particles, int ipart, LocalFields Epart, LocalFields Bpart) = 0;
 };
 
 #endif

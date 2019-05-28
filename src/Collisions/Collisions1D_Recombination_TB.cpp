@@ -115,6 +115,10 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
         count_of_particles_to_erase_s2[ibin] = 0;
     }
 
+    indexes_of_particles_to_erase_s1.clear();
+    indexes_of_particles_to_erase_s2.clear();
+    new_particles3.clear();
+
     n1.resize(nbins);
     density1.resize(nbins);
     n1_max = 0.0;
@@ -131,15 +135,24 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     {
         n2[ibin] = bmax2[ibin] - bmin2[ibin];
         density2[ibin] = n2[ibin] * W2;
-        if( density2[ibin] > n2_max ) { n2_max = density2[ibin]; };
     }
 
     totNCollision = 0;
-    for (unsigned int ibin=0 ; ibin<nbins ; ibin++) {
+    for (unsigned int ibin=0 ; ibin<nbins ; ibin++) 
+    {
+        if(  smpi->getDomainLocalMin(0) + (ibin+1) * params.cell_length[0] < params.region_collision_zoom[0]
+          || smpi->getDomainLocalMin(0) + ibin * params.cell_length[0] > params.region_collision_zoom[1] )
+        {
+            collision_zoom_factor = 1.0;
+        }
+        else
+        {
+            collision_zoom_factor = params.collision_zoom_factor;
+        }
+
         //MESSAGE("nbins000"<<"  "<<ibin<<"  "<<bmin2[ibin]<<" "<<bmax2[ibin]);
         // calculate the particle number of species1 in each cell, and the indexs of particles in the cell
         index1.resize( n1[ibin] );
-
         for(int iPart = 0; iPart < n1[ibin]; iPart++)
         {
             index1[iPart] = bmin1[ibin] + iPart;
@@ -148,7 +161,6 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
 
         // calculate the particle number of species2 in each cell, and the indexs of particles in the cell
         index2.resize( n2[ibin] );
-
         for(int iPart = 0; iPart < n2[ibin]; iPart++)
         {
             index2[iPart] = bmin2[ibin] + iPart;
@@ -194,7 +206,7 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
             ke_radiative = -E_bound;
 
             P_collision = 1.0 - exp( sqrt(v11_magnitude * v12_magnitude) * cross_section(ke11, ke12)
-                          * sqrt(density1[ibin] * density2[ibin]) * timestep );
+                          * sqrt(density1[ibin] * density2[ibin]) * timesteps_collision * timestep * collision_zoom_factor );
 
             // Generate a random number between 0 and 1
             double ran_p = (double)rand() / RAND_MAX;
@@ -229,13 +241,8 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     } // end loop on bins
 
     s1->erase_particles_from_bins(indexes_of_particles_to_erase_s1);
-    indexes_of_particles_to_erase_s1.clear();
-
     s2->erase_particles_from_bins(indexes_of_particles_to_erase_s2);
-    indexes_of_particles_to_erase_s2.clear();
-
     s3->insert_particles_to_bins(new_particles3, count_of_particles_to_insert_s3);
-    new_particles3.clear();
 }
 
 double Collisions1D_Recombination_TB::maxCV(Particles* particles, double eMass)
@@ -319,11 +326,12 @@ void Collisions1D_Recombination_TB::calculate_scatter_velocity( double v_magnitu
 double Collisions1D_Recombination_TB::cross_section(double ke1, double ke2)
 {
     double cs = 0.0;
-    for(int i = 0; i <= nmax; i++)
+    for(int i = 1; i <= nmax; i++)
     {
         cs += cross_section_each(ke1, ke2, i);
     }
-    return cs;
+    //return cs;
+    return 1.0e-22;
 }
 
 double Collisions1D_Recombination_TB::cross_section_sub(double E1, double E2, int n)

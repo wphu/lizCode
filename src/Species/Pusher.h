@@ -26,6 +26,10 @@ public:
     // methods for implicit push
     virtual void firstPush (Particles &particles, int ipart, LocalFields Epart) = 0;
     virtual void secondPush (Particles &particles, int ipart, LocalFields Epart) = 0;
+
+    // add a displacement for particles due to classical or anomalous transport
+    virtual void push_tranportV(Particles &particles, int ipart, LocalFields Epart, LocalFields Bpart) = 0;
+
 protected:
     double dt, dts2;
     //! \todo Move mass_ in Particles_
@@ -37,6 +41,8 @@ protected:
     int nDim_;
 
     std::vector<double> cell_length;
+
+    double velocity_transport;
 
 };//END class
 

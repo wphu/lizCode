@@ -207,6 +207,8 @@ class PicParams
     // define poisson equation solver: SuperLU_serial, SuperLU_mpi, petsc
     std::string poisson_solver;
 
+    double velocity_transport;
+
     int petsc_ksp_process_number;
     double petsc_ksp_tolerance_rtol;
 
