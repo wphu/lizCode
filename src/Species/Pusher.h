@@ -28,7 +28,7 @@ public:
     virtual void secondPush (Particles &particles, int ipart, LocalFields Epart) = 0;
 
     // add a displacement for particles due to classical or anomalous transport
-    virtual void push_tranportV(Particles &particles, int ipart, LocalFields Epart, LocalFields Bpart) = 0;
+    virtual void push_tranportV(Particles &particles, int ipart, LocalFields Epart, LocalFields Bpart){};
 
 protected:
     double dt, dts2;

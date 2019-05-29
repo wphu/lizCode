@@ -140,6 +140,11 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
     totNCollision = 0;
     for (unsigned int ibin=0 ; ibin<nbins ; ibin++) 
     {
+        if(n1[ibin] < 2 || n2[ibin] < 1)
+        {
+            continue;
+        }
+
         if(  smpi->getDomainLocalMin(0) + (ibin+1) * params.cell_length[0] < params.region_collision_zoom[0]
           || smpi->getDomainLocalMin(0) + ibin * params.cell_length[0] > params.region_collision_zoom[1] )
         {
@@ -177,17 +182,21 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
             npairs = n2[ibin];
         }
 
+
         for(int i = 0; i < npairs; i++)
         {
-            i11 = index1[2*i];
-            i12 = index1[2*i+1];
-
             // Collision  only erase the i11 particle
             if(n1[ibin] % 2 == 1 && i == npairs - 1)
             {
                 i11 = index1[2*i];
-                i12 = index2[2*(i-1)+1];
+                i12 = index1[2*(i-1)+1];
             }
+            else
+            {
+                i11 = index1[2*i];
+                i12 = index1[2*i+1];
+            }
+            i2  = index2[i];
 
             v11_square = pow(p1->momentum(0,i11),2) + pow(p1->momentum(1,i11),2) + pow(p1->momentum(2,i11),2);
             v11_magnitude = sqrt(v11_square);
@@ -205,12 +214,13 @@ void Collisions1D_Recombination_TB::collide(PicParams& params, SmileiMPI* smpi, 
 
             ke_radiative = -E_bound;
 
-            P_collision = 1.0 - exp( sqrt(v11_magnitude * v12_magnitude) * cross_section(ke11, ke12)
+            P_collision = 1.0 - exp( -sqrt(v11_magnitude * v12_magnitude) * cross_section(ke11, ke12)
                           * sqrt(density1[ibin] * density2[ibin]) * timesteps_collision * timestep * collision_zoom_factor );
 
             // Generate a random number between 0 and 1
             double ran_p = (double)rand() / RAND_MAX;
             if(ran_p < P_collision){
+                cout<<"collide==================="<<endl;
                 // erase i11 electron and ion
                 count_of_particles_to_erase_s1[ibin]++;
                 indexes_of_particles_to_erase_s1.push_back(i11);
@@ -330,8 +340,8 @@ double Collisions1D_Recombination_TB::cross_section(double ke1, double ke2)
     {
         cs += cross_section_each(ke1, ke2, i);
     }
-    //return cs;
-    return 1.0e-22;
+    return cs;
+    //return 1.0e-22;
 }
 
 double Collisions1D_Recombination_TB::cross_section_sub(double E1, double E2, int n)

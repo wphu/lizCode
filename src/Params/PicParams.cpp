@@ -78,8 +78,8 @@ PicParams::PicParams(InputData &ifile) {
 
     ifile.extract("read_data_file_name", read_data_file_name);
 
-    self-consistent-electric-field = true;
-    ifile.extract("self-consistent-electric-field", self-consistent-electric-field);
+    self_consistent_electric_field = true;
+    ifile.extract("self_consistent_electric_field", self_consistent_electric_field);
 
     // poisson solver
     ifile.extract("poisson_solver", poisson_solver);

@@ -228,7 +228,7 @@ int main (int argc, char* argv[])
         vecSpecies[ispec]->Project(time_dual, ispec, EMfields, Proj, smpi, params);
     }
     EMfields->computeTotalRhoJ();
-    if(params.self-consistent-electric-field)
+    if(params.self_consistent_electric_field)
     {
         (*solver)(EMfields, smpi);
     }
@@ -362,7 +362,7 @@ int main (int argc, char* argv[])
             EMfields->restartRhoJ();
             EMfields->computeTotalRhoJ();
             EMfields->gatherFields(smpi);
-            if(params.self-consistent-electric-field)
+            if(params.self_consistent_electric_field)
             {
                 (*solver)(EMfields, smpi);
             }

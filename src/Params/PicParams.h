@@ -204,7 +204,7 @@ class PicParams
     // read data from h5 file as initial condition, or constant external field
     std::string read_data_file_name;
 
-    bool self-consistent-electric-field;
+    bool self_consistent_electric_field;
 
     // define poisson equation solver: SuperLU_serial, SuperLU_mpi, petsc
     std::string poisson_solver;
