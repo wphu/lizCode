@@ -6,6 +6,8 @@ Ref: Subroutines for some plasma surface interaction processes:
      sublimation, backscattering and thermal evaporation.
 
 !!! 戴舒宇和桑超峰的程序，靶板密度的单位不一样，桑超峰的是g/cm^3，戴书宇的是atoms/Ai^3 （Ai = 10^-10 m）
+!!! 文献中附录中公式用的单位是atoms/Ai^3，用n表示，但是对应的程序中用的单位是g/cm^3，用rho表示,转化关系为：n = 1.0e-24 * rho * NA / am2
+!!! NA为阿伏伽德罗常数6.0221e23
 !!! 此处是改自戴舒宇的程序，所以密度单位要转换成　atoms/Ai^3
 ================================================================*/
 
@@ -20,7 +22,7 @@ class PhysicalSputtering_EmpiricalFormula : public Sputtering
 {
 
 public:
-    //! Constructor for Collisions between two species
+    // Constructor for Collisions between two species
     PhysicalSputtering_EmpiricalFormula(
     double an1_in,
     double am1_in,

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib as cm
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import constants as const
+import copy
 
 
 # formular (13)
@@ -57,37 +58,33 @@ def cross_section_TBR(E1, E2, nmax):
         cs += cross_section_each(E1, E2, i)
     return cs
 
-dE1 = 1.0e-3
-nE1 = 10000
+dE1 = 2.0e-2
+nE1 = 50
 
-dE2 = 1.0e-2
-nE2 = 100
-
-E2 = 0.01
-me = 9.109382616e-31
-V2 = math.sqrt(2.0 * E2 * const.e / me)
+dE2 = 2.0e-2
+nE2 = 50
 
 nmax = 20
-ne = 1.0e20
+
 x, y = np.mgrid[slice(0.0,dE1*nE1,dE1), slice(0.0,dE2*nE2,dE2)]
-print(x.max(), y.max())
+cross_section = copy.deepcopy(x)
 
-cross_section = np.zeros(nE1)
-energy = np.zeros(nE1)
 for i in np.arange(0, nE1):
-        energy[i] = i * dE1
-        #cross_section[i] = V2 * ne * cross_section_each(dE1*(i+1) * const.e, E2 * const.e, nmax)
-        cross_section[i] = cross_section_TBR(dE1*(i+1) * const.e, E2 * const.e, nmax)
+    for j in np.arange(0, nE2):
+        cross_section[i,j] = cross_section_TBR(dE1*(i+1) * const.e, dE2*(j+1) * const.e, nmax)
 
-print(cross_section[1], cross_section[10], cross_section[500])
+
+
 fig = plt.figure()
+# 2d figure
 
 ax = fig.add_subplot(1,1,1)
-ax.plot(energy, cross_section)
-plt.yscale('log')
-plt.xscale('log')
+ax.plot(x[:,40], cross_section[40,:])
+#plt.yscale('log')
+#plt.xscale('log')
 
 
+# 3d figure
 '''
 ax = Axes3D(fig)
 ax.plot_surface(x, y, cross_section)
@@ -95,6 +92,7 @@ ax.set_xlim(0.0, nE1*dE1)
 ax.set_ylim(0.0, nE2*dE2)
 '''
 
+'''
 E1 = 0.1 * const.e
 me = 9.109382616e-31
 V1 = math.sqrt(2.0 * E1 / me)
@@ -119,7 +117,8 @@ print( - math.sqrt(V1 * V2) * cross_section_TBR(E1, E2, nmax) * math.sqrt(ne * n
 # So the formular is changed as below:
 P = 1.0 - math.exp( - math.sqrt(V1 * V2) * cross_section_TBR(E1, E2, nmax) * math.sqrt(ne * ni) * dt )
 print("recombination collision probability: ", P)
-
+'''
 
 
 plt.show()
+fig.savefig("fig/Three_body_recombination_H.png")
