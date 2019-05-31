@@ -8,16 +8,16 @@ using namespace std;
 
 // Constructor
 Backscatterin_EmpiricalFormula::Backscatterin_EmpiricalFormula(
-    int nz1_in,
-    int m1_in,
+    int an1_in,
+    int am1_in,
     int ne_in,
-    vector<int> nz2_in,
+    vector<int> an2_in,
     vector<int> nw_in ) : Backscattering()
 {
-    nz1     = nz1_in;
-    m1      = m1_in;
+    an1     = an1_in;
+    am1      = am1_in;
     ne      = ne_in;
-    nz2     = nz2_in;
+    an2     = an2_in;
     nw      = nw_in;
 }
 
@@ -26,38 +26,39 @@ Backscatterin_EmpiricalFormula::~Backscatterin_EmpiricalFormula()
 
 }
 
+// theta: the angle made by the incident projectile with the normal to the target surface
 void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, double theta, double energy)
 {
     double a1, r, th, feps, r0heavy, sklfact, psi, psiden2, psiden1, psinum, fmu, redRN;
     double delta, eps, sb, sa, a2, z2, c, fi0, epsb, beta2, sl, w, zz, z2p, aa, wi, sum;
     double sbeff, saeff, a2eff, z2eff, z1p, z1,eth, eth1, mu, tau;
     double r0, as1, as2;
-    if(nz1 == 1)
+    if(an1 == 1)
     {
-        if(m1 < 1 || m1 > 3)
+        if(am1 < 1 || am1 > 3)
         {
             cout<<"BackScattering Error:  1"<<endl;
             return;
         }
-        a1 = a1t[ m1-1 ];
+        a1 = a1t[ am1-1 ];
     }
-    else if(nz1 == 2)
+    else if(an1 == 2)
     {
-        if(m1 < 3 || m1 > 4)
+        if(am1 < 3 || am1 > 4)
         {
             cout<<"BackScattering Error:  2"<<endl;
             return;
         }
-        a1 = a1t[ m1 ];
+        a1 = a1t[ am1 ];
     }
-    else if(nz1 > 2)
+    else if(an1 > 2)
     {
-        a1 = a1t[nz1 + 2];
+        a1 = a1t[an1 + 2];
         a2eff = 0.0;
         sum = 0.0;
         for( int i = 0; i < ne; i++ )
         {
-            a2 = a2t[ nz2[i] -1 ];
+            a2 = a2t[ an2[i] -1 ];
             a2eff += ( nw[i] * a2 );
             sum += nw[i];
         }
@@ -74,7 +75,7 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
         return;
     }
 
-    z1 = nz1;
+    z1 = an1;
     z1p = pow( z1, 2.0/3.0 );
     z2eff = 0.0;
     a2eff = 0.0;
@@ -84,8 +85,8 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
 
     for( int i = 0; i < ne; i++ )
     {
-        z2 = nz2[i];
-        a2 = a2t[ nz2[i] -1 ];
+        z2 = an2[i];
+        a2 = a2t[ an2[i] -1 ];
         wi = nw[i];
         z2eff = z2eff + wi * z2;
         a2eff = a2eff + wi * a2;
@@ -99,7 +100,7 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
         w = z1 * zz * aa / z2p;
         wi = wi * z1 / w / a2;
         saeff = saeff + wi * sa;
-        sl = d[ nz2[i] -1 ] * z1p * pow( aa / zz, 1.5 ) * sa / sqrt(a1);
+        sl = d[ an2[i] -1 ] * z1p * pow( aa / zz, 1.5 ) * sa / sqrt(a1);
 
         if ( z2 - 12.9 <= 0.0 )
         {

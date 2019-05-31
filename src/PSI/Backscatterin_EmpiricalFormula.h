@@ -5,6 +5,10 @@ and Compound targets
 Ref: Subroutines for some plasma surface interaction processes:
      hpysical sputtering, chemical erosion, radiation enhanced
      sublimation, backscattering and thermal evaporation.
+
+These formulas are not valid at low incident energies (below 10 eV) 
+because they do not account for the binding of projectiles chemically 
+to the surface at low energies [26].
 ================================================================*/
 #ifndef BACKSCATTERING_EMPIRICALFORMULA_H
 #define BACKSCATTERING_EMPIRICALFORMULA_H
@@ -20,10 +24,10 @@ class Backscatterin_EmpiricalFormula : public Backscattering
 {
 public:
     Backscatterin_EmpiricalFormula(
-        int nz1_in,
-        int m1_in,
+        int an1_in,
+        int am1_in,
         int ne_in,
-        vector<int> nz2_in,
+        vector<int> an2_in,
         vector<int> nw_in );
 
 
@@ -33,14 +37,14 @@ public:
 
     // parameters for sputtering
     // the name is from original fortran77 code
-    int nz1;         // atomic number of incident atomic
-    int m1;          // atomic mass of incident atomic (amu)
+    int an1;         // atomic number of incident atomic
+    int am1;          // atomic mass of incident atomic (amu)
     int ne;             // number of constituent elements in the target.
-    vector<int> nz2;	// array for atomic numbers of the constituents.
+    vector<int> an2;	// array for atomic numbers of the constituents.
     vector<int> nw;     // array for relative numbers of the constituents.
     //	example :   for Tritium ions of 1 KeV energy incident on the TiO2
-    //		        ( Titanium Dioxide ) target, Energy=1000 , nz1=1 ,
-    //		        m1=3 , ne=2 , nz2(1)=22 , nw(1)=1 , nz2(2)=8 and
+    //		        ( Titanium Dioxide ) target, Energy=1000 , an1=1 ,
+    //		        am1=3 , ne=2 , an2(1)=22 , nw(1)=1 , an2(2)=8 and
     //		        nw(2)=2 .
 
 

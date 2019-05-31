@@ -16,7 +16,7 @@ PhysicalSputtering_EmpiricalFormula::PhysicalSputtering_EmpiricalFormula(
     double an2_in,
     double am2_in,
     double es_in,
-    double density_solid_in ) : Sputtering()
+    double density_in ) : Sputtering()
 {
 
 
@@ -25,7 +25,7 @@ PhysicalSputtering_EmpiricalFormula::PhysicalSputtering_EmpiricalFormula(
     an2 = an2_in;
     am2 = am2_in;
     es = es_in;
-    n = density_solid_in;
+    density = density_in;
 
     init();
 }
@@ -42,8 +42,6 @@ PhysicalSputtering_EmpiricalFormula::~PhysicalSputtering_EmpiricalFormula()
 // Calculates the PSI1D for a given Collisions object
 void PhysicalSputtering_EmpiricalFormula::init()
 {
-
-
     //ionflag -> flag for light/heavy ion.
     //ionflag = 0 => light ion sputtering.
     //ionflag = 1 => heavy ion sputtering.
@@ -63,12 +61,14 @@ void PhysicalSputtering_EmpiricalFormula::init()
     etf = 30.74 * (am1+am2)/am2  * an1 * an2 * pow( ( pow(an1,(2.0/3.0)) +  pow(an2,(2.0/3.0)) ),(1.0/2.0) ) ;
     aL = 0.4685 * pow( ( pow(an1,(2.0/3.0)) +  pow(an2,(2.0/3.0)) ),(-1.0/2.0) );
 
+	//n = 1.0e-24 * density * 6.0221e23 / am2;
+	Ro = pow((am2/density/6.0221e23), (1.0/3.0))*1.0e8;
 }
 
 
 
 
-// from Shuyu Dai' c code
+// theta: the angle made by the incident projectile with the normal to the target surface
 double PhysicalSputtering_EmpiricalFormula::phy_sput_yield(double ke, double theta)
 {
     double	 reducedE, stopcs, yldphy;
@@ -82,7 +82,7 @@ double PhysicalSputtering_EmpiricalFormula::phy_sput_yield(double ke, double the
 	{
 		f = ( 0.94 - 1.33e-3 * Mratio ) * sqrt(es);
 		q = sqrt(es/mu/ke);
-		anu = aL * pow( n,(1.0/3.0) ) * sqrt(1.0/2.0/reducedE/q);
+		anu = (aL/Ro) * sqrt(1.0/2.0/reducedE/q);
 		ang_opt = 90.0 - 57.29*anu;		//57.29 = 180 / pi
 	}
 	else
@@ -103,7 +103,7 @@ double PhysicalSputtering_EmpiricalFormula::phy_sput_yield(double ke, double the
 		else
 			f = fs;
 
-		psi = pow( ( aL * n),(3.0/2.0) ) * sqrt(an1 * an2 * pow( ( pow(an1,(2.0/3.0)) +  pow(an2,(2.0/3.0)) ),(-1.0/2.0) )/ke);
+		psi = pow( ( aL / Ro),(3.0/2.0) ) * sqrt(an1 * an2 * pow( ( pow(an1,(2.0/3.0)) +  pow(an2,(2.0/3.0)) ),(-1.0/2.0) )/ke);
 		ang_opt = 90.0 - 286.0 * pow(psi, 0.45);
 	}
 
@@ -113,6 +113,7 @@ double PhysicalSputtering_EmpiricalFormula::phy_sput_yield(double ke, double the
 	Sigma = cos(ang_opt*1.7453293e-2);	//1.7453293e-2 = pi/180
 	t = 1.0/cos(theta*1.7453293e-2);
 	angcntrb = exp( f*( Sigma*(1-t)+log(t) ) );
+	//angcntrb = exp(f * (1-t) * Sigma ) * pow(t, f);
 
 
 	yldphy = Q * stopcs * ( 1.0 - pow( (eth/ke), (2.0/3.0) ) ) * pow( ( 1.0 - (eth/ke) ), 2.0) * angcntrb;

@@ -6,9 +6,9 @@ Ref: Subroutines for some plasma surface interaction processes:
      sublimation, backscattering and thermal evaporation.
 
 !!! 戴舒宇和桑超峰的程序，靶板密度的单位不一样，桑超峰的是g/cm^3，戴书宇的是atoms/Ai^3 （Ai = 10^-10 m）
-!!! 文献中附录中公式用的单位是atoms/Ai^3，用n表示，但是对应的程序中用的单位是g/cm^3，用rho表示,转化关系为：n = 1.0e-24 * rho * NA / am2
+!!! 文献中附录中公式用的单位是atoms/Ai^3，用n表示，但是对应的程序中用的单位是g/cm^3，用density表示,转化关系为：n = 1.0e-24 * density * NA / am2
 !!! NA为阿伏伽德罗常数6.0221e23
-!!! 此处是改自戴舒宇的程序，所以密度单位要转换成　atoms/Ai^3
+!!! 此处是改自psic/physput.f
 ================================================================*/
 
 #ifndef PHYSICALSPUTTERING_EMPIRICALFORMULA_H
@@ -42,12 +42,13 @@ public:
     double am2;     // atomic mass of target atomic (amu)
     double es;      //surface binding energy (heat of sublimation) of target (eV).
                     // W: 11.75(old value 8.68) C: 7.41
+    double density; // target density, unit: g/cm^3 （Ai = 10^-10 m）
+                    // C: 2.248 g/cm^3, W: 19.35 g/cm^3
+    double n;       // target number density, unit: atoms/Ai^3 （Ai = 10^-10 m)  n = 1.0e-24 * density * NA / am2
+    double Ro;      // n^(-1/3)
     double ionflag; //ionflag -> flag for light/heavy ion.
                     //ionflag = 0 => light ion sputtering.
                     //ionflag = 1 => heavy ion sputtering.
-    double n;       // number density, unit: atoms/Ai^3 （Ai = 10^-10 m）
-                    // C: 0.11286 (2.248 g/cm^3), W: (19.35 g/cm^3)
-
     double Q, eth,eth1, mu, etf, aL, Mratio;
 
     void init();
