@@ -86,7 +86,7 @@ void EF_Solver3D_PETSc_KSP::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field3D* Ez3D_global    = static_cast<Field3D*>(fields->Ez_global);
 
     smpi3D->barrier();
-    smpi3D->gatherAllRho(rho3D_global, rho3D);
+    smpi3D->gatherField1_all(rho3D_global, rho3D);
     if( is_in_pestc_ksp_mpicomm() )
     {
         solve_PETSc_KSP(rho3D_global, phi3D_global);

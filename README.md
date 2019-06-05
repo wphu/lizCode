@@ -12,4 +12,9 @@ The main difference is that the electromagnetic field is changed to static elect
 make -jN (N is number of processes)
 
 
+data is mainly stored in ElectroMagn (density, temperature, electric potential...), Species (particles information) and Diagnostic (collision energy loss, psi_rate like sputtering rate, reflection rate...). psi_rate is not stored in PSI classes, which is for convenience of IO operation.
+
+
 Email:  wphu@swip.ac.cn | wphu@qq.com
+
+

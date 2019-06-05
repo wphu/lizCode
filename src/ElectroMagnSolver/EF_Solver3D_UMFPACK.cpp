@@ -61,7 +61,7 @@ void EF_Solver3D_UMFPACK::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field3D* Ez3D_global    = static_cast<Field3D*>(fields->Ez_global);
 
     smpi3D->barrier();
-    smpi3D->gatherRho(rho3D_global, rho3D);
+    smpi3D->gatherField1(rho3D_global, rho3D);
 
     if(smpi3D->isMaster())
     {

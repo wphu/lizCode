@@ -4,8 +4,8 @@
 
 #include <algorithm>
 
-Diagnostic3D::Diagnostic3D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI) :
-Diagnostic(params)
+Diagnostic3D::Diagnostic3D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<Species*>& vecSpecies, vector<Collisions*> &vecCollisions, vector<PSI*>& vecPSI) :
+Diagnostic(params, smpi, vecSpecies, vecCollisions, vecPSI)
 {
     dims_global.resize(3);
     dim_global = 1;

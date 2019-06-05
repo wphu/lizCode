@@ -67,7 +67,7 @@ void EF_Solver3D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field3D* Ez3D_global    = static_cast<Field3D*>(fields->Ez_global);
 
     smpi3D->barrier();
-    smpi3D->gather_rho_all(rho3D_global, rho3D);
+    smpi3D->gatherField1_all(rho3D_global, rho3D);
 
     solve_SLU(rho3D_global, phi3D_global);
     solve_Exyz(phi3D_global, Ex3D_global, Ey3D_global, Ez3D_global);

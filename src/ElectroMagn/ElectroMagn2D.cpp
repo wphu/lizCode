@@ -704,9 +704,9 @@ void ElectroMagn2D::gatherFields(SmileiMPI *smpi)
     SmileiMPI_Cart2D* smpi2D = static_cast<SmileiMPI_Cart2D*>(smpi);
     for(int i = 0; i < rho_s.size(); i++)
     {
-        smpi2D->gatherRho( static_cast<Field2D*>(rho_s_global[i]), static_cast<Field2D*>(rho_s[i]) );
+        smpi2D->gatherField1( static_cast<Field2D*>(rho_s_global[i]), static_cast<Field2D*>(rho_s[i]) );
     }
-
+    smpi2D->gatherField1( static_cast<Field2D*>(rho_global), static_cast<Field2D*>(rho_) );
 }
 
 
@@ -715,7 +715,7 @@ void ElectroMagn2D::gatherAvgFields(SmileiMPI *smpi)
     SmileiMPI_Cart2D* smpi2D = static_cast<SmileiMPI_Cart2D*>(smpi);
     for(int i = 0; i < rho_s.size(); i++)
     {
-        smpi2D->gatherRho( static_cast<Field2D*>(rho_s_global_avg[i]), static_cast<Field2D*>(rho_s_avg[i]) );
+        smpi2D->gatherField1( static_cast<Field2D*>(rho_s_global_avg[i]), static_cast<Field2D*>(rho_s_avg[i]) );
     }
 
 }

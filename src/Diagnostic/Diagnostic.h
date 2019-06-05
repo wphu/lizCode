@@ -11,28 +11,26 @@
 
 using namespace std;
 
-class PSI;
-
 class Diagnostic {
 
 public :
 
-    Diagnostic(PicParams &params);
+    Diagnostic(PicParams &params, SmileiMPI* smpi, vector<Species*>& vecSpecies, vector<Collisions*> &vecCollisions, vector<PSI*>& vecPSI);
     virtual ~Diagnostic() {};
 
-    //! Runs the diag for all patches for local diags.
+    //run the diag for all patches for local diags.
     virtual void run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int timestep ) {};
 
-    const unsigned int n_species;
+    const int n_species;
+    const int n_collision;
+    const int n_psi;
+    const int n_dim_field;
 
-    //! nDim_field (from params)
-    const unsigned int n_dim_field;
-
-    //! n_space (from params) always 3D
-    const std::vector<unsigned int> n_space;
-    const std::vector<unsigned int> n_space_global;
-    std::vector<unsigned int> dim;
-    std::vector<unsigned int> dim_global;
+    //n_space (from params) always 3D
+    const std::vector<int> n_space;
+    const std::vector<int> n_space_global;
+    std::vector<int> dim;
+    std::vector<int> dim_global;
 
 
 protected :

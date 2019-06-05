@@ -765,7 +765,115 @@ void SmileiMPI_Cart3D::scatterGrid( Grid* grid )
 } // END scatterGrid
 
 
-void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
+
+void SmileiMPI_Cart3D::gatherField0( Field* field_global ,Field* field  )
+{
+    int procs_rk;
+    int iGlobal, jGlobal, kGlobal;
+    int iGlobal_gather;
+    int nx, ny, nz;
+
+    Field3D* f3D =  static_cast<Field3D*>(field);
+    Field3D* f3D_global =  static_cast<Field3D*>(field_global);
+    nx = f3D_global->dims_[0];
+    ny = f3D_global->dims_[1];
+    nz = f3D_global->dims_[2];
+    f3D_global->put_to(0.0);
+    MPI_Gatherv(f3D->data_, send_cnt[smilei_rk], MPI_DOUBLE, field_global_gather, &recv_cnt[0], &recv_disp[0], MPI_DOUBLE, 0, SMILEI_COMM_3D);
+
+    for(int iProcs = 0; iProcs < number_of_procs[0]; iProcs++)
+    {
+        for(int jProcs = 0; jProcs < number_of_procs[1]; jProcs++)
+        {
+            for(int kProcs = 0; kProcs < number_of_procs[2]; kProcs++)
+            {
+                procs_rk = iProcs * number_of_procs[1] * number_of_procs[2] + jProcs * number_of_procs[2] + kProcs;
+                for(int i = 0; i < dims_gather[procs_rk*3]; i++)
+                {
+                    for(int j = 0; j < dims_gather[procs_rk*3 + 1]; j++)
+                    {
+                        for(int k = 0; k < dims_gather[procs_rk*3 + 2]; k++)
+                        {
+                            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
+                            jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
+                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + k -oversize[2];
+                            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
+                                iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
+                            }
+                            if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*3+1] - 1 - oversize[1]){
+                                jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
+                            }
+                            if(kProcs == 0 && k < oversize[2] || kProcs == number_of_procs[2] -1 && k > dims_gather[procs_rk*3+2] - 1 - oversize[2]){
+                                kGlobal = abs((int)f3D_global->dims_[2] - abs(kGlobal) - 1);
+                            }
+                            iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*3+1] * dims_gather[procs_rk*3+2] + j * dims_gather[procs_rk*3+2] + k;
+                            //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
+
+                            f3D_global->data_3D[iGlobal][jGlobal][kGlobal] += field_global_gather[iGlobal_gather];
+
+                            //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;                     
+                        }
+                    }
+                }
+            }
+
+
+        }
+    }
+
+    //> Handle the boundary points and corner points,
+    //> this is meaningful for periodic boundary condition,
+    //> but not affect the results of other boudary conditions.
+    for(int i = 0; i < nx; i++)
+    {
+        for(int j = 0; j < ny; j++)
+        {
+            for(int k = 0; k < nz; k++)
+            {
+                if( i == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[nx-1][j][k];
+                }
+                else if(j == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][ny-1][k];
+                }
+                else if(k == 0)
+                {
+                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][j][nz-1];
+                }
+            }
+        }
+
+    }
+    for(int i = 0; i < nx; i++)
+    {
+        for(int j = 0; j < ny; j++)
+        {
+            for(int k = 0; k < nz; k++)
+            {
+                if( i == nx - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[0][j][k];
+                }
+                else if(j == ny - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][0][k];
+                }
+                else if(k == nz - 1)
+                {
+                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][j][0];
+                }
+            }
+
+        }
+
+    }   
+
+
+} // END gatherField
+
+void SmileiMPI_Cart3D::gatherField1( Field* field_global ,Field* field  )
 {
     int procs_rk;
     int iGlobal, jGlobal, kGlobal;
@@ -878,9 +986,9 @@ void SmileiMPI_Cart3D::gatherRho( Field* field_global ,Field* field  )
 
     }
 
-} // END gatherRho
+}
 
-void SmileiMPI_Cart3D::gatherAllRho( Field* field_global ,Field* field  )
+void SmileiMPI_Cart3D::gatherField1_all( Field* field_global ,Field* field  )
 {
     int procs_rk;
     int iGlobal, jGlobal, kGlobal;
@@ -993,116 +1101,7 @@ void SmileiMPI_Cart3D::gatherAllRho( Field* field_global ,Field* field  )
 
     }
 
-} // END gatherAllRho
-
-void SmileiMPI_Cart3D::gatherField( Field* field_global ,Field* field  )
-{
-    int procs_rk;
-    int iGlobal, jGlobal, kGlobal;
-    int iGlobal_gather;
-    int nx, ny, nz;
-
-    Field3D* f3D =  static_cast<Field3D*>(field);
-    Field3D* f3D_global =  static_cast<Field3D*>(field_global);
-    nx = f3D_global->dims_[0];
-    ny = f3D_global->dims_[1];
-    nz = f3D_global->dims_[2];
-    f3D_global->put_to(0.0);
-    MPI_Gatherv(f3D->data_, send_cnt[smilei_rk], MPI_DOUBLE, field_global_gather, &recv_cnt[0], &recv_disp[0], MPI_DOUBLE, 0, SMILEI_COMM_3D);
-
-    for(int iProcs = 0; iProcs < number_of_procs[0]; iProcs++)
-    {
-        for(int jProcs = 0; jProcs < number_of_procs[1]; jProcs++)
-        {
-            for(int kProcs = 0; kProcs < number_of_procs[2]; kProcs++)
-            {
-                procs_rk = iProcs * number_of_procs[1] * number_of_procs[2] + jProcs * number_of_procs[2] + kProcs;
-                for(int i = 0; i < dims_gather[procs_rk*3]; i++)
-                {
-                    for(int j = 0; j < dims_gather[procs_rk*3 + 1]; j++)
-                    {
-                        for(int k = 0; k < dims_gather[procs_rk*3 + 2]; k++)
-                        {
-                            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
-                            jGlobal = jProcs * (dims_gather[1] - 2*oversize[1] -1) + j -oversize[1];
-                            kGlobal = kProcs * (dims_gather[2] - 2*oversize[2] -1) + k -oversize[2];
-                            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk*3] - 1 - oversize[0]){
-                                iGlobal = abs((int)f3D_global->dims_[0] - abs(iGlobal) - 1);
-                            }
-                            if(jProcs == 0 && j < oversize[1] || jProcs == number_of_procs[1] -1 && j > dims_gather[procs_rk*3+1] - 1 - oversize[1]){
-                                jGlobal = abs((int)f3D_global->dims_[1] - abs(jGlobal) - 1);
-                            }
-                            if(kProcs == 0 && k < oversize[2] || kProcs == number_of_procs[2] -1 && k > dims_gather[procs_rk*3+2] - 1 - oversize[2]){
-                                kGlobal = abs((int)f3D_global->dims_[2] - abs(kGlobal) - 1);
-                            }
-                            iGlobal_gather = send_disp[procs_rk] + i * dims_gather[procs_rk*3+1] * dims_gather[procs_rk*3+2] + j * dims_gather[procs_rk*3+2] + k;
-                            //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
-
-                            f3D_global->data_3D[iGlobal][jGlobal][kGlobal] += field_global_gather[iGlobal_gather];
-
-                            //if(f3D_global->data_3D[iGlobal][jGlobal] != 0.0) cout<<"ereeee"; //<<f3D_global->data_3D[iGlobal][jGlobal]<<endl;                     
-                        }
-                    }
-                }
-            }
-
-
-        }
-    }
-
-    //> Handle the boundary points and corner points,
-    //> this is meaningful for periodic boundary condition,
-    //> but not affect the results of other boudary conditions.
-    for(int i = 0; i < nx; i++)
-    {
-        for(int j = 0; j < ny; j++)
-        {
-            for(int k = 0; k < nz; k++)
-            {
-                if( i == 0)
-                {
-                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[nx-1][j][k];
-                }
-                else if(j == 0)
-                {
-                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][ny-1][k];
-                }
-                else if(k == 0)
-                {
-                    f3D_global->data_3D[i][j][k] += f3D_global->data_3D[i][j][nz-1];
-                }
-            }
-        }
-
-    }
-    for(int i = 0; i < nx; i++)
-    {
-        for(int j = 0; j < ny; j++)
-        {
-            for(int k = 0; k < nz; k++)
-            {
-                if( i == nx - 1)
-                {
-                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[0][j][k];
-                }
-                else if(j == ny - 1)
-                {
-                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][0][k];
-                }
-                else if(k == nz - 1)
-                {
-                    f3D_global->data_3D[i][j][k] = f3D_global->data_3D[i][j][0];
-                }
-            }
-
-        }
-
-    }   
-
-
-} // END gatherField
-
-
+}
 
 void SmileiMPI_Cart3D::scatterField( Field* field_global ,Field* field )
 {
@@ -1169,4 +1168,4 @@ void SmileiMPI_Cart3D::scatterField( Field* field_global ,Field* field )
 
 
 
-} // END scatterField
+}

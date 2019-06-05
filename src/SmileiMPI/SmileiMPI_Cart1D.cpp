@@ -572,7 +572,47 @@ void SmileiMPI_Cart1D::sumField( Field* field )
 } // END sumField
 
 
-void SmileiMPI_Cart1D::gatherRho( Field* field_global ,Field* field  )
+
+void SmileiMPI_Cart1D::gatherField0( Field* field_global ,Field* field  )
+{
+
+    int procs_rk;
+    int iGlobal, jGlobal;
+    int iGlobal_gather;
+    int nx;
+
+    Field1D* f1D =  static_cast<Field1D*>(field);
+    Field1D* f1D_global =  static_cast<Field1D*>(field_global);
+    nx = f1D_global->dims_[0];
+    f1D_global->put_to(0.0);
+    MPI_Gatherv(f1D->data_, send_cnt[smilei_rk], MPI_DOUBLE, field_global_gather, &recv_cnt[0], &recv_disp[0], MPI_DOUBLE, 0, SMILEI_COMM_1D);
+
+    for(int iProcs = 0; iProcs < number_of_procs[0]; iProcs++)
+    {
+        procs_rk = iProcs;
+        for(int i = 0; i < dims_gather[procs_rk]; i++)
+        {
+            iGlobal = iProcs * (dims_gather[0] - 2*oversize[0] -1) + i -oversize[0];
+            if(iProcs == 0 && i < oversize[0] || iProcs == number_of_procs[0] -1 && i > dims_gather[procs_rk] - 1 - oversize[0]){
+                iGlobal = abs((int)f1D_global->dims_[0] - abs(iGlobal) - 1);
+            }
+
+            iGlobal_gather = send_disp[procs_rk] + i;
+            //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
+
+            //> the differance between gatherRho and gatherField exists only here
+            f1D_global->data_[iGlobal] = field_global_gather[iGlobal_gather];
+            //if(f1D_global->data_[iGlobal] != 0.0) cout<<"ereeee"; //<<f1D_global->data_[iGlobal]<<endl;
+        }
+    }
+
+
+    f1D_global->data_[0] += f1D_global->data_[nx-1];
+    f1D_global->data_[nx-1] = f1D_global->data_[0];
+
+}
+
+void SmileiMPI_Cart1D::gatherField1( Field* field_global ,Field* field  )
 {
 
     int procs_rk;
@@ -616,11 +656,9 @@ void SmileiMPI_Cart1D::gatherRho( Field* field_global ,Field* field  )
     f1D_global->data_[0] *= 2.0;
     f1D_global->data_[nx-1] *= 2.0;
 
-} // END gatherRho
+}
 
-
-
-void SmileiMPI_Cart1D::gatherField( Field* field_global ,Field* field  )
+void SmileiMPI_Cart1D::gatherField2( Field* field_global ,Field* field  )
 {
 
     int procs_rk;
@@ -629,6 +667,13 @@ void SmileiMPI_Cart1D::gatherField( Field* field_global ,Field* field  )
     int nx;
 
     Field1D* f1D =  static_cast<Field1D*>(field);
+
+    //for(int i = 0; i < f1D->dims_[0]; i++)
+    //{
+    //    (*f1D)(i) = i;
+    //}
+
+
     Field1D* f1D_global =  static_cast<Field1D*>(field_global);
     nx = f1D_global->dims_[0];
     f1D_global->put_to(0.0);
@@ -648,18 +693,15 @@ void SmileiMPI_Cart1D::gatherField( Field* field_global ,Field* field  )
             //if(iGlobal >= ii || jGlobal >= jj) cout<<"error "<<iGlobal<<" "<<iProcs<<" "<<dims_gather[0]<<" "<<oversize[0]<<endl;
 
             //> the differance between gatherRho and gatherField exists only here
-            f1D_global->data_[iGlobal] = field_global_gather[iGlobal_gather];
+            f1D_global->data_[iGlobal] += field_global_gather[iGlobal_gather];
             //if(f1D_global->data_[iGlobal] != 0.0) cout<<"ereeee"; //<<f1D_global->data_[iGlobal]<<endl;
         }
     }
+    // for temperate, it is average values in the cells, so the number of cells is one less than the number of nodes
+    // so to plot, fill the last value using its left value
+    f1D_global->data_[nx-1] = f1D_global->data_[nx-2];
 
-
-    f1D_global->data_[0] += f1D_global->data_[nx-1];
-    f1D_global->data_[nx-1] = f1D_global->data_[0];
-
-} // END gatherField
-
-
+}
 
 void SmileiMPI_Cart1D::scatterField( Field* field_global ,Field* field )
 {

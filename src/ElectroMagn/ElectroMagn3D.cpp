@@ -510,9 +510,9 @@ void ElectroMagn3D::gatherFields(SmileiMPI *smpi)
     SmileiMPI_Cart3D* smpi3D = static_cast<SmileiMPI_Cart3D*>(smpi);
     for(int i = 0; i < rho_s.size(); i++)
     {
-        smpi3D->gatherRho( static_cast<Field3D*>(rho_s_global[i]), static_cast<Field3D*>(rho_s[i]) );
+        smpi3D->gatherField1( static_cast<Field3D*>(rho_s_global[i]), static_cast<Field3D*>(rho_s[i]) );
     }
-
+    smpi3D->gatherField1( static_cast<Field3D*>(rho_global), static_cast<Field3D*>(rho_) );
 }
 
 
@@ -521,7 +521,7 @@ void ElectroMagn3D::gatherAvgFields(SmileiMPI *smpi)
     SmileiMPI_Cart3D* smpi3D = static_cast<SmileiMPI_Cart3D*>(smpi);
     for(int i = 0; i < rho_s.size(); i++)
     {
-        smpi3D->gatherRho( static_cast<Field3D*>(rho_s_global_avg[i]), static_cast<Field3D*>(rho_s_avg[i]) );
+        smpi3D->gatherField1( static_cast<Field3D*>(rho_s_global_avg[i]), static_cast<Field3D*>(rho_s_avg[i]) );
     }
 
 }

@@ -5,8 +5,8 @@
 
 #include <algorithm>
 
-Diagnostic2D::Diagnostic2D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI) :
-Diagnostic(params)
+Diagnostic2D::Diagnostic2D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<Species*>& vecSpecies, vector<Collisions*> &vecCollisions, vector<PSI*>& vecPSI) :
+Diagnostic(params, smpi, vecSpecies, vecCollisions, vecPSI)
 {
     Grid2D* grid2D = static_cast<Grid2D*>(grid);
 

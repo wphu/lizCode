@@ -17,7 +17,7 @@ class Diagnostic3D : public Diagnostic {
 
 public :
 
-    Diagnostic3D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI);
+    Diagnostic3D(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<Species*>& vecSpecies, vector<Collisions*> &vecCollisions, vector<PSI*>& vecPSI);
     virtual ~Diagnostic3D() {};
 
     //! Runs the diag for all patches for local diags.

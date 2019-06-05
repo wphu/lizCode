@@ -1,24 +1,26 @@
 #include "Diagnostic.h"
 
-Diagnostic::Diagnostic(PicParams &params) :
-n_species(params.species_param.size()),
+Diagnostic::Diagnostic(PicParams &params, SmileiMPI* smpi, vector<Species*>& vecSpecies, vector<Collisions*> &vecCollisions, vector<PSI*>& vecPSI) :
 sim_length(params.sim_length),
+timestep(params.timestep),
 step_dump(params.dump_step),
 step_ave(params.ntime_step_avg),
-timestep(params.timestep),
+n_species(params.species_param.size()),
+n_collision(vecCollisions.size()),
+n_psi(vecPSI.size()),
 n_dim_field(params.nDim_field),
 n_space(params.n_space),
 n_space_global(params.n_space_global)
+
 {
 	pi_ov_2 = 0.5 * params.const_pi;
 	const_e = params.const_e;
+	oversize = params.oversize;
 
 	dim.resize( n_dim_field );
     dim_global.resize( n_dim_field );
-
-	oversize = params.oversize;
-
-    for (size_t i=0 ; i<n_dim_field ; i++) {
+    for (size_t i=0 ; i<n_dim_field ; i++) 
+	{
         dim[i] = n_space[i] + 1 + 2 * oversize[i];
         dim_global[i] = n_space_global[i] + 1;
     }

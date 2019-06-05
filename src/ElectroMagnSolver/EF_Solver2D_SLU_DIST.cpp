@@ -62,7 +62,7 @@ void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
     Field2D* Ey2D_global    = static_cast<Field2D*>(fields->Ey_global);
 
     smpi2D->barrier();
-    smpi2D->gather_rho_all(rho2D_global, rho2D);
+    smpi2D->gatherField1_all(rho2D_global, rho2D);
 
     solve_SLU(rho2D_global, phi2D_global);
     solve_Exy(phi2D_global, Ex2D_global, Ey2D_global);
