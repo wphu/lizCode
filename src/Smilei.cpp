@@ -185,7 +185,7 @@ int main (int argc, char* argv[])
     smpi->barrier();
 
     TITLE("Creating Diagnostic");
-    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecPSI, vecCollisions);
+    Diagnostic*  diag  = DiagnosticFactory::create(params, smpi, grid, EMfields, vecSpecies, vecCollisions, vecPSI);
     if(smpi->isMaster() && params.geometry == "3d3v")
     {
         sio->createDiagsPattern(params, diag);

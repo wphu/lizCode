@@ -3,11 +3,13 @@
 
 #include "PicParams.h"
 #include "SmileiMPI.h"
-#include "PSI.h"
 #include "Grid.h"
 
 #include <iostream>
 #include <vector>
+
+class PSI;
+class Collisions;
 
 using namespace std;
 
@@ -27,8 +29,8 @@ public :
     const int n_dim_field;
 
     //n_space (from params) always 3D
-    const std::vector<int> n_space;
-    const std::vector<int> n_space_global;
+    const std::vector<unsigned int> n_space;
+    const std::vector<unsigned int> n_space_global;
     std::vector<int> dim;
     std::vector<int> dim_global;
 

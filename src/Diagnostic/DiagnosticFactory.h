@@ -14,16 +14,16 @@
 class DiagnosticFactory {
 public:
 
-    static Diagnostic* create(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<PSI*>& vecPSI, vector<Collisions*> &vecCollisions) {
+    static Diagnostic* create(PicParams& params, SmileiMPI* smpi, Grid* grid, ElectroMagn* EMfields, vector<Species*>& vecSpecies, vector<Collisions*> &vecCollisions, vector<PSI*>& vecPSI) {
         Diagnostic* diag = NULL;
         if ( params.geometry == "1d3v" ) {
-            diag = new Diagnostic1D(params, smpi, EMfields, vecCollisions);
+            diag = new Diagnostic1D(params, smpi, EMfields, vecSpecies, vecCollisions, vecPSI);
         }
         else if ( params.geometry == "2d3v" ) {
-            diag = new Diagnostic2D(params, smpi, grid, EMfields, vecPSI);
+            diag = new Diagnostic2D(params, smpi, grid, EMfields, vecSpecies, vecCollisions, vecPSI);
         }
         else if ( params.geometry == "3d3v" ) {
-            diag = new Diagnostic3D(params, smpi, grid, EMfields, vecPSI);
+            diag = new Diagnostic3D(params, smpi, grid, EMfields, vecSpecies, vecCollisions, vecPSI);
         }
         else {
             ERROR( "Unknwon geometry : " << params.geometry );

@@ -156,10 +156,10 @@ public:
 
 
     //broadcast a string in current communicator
-    void bcast( std::string& val );
+    void bcast(std::string& val);
     void bcast_double(double* buffer, int N, int root_rank);
-    void reduce_sum_int( double* src, double* des, int n);
-    void reduce_sum_double( double* src, double* des, int n);
+    void reduce_sum_int(int* src, int* des, int n);
+    void reduce_sum_double(double* src, double* des, int n);
     void reduce_sum_field(Field* field_send, Field* field_recv);
 
 
