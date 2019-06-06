@@ -21,7 +21,7 @@ public:
     //run the diag for all patches for local diags.
     virtual void run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecies, ElectroMagn* EMfields, vector<PSI*>& vecPSI, int itime ) ;
 
-    //calculate velocity and temperature of each species
+    //calculate velocity, temperature, total particle energy for each species, total electric field energy
 	void calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime);
 
     //calculate total energy(particles and electric field)

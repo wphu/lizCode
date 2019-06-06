@@ -169,53 +169,79 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 	}
 
 
-	//MPI gather diagnostic parameters to master
+	//MPI gather diagnostic parameters to master process
 	if( (itime % step_dump) == 0 ) 
 	{
 		vector<double> flux_temp;
 		vector<double> angle_distribution_temp;
 		vector<double> energy_distribution_temp;
 		vector<double> psi_rate_temp;
+		vector<double> radiative_energy_collision_temp;
 
 		flux_temp.resize(n_species);
 		angle_distribution_temp.resize(90);
 		energy_distribution_temp.resize(n_energy);
+		psi_rate_temp.resize(n_psi);
+		radiative_energy_collision_temp.resize(n_space_global[0]);
+
+		//same weight for all species
+		s1 = vecSpecies[0];
+		wlt = s1->species_param.weight / (dx_inv_ * timestep * step_ave);
+		for(int ispec = 0; ispec < n_species; ispec++)
+		{
+			particle_flux_left[ispec] *= wlt;
+			particle_flux_right[ispec] *= wlt;
+			heat_flux_left[ispec] *= wlt;
+			heat_flux_right[ispec] *= wlt;
+		}
+		for(int i_collision = 0; i_collision < n_collision; i_collision++)
+		{
+			for(int i_bin = 0; i_bin < radiative_energy_collision[i_collision].size(); i_bin++)
+			{
+				radiative_energy_collision[i_collision][i_bin] *= wlt;
+			}
+		}
+
+		smpi->reduce_sum_double(&particle_flux_left[0], &flux_temp[0], n_species);
+		particle_flux_left = flux_temp;
+
+		smpi->reduce_sum_double(&particle_flux_right[0], &flux_temp[0], n_species);
+		particle_flux_right = flux_temp;
+
+		smpi->reduce_sum_double(&heat_flux_left[0], &flux_temp[0], n_species);
+		heat_flux_left = flux_temp;
+
+		smpi->reduce_sum_double(&heat_flux_left[0], &flux_temp[0], n_species);
+		heat_flux_right = flux_temp;
 
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{
-			s1 = vecSpecies[ispec];
-			wlt = s1->species_param.weight / (dx_inv_ * timestep * step_ave);
-			particleFlux[ispec][0] *= wlt;
-			particleFlux[ispec][1] *= wlt;
-			heatFlux[ispec][0] 	   *= wlt;
-			heatFlux[ispec][1]     *= wlt;
+			smpi->reduce_sum_double(&angle_distribution_left[ispce][0], &angle_distribution_temp[0], 90);
+			angle_distribution_left[ispec] = angle_distribution_temp;
 
-			for(int i_direction = 0; i_direction < 2; i_direction++)
-			{
-				MPI_Allreduce( &particleFlux[ispec][i_direction], &flux_temp, 1, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-				particleFlux[ispec][i_direction] = flux_temp;
+			smpi->reduce_sum_double(&angle_distribution_right[ispce][0], &angle_distribution_temp[0], 90);
+			angle_distribution_right[ispec] = angle_distribution_temp;
 
-				MPI_Allreduce( &heatFlux[ispec][i_direction], &flux_temp, 1, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-				heatFlux[ispec][i_direction] = flux_temp;
+			smpi->reduce_sum_double(&energy_distribution_left[ispce][0], &energy_distribution_temp[0], n_energy);
+			energy_distribution_left[ispec] = energy_distribution_temp;
 
-				MPI_Allreduce( &angleDist[ispec][i_direction][0], &angle_temp[0], 90, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-				angleDist[ispec][i_direction] = angle_temp;
-			}
+			smpi->reduce_sum_double(&energy_distribution_right[ispce][0], &energy_distribution_temp[0], n_energy);
+			energy_distribution_right[ispec] = energy_distribution_temp;
 		}
 
-		s1 = vecSpecies[0];
-		wlt = s1->species_param.weight / (dx_inv_ * timestep * step_ave);
+		smpi->reduce_sum_double(&psi_rate_left[0], &psi_rate_temp[0], n_psi);
+		psi_rate_left = psi_rate_temp;
+
+		smpi->reduce_sum_double(&psi_rate_right[0], &psi_rate_temp[0], n_psi);
+		psi_rate_right = psi_rate_temp;
+
 		for(int i_collision = 0; i_collision < n_collision; i_collision++)
 		{
-			smpi->reduce_sum_double(&radiative_energy_collision[i_collision][0], &radiative_energy_collision_global[i_collision][0], radiative_energy_collision[i_collision].size());
-			for(int i_bin = 0; i_bin < radiative_energy_collision_global[i_collision].size(); i_bin++)
-			{
-				radiative_energy_collision_global[i_collision][i_bin] *= wlt;
-			}
+			smpi->reduce_sum_double(&radiative_energy_collision[i_collision][0], &radiative_energy_collision_temp[i_collision][0], radiative_energy_collision[i_collision].size());
+			radiative_energy_collision[i_collision] = radiative_energy_collision_temp;
 		}
 	}
 
-	//calculate velocity and temperature of each species
 	calVT(smpi, vecSpecies, EMfields, itime);
 
 	//calTotalEnergy(smpi, vecSpecies, EMfields, itime);
@@ -224,7 +250,7 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 
 }
 
-
+//calculate velocity, temperature, total particle energy for each species, total electric field energy
 void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroMagn* EMfields, int itime)
 {
 	Species *s1;
@@ -236,28 +262,28 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 	double vx, vy, vz;
 	double step_ave_inv_;
 	double v_square;
-	vector<int> number_temp;
-	vector<double> energy_temp;
+	vector<int> particle_number_temp;
+	vector<double> total_particle_energy_temp;
 
-	number_temp.resize(n_species);
-	energy_temp.resize(n_species);
+	particle_number_temp.resize(n_species);
+	total_particle_energy_temp.resize(n_species);
 	step_ave_inv_ = 1.0 / step_ave;
-	for(int iSpec = 0; iSpec < vecSpecies.size(); iSpec++)
+	for(int ispec = 0; ispec < vecSpecies.size(); ispec++)
 	{
-		s1 = vecSpecies[iSpec];
+		s1 = vecSpecies[ispec];
 		p1 = &(s1->particles);
-		Field1D* Vx1D_s = static_cast<Field1D*>(EMfields->Vx_s[iSpec]);
-		Field1D* Vy1D_s = static_cast<Field1D*>(EMfields->Vy_s[iSpec]);
-		Field1D* Vz1D_s = static_cast<Field1D*>(EMfields->Vz_s[iSpec]);
-		Field1D* Vp1D_s = static_cast<Field1D*>(EMfields->Vp_s[iSpec]);
+		Field1D* Vx1D_s = static_cast<Field1D*>(EMfields->Vx_s[ispec]);
+		Field1D* Vy1D_s = static_cast<Field1D*>(EMfields->Vy_s[ispec]);
+		Field1D* Vz1D_s = static_cast<Field1D*>(EMfields->Vz_s[ispec]);
+		Field1D* Vp1D_s = static_cast<Field1D*>(EMfields->Vp_s[ispec]);
 
-		Field1D* Vx1D_s_avg = static_cast<Field1D*>(EMfields->Vx_s_avg[iSpec]);
-		Field1D* Vy1D_s_avg = static_cast<Field1D*>(EMfields->Vy_s_avg[iSpec]);
-		Field1D* Vz1D_s_avg = static_cast<Field1D*>(EMfields->Vz_s_avg[iSpec]);
-		Field1D* Vp1D_s_avg = static_cast<Field1D*>(EMfields->Vp_s_avg[iSpec]);
+		Field1D* Vx1D_s_avg = static_cast<Field1D*>(EMfields->Vx_s_avg[ispec]);
+		Field1D* Vy1D_s_avg = static_cast<Field1D*>(EMfields->Vy_s_avg[ispec]);
+		Field1D* Vz1D_s_avg = static_cast<Field1D*>(EMfields->Vz_s_avg[ispec]);
+		Field1D* Vp1D_s_avg = static_cast<Field1D*>(EMfields->Vp_s_avg[ispec]);
 
-		Field1D* T1D_s = static_cast<Field1D*>(EMfields->T_s[iSpec]);
-		Field1D* T1D_s_avg = static_cast<Field1D*>(EMfields->T_s_avg[iSpec]);
+		Field1D* T1D_s = static_cast<Field1D*>(EMfields->T_s[ispec]);
+		Field1D* T1D_s_avg = static_cast<Field1D*>(EMfields->T_s_avg[ispec]);
 
 		if( ((itime - 1) % step_dump) == 0 ) {
 			Vx1D_s_avg->put_to(0.0);
@@ -279,17 +305,17 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 			Vp1D_s->put_to(0.0);
 			T1D_s->put_to(0.0);
 
-			//reset particleNumber and kineticEnergy
-			particleNumber[iSpec] = 0;
-			kineticEnergy[iSpec] = 0.0;
-			//get particleNumber
-			particleNumber[iSpec] = p1->size();
+			//reset particle_number and total_particle_energy
+			particle_number[ispec] = 0;
+			total_particle_energy[ispec] = 0.0;
+			//get particle_number
+			particle_number[ispec] = p1->size();
 
 			for(int i_particle = 0; i_particle < p1->size(); i_particle++)
 			{
 				//Locate particle on the grid
 				xjn    = p1->position(0, i_particle) * dx_inv_;  	//normalized distance to the first node
-				i_temp      = floor(xjn);                   		//index of the central node
+				i_temp = floor(xjn);                   				//index of the central node
 				xjmxi  = xjn - (double)i_temp;              		//normalized distance to the nearest grid point
 
 				i_temp -= index_domain_begin;
@@ -299,9 +325,9 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 				(*Vz1D_s)(i_temp) 		+= p1->momentum(2, i_particle);
 				(*Vp1D_s)(i_temp) 		+= (p1->momentum(0, i_particle) * sinPhi + p1->momentum(1, i_particle) * cosPhi);
 
-				//calculate total kineticEnergy
+				//calculate total total_particle_energy
 				v_square = p1->momentum(0, i_particle) * p1->momentum(0, i_particle) + p1->momentum(1, i_particle) * p1->momentum(1, i_particle) + p1->momentum(2, i_particle) * p1->momentum(2, i_particle);
-				kineticEnergy[iSpec] += ( m_ov_2 * v_square );
+				total_particle_energy[ispec] += ( m_ov_2 * v_square );
 			}
 			for(int i = 0; i < ptclNum1D->dims_[0]; i++)
 			{
@@ -366,23 +392,36 @@ void Diagnostic1D::calVT(SmileiMPI* smpi, vector<Species*>& vecSpecies, ElectroM
 
 			//another way: firstly gather V, T, ptclNum, then calculate V_global, T_global
 			SmileiMPI_Cart1D* smpi1D = static_cast<SmileiMPI_Cart1D*>(smpi);
-			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vx_s_global_avg[iSpec]), Vx1D_s_avg );
-			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vy_s_global_avg[iSpec]), Vy1D_s_avg );
-			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vz_s_global_avg[iSpec]), Vz1D_s_avg );
-			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vp_s_global_avg[iSpec]), Vp1D_s_avg );
-			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->T_s_global_avg [iSpec]), T1D_s_avg );
+			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vx_s_global_avg[ispec]), Vx1D_s_avg );
+			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vy_s_global_avg[ispec]), Vy1D_s_avg );
+			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vz_s_global_avg[ispec]), Vz1D_s_avg );
+			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->Vp_s_global_avg[ispec]), Vp1D_s_avg );
+			smpi1D->gatherField2( static_cast<Field1D*>(EMfields->T_s_global_avg [ispec]), T1D_s_avg );
 
 		}
 
 	}
-	//gather particleNumber and kineticEnergy to master process
+	//sum particle_number and total_particle_energy to master process
 	if( (itime % step_dump) == 0 )
 	{
-		MPI_Allreduce( &particleNumber[0], &number_temp[0], n_species , MPI_INT,MPI_SUM, MPI_COMM_WORLD);
-		particleNumber = number_temp;
-		MPI_Allreduce( &kineticEnergy[0], &energy_temp[0], n_species , MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-		kineticEnergy = energy_temp;
+		smpi->reduce_sum_int(&particle_number[0], &particle_number_temp[0], n_species);
+		particle_number = particle_number_temp;
+		smpi->reduce_sum_double(&total_particle_energy[0], &total_particle_energy_temp[0], n_species);
+		total_particle_energy = total_particle_energy_temp;
 	}
+
+
+	//calculate electric field energy
+	Field1D* Ex1D = static_cast<Field1D*>(EMfields->Ex_);
+	for(int i = oversize[0]; i < Ex1D->dims_[0] - oversize[0]; i++)
+	{
+			total_electric_field_energy += (*Ex1D)(i) * (*Ex1D)(i);
+	}
+
+	smpi->reduce_sum_double(&total_electric_field_energy, &total_electric_field_energy_temp, 1);
+	totalParticleEnergy = total_electric_field_energy_temp;
+	total_electric_field_energy = total_electric_field_energy_temp;
+
 
 
 }
@@ -394,48 +433,37 @@ void Diagnostic1D::calTotalEnergy(SmileiMPI* smpi, vector<Species*>& vecSpecies,
 		Particles *p1;
 		double m_ov_2, v_square;
 		int i;
-		double totalElectricFieldEnergy_temp;
-		vector<double> totalParticleEnergy_temp;
-		totalParticleEnergy_temp.resize(n_species);
+		double total_electric_field_energy_temp;
+		vector<double> total_electric_field_energy_temp;
+		total_electric_field_energy_temp.resize(n_species);
 
-		for(int iSpec = 0; iSpec < vecSpecies.size(); iSpec++)
+		for(int ispec = 0; ispec < vecSpecies.size(); ispec++)
 		{
-				s1 = vecSpecies[iSpec];
+				s1 = vecSpecies[ispec];
 				p1 = &(s1->particles);
 
 				m_ov_2 = s1->species_param.mass / 2.0;
 
-				//reset particleNumber and kineticEnergy
-				totalParticleEnergy[iSpec] = 0.0;
+				//reset particle_number and total_particle_energy
+				totalParticleEnergy[ispec] = 0.0;
 
 				for(int i_particle = 0; i_particle < p1->size(); i_particle++)
 				{
-					//calculate total kineticEnergy
+					//calculate total total_particle_energy
 					v_square = p1->momentum(0, i_particle) * p1->momentum(0, i_particle) + p1->momentum(1, i_particle) * p1->momentum(1, i_particle) + p1->momentum(2, i_particle) * p1->momentum(2, i_particle);
-					totalParticleEnergy[iSpec] += ( m_ov_2 * v_square );
+					totalParticleEnergy[ispec] += ( m_ov_2 * v_square );
 				}
 
 		}
 
-		totalElectricFieldEnergy = 0.0;
+		total_electric_field_energy = 0.0;
 		Field1D* Ex1D = static_cast<Field1D*>(EMfields->Ex_);
 		for(int i = oversize[0]; i < Ex1D->dims_[0] - oversize[0]; i++)
 		{
-				totalElectricFieldEnergy += (*Ex1D)(i) * (*Ex1D)(i);
+				total_electric_field_energy += (*Ex1D)(i) * (*Ex1D)(i);
 		}
 
-		smpi->reduce_sum_double(&totalParticleEnergy[0], &totalParticleEnergy_temp[0], n_species);
-		smpi->reduce_sum_double(&totalElectricFieldEnergy, &totalElectricFieldEnergy_temp, 1);
-		totalParticleEnergy = totalParticleEnergy_temp;
-		totalElectricFieldEnergy = totalElectricFieldEnergy_temp;
-
-		if(smpi->isMaster())
-		{
-				ofstream outfile;
-				outfile.open("totalEnergy.txt", ios::app);
-				outfile<<setw(15)<<itime<<setw(15)<<totalElectricFieldEnergy<<setw(15)<<totalParticleEnergy[0]<<setw(15)<<totalParticleEnergy[1]
-							 <<setw(15)<<totalParticleEnergy[0]+totalParticleEnergy[1]<<endl;
-				outfile.close();
-		}
-
+		smpi->reduce_sum_double(&totalParticleEnergy[0], &total_electric_field_energy_temp[0], n_species);
+		smpi->reduce_sum_double(&total_electric_field_energy, &total_electric_field_energy_temp, 1);
+		total_electric_field_energy = total_electric_field_energy_temp;
 }

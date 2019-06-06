@@ -38,15 +38,17 @@ public:
     // Create particles h5 file pattern
     void createDiagsPattern( PicParams& params, Diagnostic* diag);
 
-    void initVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies );
-    // calculate velocity distribution function
-    void calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime);
-
     // write grid to grid.h5 file
     virtual void writeGrid(Grid* grid){};
 
     // read grid from grid.h5 file
     virtual void readGrid(Grid* grid){};
+
+
+    //methods to calculate VDF should be removed to Diagnostic Class
+    void initVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies );
+    // calculate velocity distribution function
+    void calVDF( PicParams& params, SmileiMPI* smpi, ElectroMagn* fields, vector<Species*>& vecSpecies, int itime);
 
 private:
 

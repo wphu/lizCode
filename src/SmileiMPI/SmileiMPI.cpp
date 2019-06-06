@@ -116,19 +116,29 @@ void SmileiMPI::sumRhoJs( ElectroMagn* EMfields, int ispec, bool currents )
    }
 }
 
-
-void SmileiMPI::reduce_sum_double( double* src, double* des, int n )
+int SmileiMPI::globalNbrParticles(Species* species) 
 {
-    MPI_Allreduce( src, des, n, MPI_DOUBLE, MPI_SUM, SMILEI_COMM_WORLD );
-}
-
-
-int SmileiMPI::globalNbrParticles(Species* species) {
     int nParticles(0);
     int locNbrParticles(0);
     locNbrParticles = species->getNbrOfParticles();
     MPI_Reduce(&locNbrParticles, &nParticles, 1, MPI_INT, MPI_SUM, 0, SMILEI_COMM_WORLD);
     return nParticles;
+}
+
+
+void SmileiMPI::bcast_double(double* buffer, int N, int root_rank)
+{
+    MPI_Bcast(buffer, N, MPI_DOUBLE, root_rank, SMILEI_COMM_WORLD);
+}
+
+void SmileiMPI::reduce_sum_int(int* src, int* des, int n)
+{
+    MPI_Reduce(src, des, n, MPI_INT, MPI_SUM, 0, SMILEI_COMM_WORLD);
+}
+
+void SmileiMPI::reduce_sum_double(double* src, double* des, int n)
+{
+    MPI_Reduce(src, des, n, MPI_DOUBLE, MPI_SUM, 0, SMILEI_COMM_WORLD);
 }
 
 void SmileiMPI::reduce_sum_field(Field* field_send, Field* field_recv)

@@ -118,14 +118,6 @@ public:
         return max_local[i];
     }
 
-
-    inline void bcast_double(double* buffer, int N, int root_rank)
-    {
-        MPI_Bcast(buffer, N, MPI_DOUBLE, root_rank, SMILEI_COMM_WORLD);
-    }
-
-
-
     //Temporary storage of particles Id to exchange, merge from per thread storage
     //A single communication per direction managed by thread master in OpenMP
     //@see Species::indexes_of_particles_to_exchange_per_thrd
@@ -148,9 +140,6 @@ public:
 
     int globalNbrParticles(Species* species);
 
-    // Broadcast a string in current communicator
-    void bcast( std::string& val );
-
     virtual void scatterGrid( Grid* grid ){};
 
     //gatherField0: values at the nodes, like electric field, electric potential
@@ -165,8 +154,13 @@ public:
     virtual void scatterField( Field* field_global ,Field* field ){};
     virtual void gatherVDF( Array4D* array_global, Array4D* array ){};
 
-    virtual void reduce_sum_double( double* src, double* des, int n);
-    virtual void reduce_sum_field(Field* field_send, Field* field_recv);
+
+    //broadcast a string in current communicator
+    void bcast( std::string& val );
+    void bcast_double(double* buffer, int N, int root_rank);
+    void reduce_sum_int( double* src, double* des, int n);
+    void reduce_sum_double( double* src, double* des, int n);
+    void reduce_sum_field(Field* field_send, Field* field_recv);
 
 
     //Real (exclunding oversize) global number of cells (res_space x sim_length)
