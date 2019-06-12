@@ -29,7 +29,8 @@ public:
     double          load_temperature_unLimit_factor,
     vector<double>  load_dn_vector,
     double          load_Pos_start,
-    double          load_Pos_end );
+    double          load_Pos_end,
+    double          load_step_update);
 
     ~PartSource1D_Load();
 

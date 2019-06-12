@@ -1,6 +1,7 @@
 #include "PSI1D_Sputtering.h"
 #include "SmileiMPI.h"
 #include "Field2D.h"
+#include "Diagnostic1D.h"
 
 #include <cmath>
 #include <iomanip>
@@ -57,9 +58,9 @@ void PSI1D_Sputtering::init(vector<Species*>& vecSpecies)
     double an2 = s2->species_param.atomic_number;
     double am2 = s2->species_param.atomic_mass;
     double es = s2->species_param.surface_binding_energy;
-    double n = s2->species_param.density_solid;
+    double density = s2->species_param.density_solid;
 
-    sputtering = new PhysicalSputtering_EmpiricalFormula(an1, am1, an2, am2, es, n);
+    sputtering = new PhysicalSputtering_EmpiricalFormula(an1, am1, an2, am2, es, density);
 }
 
 
@@ -83,23 +84,40 @@ void PSI1D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
     p1 = &(s1->psi_particles);
     p2 = &(s2->psi_particles);
 
+    Diagnostic1D *diag1D = static_cast<Diagnostic1D*>(diag);
 
     iDim = 0;
     nPartEmit = 0;
     int nPart = p1->size();
     for(unsigned int iPart = 0; iPart < nPart; iPart++)
     {
-        if( p1->position(iDim,iPart) < smpi->getDomainLocalMin(iDim) || p1->position(iDim,iPart) > smpi->getDomainLocalMax(iDim) ) {
+        if(p1->position(iDim,iPart) < smpi->getDomainLocalMin(iDim)) 
+        {
             v_square = pow(p1->momentum(0,iPart),2) + pow(p1->momentum(1,iPart),2) + pow(p1->momentum(2,iPart),2);
             theta = abs( p1->momentum(0,iPart) ) / sqrt( v_square );
             theta *= ( 180.0 / params.const_pi );
             ke = 0.5 * s1->species_param.mass * v_square;
-            //ke *= params.norm_temperature;
             pSput = sputtering->phy_sput_yield( theta, ke/const_e );
             double ran_p = (double)rand() / RAND_MAX;
             if( pSput > ran_p ) {
                 nPartEmit++;
             }
+
+            diag1D->psi_rate_left[n_psi] += pSput;
+        }
+        else if(p1->position(iDim,iPart) > smpi->getDomainLocalMax(iDim)) 
+        {
+            v_square = pow(p1->momentum(0,iPart),2) + pow(p1->momentum(1,iPart),2) + pow(p1->momentum(2,iPart),2);
+            theta = abs( p1->momentum(0,iPart) ) / sqrt( v_square );
+            theta *= ( 180.0 / params.const_pi );
+            ke = 0.5 * s1->species_param.mass * v_square;
+            pSput = sputtering->phy_sput_yield( theta, ke/const_e );
+            double ran_p = (double)rand() / RAND_MAX;
+            if( pSput > ran_p ) {
+                nPartEmit++;
+            }
+
+            diag1D->psi_rate_right[n_psi] += pSput;
         }
     };
 

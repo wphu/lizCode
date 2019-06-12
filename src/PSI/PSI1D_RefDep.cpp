@@ -71,20 +71,23 @@ void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, ve
     double pSput;
     int iDim;
 
+    Diagnostic1D *diag1D = static_cast<Diagnostic1D*>(diag);
+
     iDim = 0;
     int nPartEmit = 0;
     int nPart = p1->size();
     for(unsigned int iPart = 0; iPart < nPart; iPart++)
     {
-        if( p1->position(iDim,iPart) < smpi->getDomainLocalMin(iDim) || p1->position(iDim,iPart) > smpi->getDomainLocalMax(iDim) ) {
+        if(p1->position(iDim,iPart) < smpi->getDomainLocalMin(iDim)) 
+        {
             v_square = pow(p1->momentum(0,iPart),2) + pow(p1->momentum(1,iPart),2) + pow(p1->momentum(2,iPart),2);
             theta = abs( p1->momentum(0,iPart) ) / sqrt( v_square );
             theta *= ( 180.0 / params.const_pi );
             ke = 0.5 * s1->species_param.mass * v_square;
-            //ke *= params.norm_temperature;
             backscattering->scatter( rn, re, theta, ke/const_e );
             double ran_p = (double)rand() / RAND_MAX;
-            if( rn > ran_p ) {
+            if( rn > ran_p ) 
+            {
                 emitTemp = re * ke;
                 new_particles.create_particle();
                 if(psiPos == "left")
@@ -138,6 +141,74 @@ void PSI1D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, ve
                 new_particles.charge(iPart) = s1->species_param.charge;
                 nPartEmit++;
             }
+
+            diag1D->psi_rate_left[n_psi] += rn;
+        }
+        else if(p1->position(iDim,iPart) > smpi->getDomainLocalMax(iDim)) 
+        {
+            v_square = pow(p1->momentum(0,iPart),2) + pow(p1->momentum(1,iPart),2) + pow(p1->momentum(2,iPart),2);
+            theta = abs( p1->momentum(0,iPart) ) / sqrt( v_square );
+            theta *= ( 180.0 / params.const_pi );
+            ke = 0.5 * s1->species_param.mass * v_square;
+            backscattering->scatter( rn, re, theta, ke/const_e );
+            double ran_p = (double)rand() / RAND_MAX;
+            if( rn > ran_p ) 
+            {
+                emitTemp = re * ke;
+                new_particles.create_particle();
+                if(psiPos == "left")
+                {
+                    new_particles.position(0,iPart)=(((double)rand() / RAND_MAX))*params.cell_length[0]*posOffset;
+                    new_particles.position_old(0,iPart) = new_particles.position(0,iPart);
+
+                    double ran;
+                    do {
+                        ran = (double)rand() / RAND_MAX;
+                    }
+                    while (ran == 0.0);
+
+                    // initialize using the Maxwell distribution function in x-direction
+                    double psm = sqrt(2.0 * emitTemp / s1->species_param.mass) * sqrt(-log(ran));
+                    double theta = M_PI*(double)rand() / RAND_MAX;
+                    double phi   = 2.0 * M_PI*(double)rand() / RAND_MAX;
+                    new_particles.momentum(0,iPart) = abs( psm*sin(theta)*cos(phi) );
+                }
+                else if(psiPos == "right")
+                {
+                    new_particles.position(0,iPart)=params.cell_length[0]*params.n_space_global[0] - (((double)rand() / RAND_MAX))*params.cell_length[0]*posOffset;
+                    new_particles.position_old(0,iPart) = new_particles.position(0,iPart);
+
+                    double ran;
+                    do {
+                        ran = (double)rand() / RAND_MAX;
+                    }
+                    while (ran == 0.0);
+                    // initialize using the Maxwell distribution function in x-direction
+                    double psm = sqrt(2.0 * emitTemp / s1->species_param.mass) * sqrt(-log(ran));
+                    double theta = M_PI*(double)rand() / RAND_MAX;
+                    double phi   = 2.0 * M_PI*(double)rand() / RAND_MAX;
+                    new_particles.momentum(0,iPart) = -abs( psm*sin(theta)*cos(phi) );
+                }
+                else
+                {
+                    return;
+                }
+                new_particles.momentum(1,nPartEmit) = 0.0;
+                new_particles.momentum(2,nPartEmit) = 0.0;
+
+                new_particles.al_imp(0,iPart) = 0.0;
+                new_particles.al_imp(1,iPart) = 0.0;
+                new_particles.al_imp(2,iPart) = 0.0;
+                new_particles.au_imp(0,iPart) = 0.0;
+                new_particles.au_imp(1,iPart) = 0.0;
+                new_particles.au_imp(2,iPart) = 0.0;
+
+                new_particles.weight(iPart) = weight_const;
+                new_particles.charge(iPart) = s1->species_param.charge;
+                nPartEmit++;
+            }
+
+            diag1D->psi_rate_right[n_psi] += rn;
         }
     };
 

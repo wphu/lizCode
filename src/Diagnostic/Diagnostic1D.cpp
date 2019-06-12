@@ -128,7 +128,7 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 				v_magnitude = sqrt(v_square);
 				energy = mass_ov_2 * v_square;
 				i_angle = 90.0 * acos( abs(p1->momentum(0,i_particle)) / v_magnitude ) / pi_ov_2;
-				i_energy = n_energy * energy / energy_max;
+				i_energy = n_energy * (energy / const_e) / energy_max;
 				if(i_energy >= n_energy)
 				{
 					i_energy = n_energy + 1;

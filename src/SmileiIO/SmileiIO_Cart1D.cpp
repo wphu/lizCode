@@ -282,7 +282,7 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
         //============== write Diagnostic: particle_flux, heat_flux and angle_distribution ============
         //============== particle_number, particle_energy, radiative_energy_collision      ============
-        diagsGroup.group_id = H5Gcreate(data_file_id, "/Diagnostic", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);
+        group_id = H5Gcreate(data_file_id, "/Diagnostic", H5P_DEFAULT, H5P_DEFAULT,H5P_DEFAULT);
 
         //total_electric_field_energy
         dims_global[0] = 1;
@@ -292,7 +292,7 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         dataspace_id = H5Screate_simple(n_dims_data, dims_global, NULL);
  
         dataset_id   = H5Dcreate2(group_id, "total_electric_field_energy", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->total_electric_field_energy));
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->total_electric_field_energy));
         status       = H5Dclose(dataset_id);
         status       = H5Sclose(dataspace_id);
 
@@ -303,34 +303,30 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
         dataspace_id = H5Screate_simple(n_dims_data, dims_global, NULL);
  
-        dataset_id   = H5Dcreate2(group_id, "particle_number", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->particle_number[0]));
+        dataset_id   = H5Dcreate2(group_id, "particle_number", H5T_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->particle_number[0]));
         status       = H5Dclose(dataset_id);
-        status       = H5Sclose(dataspace_id);
 
         dataset_id   = H5Dcreate2(group_id, "total_particle_energy", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->total_particle_energy[0]));
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->total_particle_energy[0]));
         status       = H5Dclose(dataset_id);
-        status       = H5Sclose(dataspace_id);
 
         dataset_id   = H5Dcreate2(group_id, "particle_flux_left", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->particle_flux_left[0]));
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->particle_flux_left[0]));
         status       = H5Dclose(dataset_id);
-        status       = H5Sclose(dataspace_id);
 
         dataset_id   = H5Dcreate2(group_id, "particle_flux_right", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->particle_flux_right[0]));
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->particle_flux_right[0]));
         status       = H5Dclose(dataset_id);
-        status       = H5Sclose(dataspace_id);
 
         dataset_id   = H5Dcreate2(group_id, "heat_flux_left", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->heat_flux_left[0]));
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->heat_flux_left[0]));
         status       = H5Dclose(dataset_id);
-        status       = H5Sclose(dataspace_id);
 
         dataset_id   = H5Dcreate2(group_id, "heat_flux_right", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->heat_flux_right[0]));
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->heat_flux_right[0]));
         status       = H5Dclose(dataset_id);
+
         status       = H5Sclose(dataspace_id);    
 
         //angle_distribution
@@ -350,13 +346,12 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             count[1]  = 1;
             count[2]  = 90;
 
-            memspace_id = H5Screate_simple (n_dims_data, diagsGroup.count, NULL);
-            status      = H5Sselect_hyperslab (diagsGroup.dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
-            status      = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->angle_distribution_left[ispec][0])) ;
-            status      = H5Sclose (diagsGroup.memspace_id);
+            memspace_id = H5Screate_simple(n_dims_data, count, NULL);
+            status      = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
+            status      = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->angle_distribution_left[ispec][0])) ;
+            status      = H5Sclose(memspace_id);
         }
         status = H5Dclose(dataset_id);
-        status = H5Sclose(dataspace_id);
 
         dataset_id = H5Dcreate2(group_id, "angle_distribution_right", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         for(int ispec = 0; ispec < diag1D->n_species; ispec++)
@@ -368,10 +363,10 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             count[1]  = 1;
             count[2]  = 90;
 
-            memspace_id = H5Screate_simple(n_dims_data, diagsGroup.count, NULL);
-            status      = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
+            memspace_id = H5Screate_simple(n_dims_data, count, NULL);
+            status      = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
             status      = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->angle_distribution_right[ispec][0]));
-            status      = H5Sclose(diagsGroup.memspace_id);
+            status      = H5Sclose(memspace_id);
         }
         status = H5Dclose(dataset_id);
         status = H5Sclose(dataspace_id);
@@ -393,13 +388,12 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             count[1]  = 1;
             count[2]  = diag1D->n_energy;
 
-            memspace_id = H5Screate_simple(n_dims_data, diagsGroup.count, NULL);
-            status      = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
+            memspace_id = H5Screate_simple(n_dims_data, count, NULL);
+            status      = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
             status      = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->energy_distribution_left[ispec][0]));
-            status      = H5Sclose(diagsGroup.memspace_id);
+            status      = H5Sclose(memspace_id);
         }
         status = H5Dclose(dataset_id);
-        status = H5Sclose(dataspace_id);
 
         dataset_id = H5Dcreate2(group_id, "energy_distribution_right", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         for(int ispec = 0; ispec < diag1D->n_species; ispec++)
@@ -411,10 +405,10 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             count[1]  = 1;
             count[2]  = diag1D->n_energy;
 
-            memspace_id = H5Screate_simple(n_dims_data, diagsGroup.count, NULL);
-            status      = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
+            memspace_id = H5Screate_simple(n_dims_data, count, NULL);
+            status      = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
             status      = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->energy_distribution_right[ispec][0]));
-            status      = H5Sclose(diagsGroup.memspace_id);
+            status      = H5Sclose(memspace_id);
         }
         status = H5Dclose(dataset_id);
         status = H5Sclose(dataspace_id);
@@ -427,12 +421,11 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         dataspace_id = H5Screate_simple(n_dims_data, dims_global, NULL);
  
         dataset_id   = H5Dcreate2(group_id, "psi_rate_left", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->psi_rate_left[0]));
+        status       = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->psi_rate_left[0]));
         status       = H5Dclose(dataset_id);
-        status       = H5Sclose(dataspace_id);
 
         dataset_id   = H5Dcreate2(group_id, "psi_rate_right", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        status       = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->psi_rate_right[0]));
+        status       = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->psi_rate_right[0]));
         status       = H5Dclose(dataset_id);
         status       = H5Sclose(dataspace_id);
 
@@ -453,10 +446,10 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
             count[1]  = 1;
             count[2]  = diag1D->n_space_global[0];
 
-            memspace_id = H5Screate_simple(n_dims_data, diagsGroup.count, NULL);
-            status      = H5Sselect_hyperslab(diagsGroup.dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
+            memspace_id = H5Screate_simple(n_dims_data, count, NULL);
+            status      = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, stride, count, block);
             status      = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, &(diag1D->radiative_energy_collision[i_collision][0]));
-            status      = H5Sclose(diagsGroup.memspace_id);
+            status      = H5Sclose(memspace_id);
         }
         status = H5Dclose(dataset_id);
         status = H5Sclose(dataspace_id);

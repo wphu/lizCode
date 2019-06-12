@@ -109,7 +109,7 @@ void PSI2D_Sputtering::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid
         
         pSput = sputtering->phy_sput_yield(theta, energy_incident / const_e);
 
-        diag2D->psiRate[n_PSI][iLine_cross][iSegment_cross] += pSput;
+        diag2D->psiRate[n_psi][iLine_cross][iSegment_cross] += pSput;
 
         if(is_self_consistent)
         {

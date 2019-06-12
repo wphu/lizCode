@@ -28,8 +28,8 @@ PartSource1D_Load::PartSource1D_Load(
     double          load_temperature_unLimit_factor,
     vector<double>  load_dn_vector,
     double          load_Pos_start,
-    double          load_Pos_end
-):
+    double          load_Pos_end,
+    double          load_step_update):
 PartSource1D (params, smpi)
 
 {
@@ -45,6 +45,7 @@ PartSource1D (params, smpi)
     loadTemperature = load_temperature;
     loadPos_start   = load_Pos_start;
     loadPos_end     = load_Pos_end;
+    step_update     = load_step_update;
 
     loadTimeStepVector      = load_timeStep_vector;
     loadTemperatureVector   = load_temperature_vector;
@@ -202,6 +203,8 @@ void PartSource1D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
     double source_density;
     double zoom_factor;
 	double loadDn_temp;
+
+    if(itime % step_update != 0){ return; }
 
     if(loadKind == "nq")
     {

@@ -180,6 +180,9 @@ public:
 				loadPos_end = 0.0; // default
 				ifile.extract("loadPos_end",loadPos_end,"PartSource",n_PartSource);
 
+				step_update = 1;
+				ifile.extract("step_update",step_update,"PartSource",n_PartSource);
+
 		        // Print PSI parameters
 		        mystream.str(""); // clear
 		        for (unsigned int rs=0 ; rs<sgroup1.size() ; rs++) mystream << " #" << sgroup1[rs];
@@ -189,7 +192,7 @@ public:
 		        //vecPartSource.push_back( new PartSource1D_Load(params, smpi, sgroup1[0], loadDensity, loadTemperature, loadPos_start, loadPos_end) );
 				vecPartSource.push_back( new PartSource1D_Load(params, smpi, sgroup1[0], sgroup_dependent, mean_velocity, loadKind, loadNumber, loadDn,
 															   loadDensity, loadTemperature, loadTimeStepVector, loadTemperatureVector, loadTemperature_upLimit_factor,
-															   loadDnVector, loadPos_start, loadPos_end) );
+															   loadDnVector, loadPos_start, loadPos_end, step_update) );
 
 			}
 

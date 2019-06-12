@@ -101,7 +101,7 @@ void PSI2D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, ve
         
         backscattering->scatter(rn, re, theta, energy_incident / const_e);
 
-        diag2D->psiRate[n_PSI][iLine_cross][iSegment_cross] += rn;
+        diag2D->psiRate[n_psi][iLine_cross][iSegment_cross] += rn;
 
         // add reflected particle if rn > ran_p
         double ran_p = (double)rand() / RAND_MAX;

@@ -62,7 +62,7 @@ public:
     };
 
     //! Identification number of the PSI object
-    int n_PSI;
+    int n_psi;
 
     // PSI position : only left and right for 1D case
     string psiPos;
