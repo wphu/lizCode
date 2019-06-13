@@ -11,24 +11,33 @@ import math
 method = 'explicit'
 
 l0 = 0.5e-5     # nu.norm_l is reference time, the value's unit before / is m (SI)
-Lsim = [500.*l0]	# length of the simulation
+Lsim = [1000.*l0]	# length of the simulation
 
 t0 = 0.5e-12
 ns = int( 1.0e-9 / t0 )
-Tsim = 30 * ns			# duration of the simulation
+Tsim = 200 * ns			# duration of the simulation
 output_step = 10
 
+
+# free parameters
+nx_source_left = 100
+
 # number of processes
-n_procs = 5
+n_procs = 20
 
+B = 2.0
+Bangle = 5.0
 
+#temperature of electron and ion is equal (eV)
+plasma_temperature = 20
 
-#> number of timestep of incrementing averaged electromagnetic fields
-ntime_step_avg = ns
+plasma_density = 1.0e19
+
 
 #> Timestep to output some fields into hdf5 file
 dump_step = int( Tsim / output_step )
 timesteps_restore = dump_step
+ntime_step_avg = dump_step
 
 ion_step = 1
 
@@ -57,16 +66,16 @@ bc_em_value_x = [60.0, 0.0]
 
 
 
-Bx = 0.0
-By = 0.0
+angle = Bangle * math.pi / 180.0
+Bx = B * math.sin(angle)
+By = B * math.cos(angle)
 Bz = 0.0
 externB = [Bx, By, Bz]
 
-ion_sound_velocity = math.sqrt( (20.0 * 1.6021766208e-19) / (2.0 * 1.67262158e-27) )
-vx = ion_sound_velocity
-vy = 0.0
+ion_sound_velocity = math.sqrt( (plasma_temperature * 1.6021766208e-19) / (2.0 * 1.67262158e-27) )
+vx = ion_sound_velocity * math.sin(angle)
+vy = ion_sound_velocity * math.cos(angle)
 vz = 0.0
-
 
 
 
@@ -124,15 +133,15 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 100,
-	n_part_per_cell_for_weight = 100,
+	n_part_per_cell = 200,
+	n_part_per_cell_for_weight = 200,
 	c_part_max = 1.0,
 	mass = 9.109382616e-31,
 	charge = -1.6021766208e-19,
-	nb_density = 1.0e19,
-	temperature = [20.0],
-	mean_velocity = [vx, vy, vz],
-	#mean_velocity = [0.0, 0.0, 0.0],
+	nb_density = plasma_density,
+	temperature = [plasma_temperature],
+	#mean_velocity = [vx, vy, vz],
+	mean_velocity = [0.0, 0.0, 0.0],
 	time_frozen = 0.,
 	bc_part_type_west  = 'supp',
 	bc_part_type_east  = 'supp',
@@ -143,13 +152,13 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 100,
-	n_part_per_cell_for_weight = 100,
+	n_part_per_cell = 200,
+	n_part_per_cell_for_weight = 200,
 	c_part_max = 1.0,
 	mass = 2.0 * 1.67262158e-27,
 	charge = 1.6021766208e-19,
-	nb_density = 1.0e19,
-	temperature = [20.0],
+	nb_density = plasma_density,
+	temperature = [plasma_temperature],
 	mean_velocity = [vx, vy, vz],
 	time_frozen = 0.0,
 	bc_part_type_west  = 'supp',
@@ -163,19 +172,20 @@ Species(
 # species2    = list of strings, the names of the second species that performPSI
 #               (can be the same as species1)
 
-nx_source_left = 200
 
 PartSource(
 	species1 = ["e"],
 	PartSource_type = "Load",
 	loadKind = "nT",
-	loadStep = 100,
-	loadDensity = 1.0e19,
-	loadTemperature = 20.0,
-	mean_velocity = [vx, vy ,vz],
+	loadStep = 10,
+	loadDensity = plasma_density,
+	loadTemperature = plasma_temperature,
+	#mean_velocity = [vx, vy ,vz],
+	mean_velocity = [0.0, 0.0 ,0.0],
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
 	loadPos_end 	= nx_source_left * l0,
+	step_update		= 10,
 
 
 
@@ -186,12 +196,13 @@ PartSource(
 	species1 = ["D1"],
 	PartSource_type = "Load",
 	loadKind = "nT",
-	loadStep = 100,
-	loadDensity = 1.0e19,
-	loadTemperature = 20.0,
+	loadStep = 10,
+	loadDensity = plasma_density,
+	loadTemperature = plasma_temperature,
 	mean_velocity = [vx, vy ,vz],
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
 	loadPos_end 	= nx_source_left * l0,
+	step_update		= 10,
 
 )

@@ -131,36 +131,36 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 				i_energy = n_energy * (energy / const_e) / energy_max;
 				if(i_energy >= n_energy)
 				{
-					i_energy = n_energy + 1;
+					i_energy = n_energy - 1;
 				}
 				if( p1->position(0,i_particle) < 0.0 ) 
 				{
-					particle_flux_left[ispec]++;
+					particle_flux_left[ispec] += 1.0;
 					heat_flux_left[ispec] += energy;
 					if (i_angle >= 0 && i_angle < 90)
 					{
-						angle_distribution_left[ispec][i_angle]++;
+						angle_distribution_left[ispec][i_angle] += 1.0;
 					}
 					else
 					{
 						WARNING("i_angle left out of range: i_angle = "<<i_angle);
 					}
-					energy_distribution_left[ispec][i_energy]++;					
+					energy_distribution_left[ispec][i_energy] += 1.0;					
 
 				}
 				else if( p1->position(0,i_particle) > sim_length[0] ) 
 				{
-					particle_flux_right[ispec]++;
+					particle_flux_right[ispec] += 1.0;
 					heat_flux_right[ispec] += energy;
 					if (i_angle >= 0 && i_angle < 90)
 					{
-						angle_distribution_right[ispec][i_angle]++;
+						angle_distribution_right[ispec][i_angle] += 1.0;
 					}
 					else
 					{
 						WARNING("i_angle right out of range: i_angle = "<<i_angle);
 					}
-					energy_distribution_right[ispec][i_energy]++;
+					energy_distribution_right[ispec][i_energy] +=1.0;
 				}
 			}
 		}
@@ -209,8 +209,15 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 		smpi->reduce_sum_double(&heat_flux_left[0], &flux_temp[0], n_species);
 		heat_flux_left = flux_temp;
 
-		smpi->reduce_sum_double(&heat_flux_left[0], &flux_temp[0], n_species);
+		smpi->reduce_sum_double(&heat_flux_right[0], &flux_temp[0], n_species);
 		heat_flux_right = flux_temp;
+
+		/*
+		if(itime > step_dump && smpi->isMaster()) 
+		{
+			cout<<particle_flux_right[0]/wlt<<"  "<<particle_flux_right[1]/wlt<<endl;
+		}
+		*/
 
 		for(int ispec = 0; ispec < n_species; ispec++)
 		{

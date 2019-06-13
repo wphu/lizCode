@@ -1,2 +1,2 @@
 clean:
-	rm data/errfile data/outfile data/data* -rf restore
+	rm *.png data/errfile data/outfile data/data* -rf restore
