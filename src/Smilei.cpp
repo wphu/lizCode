@@ -230,7 +230,7 @@ int main (int argc, char* argv[])
     EMfields->computeTotalRhoJ();
     if(params.self_consistent_electric_field)
     {
-        (*solver)(EMfields, smpi);
+        (*solver)(smpi, EMfields, diag);
     }
     
     smpi->barrier();
@@ -364,7 +364,7 @@ int main (int argc, char* argv[])
             EMfields->gatherFields(smpi);
             if(params.self_consistent_electric_field)
             {
-                (*solver)(EMfields, smpi);
+                (*solver)(smpi, EMfields, diag);
             }
             timer[9].update();
 
@@ -469,7 +469,7 @@ int main (int argc, char* argv[])
                 EMfields->restartRhoJ();
                 EMfields->computeTotalRhoJ();
                 EMfields->gatherFields(smpi);
-                (*solver)(EMfields, smpi);
+                (*solver)(smpi, EMfields, diag);
                 timer[9].update();
                 tid = 0;
                 timer[3].restart();

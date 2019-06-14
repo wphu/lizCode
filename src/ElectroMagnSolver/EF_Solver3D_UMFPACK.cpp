@@ -37,14 +37,14 @@ EF_Solver3D_UMFPACK::~EF_Solver3D_UMFPACK()
 {
 }
 
-void EF_Solver3D_UMFPACK::operator() ( ElectroMagn* fields )
+void EF_Solver3D_UMFPACK::operator()(ElectroMagn* fields)
 {
 
 }
 
 
 
-void EF_Solver3D_UMFPACK::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
+void EF_Solver3D_UMFPACK::operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)
 {
     SmileiMPI_Cart3D* smpi3D = static_cast<SmileiMPI_Cart3D*>(smpi);
     // Static-cast of the fields

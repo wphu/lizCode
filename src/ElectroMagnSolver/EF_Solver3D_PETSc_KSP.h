@@ -26,8 +26,8 @@ public:
     virtual ~EF_Solver3D_PETSc_KSP();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields);
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields);
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
     void solve_PETSc_KSP(Field* rho, Field* phi);
     void finish_PETSc_KSP();
     void init_PETSc_KSP_test();

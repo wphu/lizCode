@@ -33,10 +33,12 @@ public:
                 if(params.solver_type == "GeneralThomas")
                 {
                   solver = new EF_Solver1D_GeneralThomas(params, smpi, nx_source_left);
+                  MESSAGE("GeneralThomas solver is used");
                 }
-                else
+                else if(params.solver_type == "TDMA")
                 {
                   solver = new EF_Solver1D_TDMA(params, smpi, nx_source_left);
+                  MESSAGE("TDMA solver is used");
                 }
 
             }

@@ -26,8 +26,8 @@ public:
     virtual ~EF_Solver3D_UMFPACK();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields);
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields);
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
     void solve_UMFPACK(Field* rho, Field* phi);
     void finishUMFPACK();
     void initUMFPACK_test();

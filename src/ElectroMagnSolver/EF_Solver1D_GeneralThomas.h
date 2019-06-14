@@ -24,8 +24,8 @@ public:
     virtual ~EF_Solver1D_GeneralThomas();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields){};
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields){};
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
 
     void initGeneralThomas();
     void solve_GeneralThomas(Field* rho, Field* phi);

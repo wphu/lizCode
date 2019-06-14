@@ -48,7 +48,7 @@ void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields )
 
 
 
-void EF_Solver2D_SLU_DIST::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
+void EF_Solver2D_SLU_DIST::operator() (SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)
 {
     SmileiMPI_Cart2D* smpi2D = static_cast<SmileiMPI_Cart2D*>(smpi);
     // Static-cast of the fields

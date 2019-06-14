@@ -25,8 +25,8 @@ public:
     virtual ~EF_Solver2D_SLU();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields);
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields);
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
     void solve_SLU(Field* rho, Field* phi);
     void finishSLU();
     void initSLU_test();

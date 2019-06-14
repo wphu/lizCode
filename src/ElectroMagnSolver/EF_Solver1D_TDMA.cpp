@@ -3,6 +3,7 @@
 
 #include "ElectroMagn.h"
 #include "Field1D.h"
+#include "Diagnostic1D.h"
 
 EF_Solver1D_TDMA::EF_Solver1D_TDMA(PicParams &params, SmileiMPI* smpi, int nx_sou_left)
     : Solver1D(params)
@@ -15,38 +16,53 @@ EF_Solver1D_TDMA::EF_Solver1D_TDMA(PicParams &params, SmileiMPI* smpi, int nx_so
     nx = params.n_space_global[0]+1;
     nx_source_left = nx_sou_left;
 
-    if(params.bc_em_type_x[0] == "Dirichlet"){
+    if(bc_em_type_x[0] == "Dirichlet")
+    {
         bc_x_left = 1;
-        bc_e_value[0][0] = params.bc_em_value_x[0];
+        bc_e_value_left = bc_em_value_x[0];
     }
-    else if(params.bc_em_type_x[0] == "Neumann"){
+    else if(bc_em_type_x[0] == "Neumann")
+    {
         bc_x_left = 2;
-        bc_e_derivative[0][0] = params.bc_em_value_x[0];
+        bc_e_derivative_left = bc_em_value_x[0];
+    }
+    else if(bc_em_type_x[0] == "Neumann_self_consistent")
+    {
+        bc_x_left = 2;
+        bc_e_derivative_left = bc_em_value_x[0];
     }
 
-    if(params.bc_em_type_x[1] == "Dirichlet"){
+
+    if(bc_em_type_x[1] == "Dirichlet")
+    {
         bc_x_right = 1;
-        bc_e_value[0][1] = params.bc_em_value_x[1];
+        bc_e_value_right = bc_em_value_x[1];
     }
-    else if(params.bc_em_type_x[1] == "Neumann"){
+    else if(bc_em_type_x[1] == "Neumann")
+    {
         bc_x_right = 2;
-        bc_e_derivative[0][1] = params.bc_em_value_x[1];
+        bc_e_derivative_right = bc_em_value_x[1];
+    }
+    else if(bc_em_type_x[1] == "Neumann_self_consistent")
+    {
+        bc_x_right = 2;
+        bc_e_derivative_right = bc_em_value_x[1];   
     }
 
 
-
-    if(smpi1D->isMaster()){
-        //grid1D = static_cast<Grid1D*>(grid);
+    if(smpi1D->isMaster())
+    {
         initTDMA();
     }
-    //initSLU();
+
+    
 }
 
 EF_Solver1D_TDMA::~EF_Solver1D_TDMA()
 {
 }
 
-void EF_Solver1D_TDMA::operator()( ElectroMagn* fields, SmileiMPI* smpi)
+void EF_Solver1D_TDMA::operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)
 {
     SmileiMPI_Cart1D* smpi1D = static_cast<SmileiMPI_Cart1D*>(smpi);
     // Static-cast of the fields
@@ -59,7 +75,7 @@ void EF_Solver1D_TDMA::operator()( ElectroMagn* fields, SmileiMPI* smpi)
     Field1D* Ex1D_global    = static_cast<Field1D*>(fields->Ex_global);
 
     if(smpi1D->isMaster()){
-        solve_TDMA(rho1D_global, phi1D_global);
+        solve_TDMA(rho1D_global, phi1D_global, diag);
         //phi1D_global->put_to(0.0);
         solve_Ex(phi1D_global, Ex1D_global);
     }
@@ -118,29 +134,51 @@ void EF_Solver1D_TDMA::initTDMA()
 }
 
 
-void EF_Solver1D_TDMA::solve_TDMA(Field* rho, Field* phi)
+void EF_Solver1D_TDMA::solve_TDMA(Field* rho, Field* phi, Diagnostic* diag)
 {
     Field1D* rho1D = static_cast<Field1D*>(rho);
     Field1D* phi1D = static_cast<Field1D*>(phi);
 
-    //> The boundary value can be changed with time
+    Diagnostic1D* diag1D = static_cast<Diagnostic1D*>(diag);
+
+    if(bc_em_type_x[0] == "Neumann_self_consistent")
+    {
+        bc_e_derivative_left = 0.0;
+        for(int ispec = 0; ispec < diag1D->n_species; ispec++)
+        {
+            bc_e_derivative_left += diag1D->sigma_left[ispec];
+        }
+        bc_e_derivative_left *= const_ephi0_inv;
+    }
+
+    if(bc_em_type_x[1] == "Neumann_self_consistent")
+    {
+        bc_e_derivative_right = 0.0;
+        for(int ispec = 0; ispec < diag1D->n_species; ispec++)
+        {
+            bc_e_derivative_right += diag1D->sigma_right[ispec];
+        }
+        bc_e_derivative_right *= -const_ephi0_inv;
+    }
+
+    //The boundary value can be changed with time
     for(int i = 1; i < nx-1-nx_source_left; i++)
     {
         f[i] = -dx_sq * const_ephi0_inv * (*rho1D)(i+nx_source_left);
     }
 
     if(bc_x_left == 1){
-        f[0] = bc_e_value[0][0];
+        f[0] = bc_e_value_left;
     }
     else if(bc_x_left == 2){
-        f[0] = bc_e_derivative[0][0];
+        f[0] = bc_e_derivative_left * dx;
     }
 
     if(bc_x_right == 1){
-        f[nx-1-nx_source_left] = bc_e_value[0][1];
+        f[nx-1-nx_source_left] = bc_e_value_right;
     }
     else if(bc_x_right == 2){
-        f[nx-1-nx_source_left] = -bc_e_derivative[0][1];
+        f[nx-1-nx_source_left] = -bc_e_derivative_right * dx;
     }
 
     e[0] = c[0] / b[0];
@@ -160,6 +198,7 @@ void EF_Solver1D_TDMA::solve_TDMA(Field* rho, Field* phi)
     for(int i=0; i<nx_source_left; i++)
     {
         (*phi1D)(i) = (*phi1D)(nx_source_left);
+        //cout<<(*phi1D)(i)<<endl;
     }
 
 
@@ -225,22 +264,22 @@ void EF_Solver1D_TDMA::solve_TDMA_org(Field* rho, Field* phi)
 {
     Field1D* rho1D = static_cast<Field1D*>(rho);
     Field1D* phi1D = static_cast<Field1D*>(phi);
-    //> The boundary value can be changed with time
+    //The boundary value can be changed with time
     for(int i = 1; i < nx-1; i++)
     {
         f[i] = -dx_sq * const_ephi0_inv * (*rho1D)(i);
     }
     if(bc_x_left == 1){
-        f[0] = bc_e_value[0][0];
+        f[0] = bc_e_value_left;
     }
     else if(bc_x_left == 2){
-        f[0] = bc_e_derivative[0][0];
+        f[0] = bc_e_derivative_left;
     }
     if(bc_x_right == 1){
-        f[nx-1] = bc_e_value[0][1];
+        f[nx-1] = bc_e_value_right;
     }
     else if(bc_x_right == 2){
-        f[nx-1] = -bc_e_derivative[0][1];
+        f[nx-1] = -bc_e_derivative_right;
     }
     e[0] = c[0] / b[0];
     d[0] = f[0] / b[0];

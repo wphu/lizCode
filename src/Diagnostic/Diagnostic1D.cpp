@@ -14,6 +14,7 @@ Diagnostic(params, smpi, vecSpecies, vecCollisions, vecPSI)
 	SmileiMPI_Cart1D* smpi1D = static_cast<SmileiMPI_Cart1D*>(smpi);
 	index_domain_begin = smpi1D->getCellStartingGlobalIndex(0);
 
+	dx  = params.cell_length[0];
 	dx_inv_  = 1.0 / params.cell_length[0];
 
 	n_energy = 100;
@@ -54,6 +55,14 @@ Diagnostic(params, smpi, vecSpecies, vecCollisions, vecPSI)
 	{
 		radiative_energy_collision[i_collision].resize(n_space_global[0]);
 	}
+
+	sigma_left.resize(n_species);
+	sigma_right.resize(n_species);
+	for(int ispec = 0; ispec < n_species; ispec++)
+	{
+		sigma_left[ispec]  = 0.0;
+		sigma_right[ispec] = 0.0;
+	}
 }
 
 Diagnostic1D::~Diagnostic1D()
@@ -73,8 +82,10 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 	int i_angle, i_energy;
 	double flux_temp;
 	vector<double> angle_temp;
+	vector<double> sigma_temp;
 
 	angle_temp.resize(90);
+	sigma_temp.resize(n_species);
 
 	//reset diagnostic parameters to zero
 	if( ((itime - 1) % step_dump) == 0 ) 
@@ -246,6 +257,39 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 			radiative_energy_collision[i_collision] = radiative_energy_collision_temp;
 		}
 	}
+
+
+	//calculate sigma_left and sigma_right every timestep
+	for(int ispec = 0; ispec < n_species; ispec++)
+	{
+		s1 = vecSpecies[ispec];
+		p1 = &(s1->psi_particles);
+		double sigma_left_temp, sigma_right_temp;
+
+		sigma_left_temp = 0.0;
+		sigma_right_temp = 0.0;
+		wlt = s1->species_param.charge * s1->species_param.weight * dx;
+
+		for(int i_particle = 0; i_particle < p1->size(); i_particle++)
+		{
+			if( p1->position(0,i_particle) < 0.0 ) 
+			{
+				sigma_left_temp += 1.0;
+			}
+			else if( p1->position(0,i_particle) > sim_length[0] ) 
+			{
+				sigma_right_temp += 1.0;
+			}
+		}
+
+		sigma_left[ispec] += sigma_left_temp * wlt;
+		sigma_right[ispec] += sigma_right_temp * wlt;
+	}
+	smpi->reduce_sum_double(&sigma_left[0], &sigma_temp[0], n_species);
+	sigma_left = sigma_temp;
+
+	smpi->reduce_sum_double(&sigma_right[0], &sigma_temp[0], n_species);
+	sigma_right = sigma_temp;
 
 	calVT(smpi, vecSpecies, EMfields, itime);
 

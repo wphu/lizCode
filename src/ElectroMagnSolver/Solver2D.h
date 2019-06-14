@@ -24,8 +24,8 @@ public:
     virtual ~Solver2D() {};
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields)=0;
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi)=0;
+    virtual void operator()(ElectroMagn* fields)=0;
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)=0;
     virtual void solve_SLU(Field* rho, Field* phi){};
     virtual void finishSLU(){};
     virtual void initSLU_test(){};

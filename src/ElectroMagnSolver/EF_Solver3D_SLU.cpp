@@ -37,14 +37,14 @@ EF_Solver3D_SLU::~EF_Solver3D_SLU()
 {
 }
 
-void EF_Solver3D_SLU::operator() ( ElectroMagn* fields )
+void EF_Solver3D_SLU::operator()(ElectroMagn* fields)
 {
 
 }
 
 
 
-void EF_Solver3D_SLU::operator() ( ElectroMagn* fields , SmileiMPI* smpi)
+void EF_Solver3D_SLU::operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)
 {
     SmileiMPI_Cart3D* smpi3D = static_cast<SmileiMPI_Cart3D*>(smpi);
     // Static-cast of the fields

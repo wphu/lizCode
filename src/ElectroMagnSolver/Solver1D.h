@@ -17,16 +17,21 @@ public:
         nx_d = params.n_space[0]+2+2*params.oversize[0];
 
         dt_ov_dx = params.timestep / params.cell_length[0];
+
+        bc_em_type_x  = params.bc_em_type_x;
+        bc_em_value_x = params.bc_em_value_x;
     };
     virtual ~Solver1D() {};
 
-    //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields) = 0;
+    virtual void operator()(ElectroMagn* fields)=0;
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)=0;
 
 protected:
     int nx_p;
     int nx_d;
     double dt_ov_dx;
+    std::vector<std::string> bc_em_type_x;
+    std::vector<double> bc_em_value_x;
 
 };//END class
 

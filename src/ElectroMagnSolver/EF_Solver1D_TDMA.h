@@ -17,11 +17,11 @@ public:
     virtual ~EF_Solver1D_TDMA();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields){};
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields){};
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
 
     void initTDMA();
-    void solve_TDMA(Field* rho, Field* phi);
+    void solve_TDMA(Field* rho, Field* phi, Diagnostic* diag);
     void solve_Ex(Field* phi, Field* Ex);
 
     // no source region for electric field
@@ -45,6 +45,11 @@ public:
 
     // grid point number of source region in the left side
     int nx_source_left;
+
+    // boundary condition of electric field for Dirichlet condition
+    double bc_e_value_left, bc_e_value_right;
+    // boundary condition of electric field for Neumann condition
+    double bc_e_derivative_left, bc_e_derivative_right;
 
 
 protected:

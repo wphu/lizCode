@@ -20,8 +20,8 @@ public:
     virtual ~EF_Solver1D_TDMA_imp();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields){};
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields){};
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
 
     void initTDMA(PicParams &params);
     void solve_TDMA_imp(ElectroMagn* fields);

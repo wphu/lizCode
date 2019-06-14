@@ -25,8 +25,8 @@ public:
     virtual ~EF_Solver3D_SLU_DIST();
 
     //! Overloading of () operator
-    virtual void operator()( ElectroMagn* fields);
-    virtual void operator()( ElectroMagn* fields, SmileiMPI* smpi);
+    virtual void operator()(ElectroMagn* fields);
+    virtual void operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag);
     void solve_SLU(Field* rho, Field* phi);
     void finishSLU();
     void initSLU();

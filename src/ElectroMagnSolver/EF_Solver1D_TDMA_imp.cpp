@@ -48,7 +48,7 @@ EF_Solver1D_TDMA_imp::~EF_Solver1D_TDMA_imp()
 {
 }
 
-void EF_Solver1D_TDMA_imp::operator()( ElectroMagn* fields, SmileiMPI* smpi)
+void EF_Solver1D_TDMA_imp::operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)
 {
     SmileiMPI_Cart1D* smpi1D = static_cast<SmileiMPI_Cart1D*>(smpi);
     // Static-cast of the fields

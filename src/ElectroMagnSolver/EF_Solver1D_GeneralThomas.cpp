@@ -54,7 +54,7 @@ EF_Solver1D_GeneralThomas::~EF_Solver1D_GeneralThomas()
 {
 }
 
-void EF_Solver1D_GeneralThomas::operator()( ElectroMagn* fields, SmileiMPI* smpi)
+void EF_Solver1D_GeneralThomas::operator()(SmileiMPI* smpi, ElectroMagn* fields, Diagnostic* diag)
 {
     SmileiMPI_Cart1D* smpi1D = static_cast<SmileiMPI_Cart1D*>(smpi);
     // Static-cast of the fields
