@@ -25,6 +25,7 @@ SmileiIO::SmileiIO( PicParams& params, SmileiMPI* smpi )
     // Fields_global.h5
     is_restart = 0;
     stepStart  = 0;
+    step_output_max = params.n_time / params.dump_step;
     restore_file_dir_ = "restore";
 
 }

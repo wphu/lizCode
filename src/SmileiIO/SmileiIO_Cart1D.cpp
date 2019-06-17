@@ -247,11 +247,35 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
     if(itime % params.dump_step == 0 && smpi->isMaster())
     {
-        ndims_t = itime / params.dump_step - 1;
-        long long ndims_t_temp = ndims_t;
+        string step_output_string;
 
-        //create file at current output step
-        data_file_name = "data/data" + to_string(ndims_t_temp) + ".h5";
+        step_output = itime / params.dump_step;
+        step_output_string = to_string(step_output);
+        
+        if(step_output_max >= 10 && step_output_max <100)
+        {
+            if(step_output < 10)
+            {
+                step_output_string = "0" + step_output_string;
+            }
+        }
+        else if(step_output_max >= 100 && step_output_max <1000)
+        {
+            if(step_output < 10)
+            {
+                step_output_string = "00" + step_output_string;
+            }
+            else if(step_output<100)
+            {
+                step_output_string = "0" + step_output_string;
+            }
+        }
+        else if(step_output_max >= 1000)
+        {
+            WARNING("step_output_max is too large, please change the code in SmileiIO_Cart1D.cpp");
+        }
+
+        data_file_name = "data/data" + step_output_string + ".h5";
         data_file_id = H5Fcreate( data_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
         //============= write attributes, n_dim: number of dimension ======================
@@ -453,6 +477,23 @@ void SmileiIO_Cart1D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
         }
         status = H5Dclose(dataset_id);
         status = H5Sclose(dataspace_id);
+
+        //sigma_left, sigma_right
+        dims_global[0] = 1;
+        dims_global[1] = 1;
+        dims_global[2] = diag1D->n_species;
+
+        dataspace_id = H5Screate_simple(n_dims_data, dims_global, NULL);
+
+        dataset_id   = H5Dcreate2(group_id, "sigma_left", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->sigma_left[0]));
+        status       = H5Dclose(dataset_id);
+
+        dataset_id   = H5Dcreate2(group_id, "sigma_right", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        status       = H5Dwrite (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(diag1D->sigma_right[0]));
+        status       = H5Dclose(dataset_id);
+
+        status       = H5Sclose(dataspace_id); 
 
         //close dignostic group
         status = H5Gclose(group_id);

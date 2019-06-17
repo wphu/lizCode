@@ -245,11 +245,35 @@ void SmileiIO_Cart2D::write( PicParams& params, SmileiMPI* smpi, ElectroMagn* fi
 
     if( itime % params.dump_step == 0 && smpi->isMaster() )
     {
-        ndims_t = itime / params.dump_step - 1;
-        long long ndims_t_temp = ndims_t;
+        string step_output_string;
 
-        // create file at current output step
-        data_file_name = "data/data" + to_string(ndims_t_temp) + ".h5";
+        step_output = itime / params.dump_step;
+        step_output_string = to_string(step_output);
+        
+        if(step_output_max >= 10 && step_output_max <100)
+        {
+            if(step_output < 10)
+            {
+                step_output_string = "0" + step_output_string;
+            }
+        }
+        else if(step_output_max >= 100 && step_output_max <1000)
+        {
+            if(step_output < 10)
+            {
+                step_output_string = "00" + step_output_string;
+            }
+            else if(step_output<100)
+            {
+                step_output_string = "0" + step_output_string;
+            }
+        }
+        else if(step_output_max >= 1000)
+        {
+            WARNING("step_output_max is too large, please change the code in SmileiIO_Cart1D.cpp");
+        }
+
+        data_file_name = "data/data" + step_output_string + ".h5";
         data_file_id = H5Fcreate( data_file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
         // ============= write attributes, n_dim: number of dimension ======================

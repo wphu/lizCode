@@ -239,7 +239,13 @@ int main (int argc, char* argv[])
     // ------------------------------------------------------------------
     //                     HERE STARTS THE PIC LOOP
     // ------------------------------------------------------------------
-    TITLE("Time-Loop is started: number of time-steps n_time = " << params.n_time);
+    TITLE("Time-Loop is started: number of output time-steps = " << params.n_time/params.dump_step);
+
+    //ouput fields at initial time
+    EMfields->incrementAvgFields(itime);
+    EMfields->gatherAvgFields(smpi);
+    MESSAGE("time step = 0");
+    sio->write(params, smpi, EMfields, vecSpecies, diag, itime);
 
     #ifdef  __DEBUG
     
@@ -377,7 +383,7 @@ int main (int argc, char* argv[])
             }
             if(itime % params.dump_step == 0){
                 EMfields->gatherAvgFields(smpi);
-                MESSAGE("time step = "<<itime);
+                MESSAGE("time step = "<<itime/params.dump_step);
             }
             sio->write(params, smpi, EMfields, vecSpecies, diag, itime);
             if(itime % params.timesteps_restore == 0)

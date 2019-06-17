@@ -82,8 +82,8 @@ public:
     // Space dimension of a particle
     unsigned int nDim_particle;
 
-    // dimensions of time, which means total timestep number to output
-    int ndims_t;
+    int step_output;
+    int step_output_max;
 
     // H5Group is for fields and particles( velocity distribution funtion )
     struct H5Group
