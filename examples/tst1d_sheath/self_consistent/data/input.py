@@ -11,16 +11,16 @@ import math
 method = 'explicit'
 
 l0 = 0.5e-5     # nu.norm_l is reference time, the value's unit before / is m (SI)
-Lsim = [1000.*l0]	# length of the simulation
+Lsim = [500.*l0]	# length of the simulation
 
 t0 = 0.5e-12
 ns = int( 1.0e-9 / t0 )
 Tsim = 200 * ns 			# duration of the simulation
-output_step = 10
+output_step = 100
 
 
 # free parameters
-nx_source_left = 100
+nx_source_left = 50
 
 # number of processes
 n_procs = 20
@@ -32,6 +32,16 @@ Bangle = 5.0
 plasma_temperature = 20
 
 plasma_density = 1.0e19
+
+particle_number_per_cell = 100
+particle_number_per_cell_for_weight = 100
+
+bc_em_type_x = ['Dirichlet', 'Neumann_self_consistent']
+
+bc_em_value_x = [0.0, 0.0]
+
+
+
 
 
 #> Timestep to output some fields into hdf5 file
@@ -51,20 +61,6 @@ ion_step = 1
 dim = '1d3v'
 
 number_of_procs = [n_procs]
-
-#print sim_time / timestep
-# ELECTROMAGNETIC BOUNDARY CONDITIONS
-# bc_em_type_x/y/z : boundary conditions used for EM fields
-#                    periodic = periodic BC (using MPI topology)
-#                    silver-muller = injecting/absorbing BC
-#                    reflective = consider the ghost-cells as a perfect conductor
-#
-bc_em_type_x = ['Dirichlet', 'Neumann_self_consistent']
-#bc_em_type_x = ['Neumann', 'Dirichlet']
-
-bc_em_value_x = [0.0, 0.0]
-
-
 
 angle = Bangle * math.pi / 180.0
 Bx = B * math.sin(angle)
@@ -133,8 +129,8 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 200,
-	n_part_per_cell_for_weight = 200,
+	n_part_per_cell = particle_number_per_cell,
+	n_part_per_cell_for_weight = particle_number_per_cell_for_weight,
 	c_part_max = 1.0,
 	mass = 9.109382616e-31,
 	charge = -1.6021766208e-19,
@@ -152,8 +148,8 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 200,
-	n_part_per_cell_for_weight = 200,
+	n_part_per_cell = particle_number_per_cell,
+	n_part_per_cell_for_weight = particle_number_per_cell_for_weight,
 	c_part_max = 1.0,
 	mass = 2.0 * 1.67262158e-27,
 	charge = 1.6021766208e-19,

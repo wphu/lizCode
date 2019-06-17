@@ -12,7 +12,8 @@ hFlux0 = 1.0e7
 
 val1 = collect("/Diagnostic/", "particle_number")
 
-nx = (val1.shape)[0]
+#the first value is initial value, not calculated
+nx = (val1.shape)[0] - 1
 x = np.linspace(0,nx*dt,nx)
 
 ##inite the fig of matplotlib
@@ -23,8 +24,8 @@ fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.6,hspace=0.55)
 #============Total particle number=======================================
 val = collect("/Diagnostic/", "particle_number")
 val = val / N0
-val1_1d = val[:, 0, 0, 0]
-val2_1d = val[:, 0, 0, 1]
+val1_1d = val[1:, 0, 0, 0]
+val2_1d = val[1:, 0, 0, 1]
 print(val.shape)
 
 ax0=fig.add_subplot(3,1,1)
@@ -57,8 +58,8 @@ ax0.annotate(r'$\mathbf{(a)}$', xy=get_axis_limits(ax0), annotation_clip=False)
 ##============Particle flux======================================================
 val = collect("/Diagnostic/", "particle_flux_right")
 val = val / pFlux0
-val1_1d = val1[:, 0, 0, 0]
-val2_1d = val1[:, 0, 0, 1]
+val1_1d = val1[1:, 0, 0, 0]
+val2_1d = val1[1:, 0, 0, 1]
 
 ax0=fig.add_subplot(3,1,2)
 
@@ -85,8 +86,8 @@ ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ##============heat flux======================================================
 val = collect("/Diagnostic/", "heat_flux_right")
 val = val / hFlux0
-val1_1d = val[:, 0, 0, 0]
-val2_1d = val[:, 0, 0, 1]
+val1_1d = val[1:, 0, 0, 0]
+val2_1d = val[1:, 0, 0, 1]
 
 ax0=fig.add_subplot(3,1,3)
 

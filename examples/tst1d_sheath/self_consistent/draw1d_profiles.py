@@ -48,7 +48,7 @@ ax0=fig.add_subplot(3,1,1)
 val = collect("/Fields/", "Phi_global_avg")
 val_1d = np.transpose(val[t, 0, 0, :])
 print( "potential max: ", val_1d.max() )
-print( "potential: ",val_1d[0], val_1d[-100], val_1d[-1] )
+print( "potential: ",val_1d[x0], val_1d[x1] )
 val_1d = val_1d[::x_step]
 
 line0=ax0.plot(x_less, val_1d, label = r"$\phi$", color='#1f77b4')
@@ -56,8 +56,8 @@ line0=ax0.plot(x_less, val_1d, label = r"$\phi$", color='#1f77b4')
 ax0.set_ylabel(r"$\phi\ \mathrm{(V)}$", color='#1f77b4', fontsize = label_fontsize)
 ax0.tick_params('y', colors='#1f77b4')
 
-#major_ticks = np.arange(0, 91, 30)
-#ax0.set_yticks(major_ticks)
+major_ticks = np.arange(0, 91, 30)
+ax0.set_yticks(major_ticks)
 
 
 
