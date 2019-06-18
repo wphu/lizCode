@@ -51,6 +51,9 @@ public:
     vector<double> psi_rate_left;                            //psi_rate_left[i_psi]
     vector<double> psi_rate_right;                           //psi_rate_right[i_psi]
 
+    //intermediate variable, not ouput, for psi rate calculation
+    vector<int> psi_species1;                                 //psi_species1[i_psi]
+
     //radiative_energy_collision[iCollision][iBin]
     vector< vector<double> > radiative_energy_collision;
 

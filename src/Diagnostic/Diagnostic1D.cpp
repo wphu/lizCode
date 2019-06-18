@@ -49,6 +49,11 @@ Diagnostic(params, smpi, vecSpecies, vecCollisions, vecPSI)
 
 	psi_rate_left.resize(n_psi);
 	psi_rate_right.resize(n_psi);
+	psi_species1.resize(n_psi);
+	for(int i_psi = 0; i_psi < n_psi; i_psi++)
+	{
+		psi_species1[i_psi] = vecPSI[i_psi]->species1;
+	}
 
 	radiative_energy_collision.resize(n_collision);
 	for(int i_collision = 0; i_collision < n_collision; i_collision++)
@@ -192,6 +197,19 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 		energy_distribution_temp.resize(n_energy);
 		psi_rate_temp.resize(n_psi);
 		radiative_energy_collision_temp.resize(n_space_global[0]);
+
+		//calculate average psi rate
+		for(int i_psi = 0; i_psi < n_psi; i_psi++)
+		{
+			if(particle_flux_left[psi_species1[i_psi]] != 0.0)
+			{
+				psi_rate_left[i_psi]  /= particle_flux_left[psi_species1[i_psi]];
+			}
+			if(particle_flux_right[psi_species1[i_psi]] != 0.0)
+			{
+				psi_rate_right[i_psi] /= particle_flux_right[psi_species1[i_psi]];
+			}				
+		}
 
 		//same weight for all species
 		s1 = vecSpecies[0];
