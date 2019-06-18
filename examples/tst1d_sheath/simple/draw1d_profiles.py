@@ -45,9 +45,8 @@ fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
 ax0=fig.add_subplot(3,1,1)
 
 val = collect("/Fields/", "Phi_global_avg", itime = t)
-val_1d = np.transpose(val[0, 0, :])
-print( "potential max: ", val_1d.max() )
-print( "potential: ",val_1d[x0], val_1d[x1] )
+val_1d = val[0, 0, :]
+print( "potential min and max: ", val_1d.min(), val_1d.max() )
 val_1d = val_1d[::x_step]
 
 line0=ax0.plot(x_less, val_1d, label = r"$\phi$", color='#1f77b4')
@@ -65,7 +64,7 @@ ax0.tick_params('y', colors='#1f77b4')
 ax0_twinx = ax0.twinx()
 val = collect("/Fields/", "Ex_global_avg", itime = t)
 val = val / Ex0
-val_1d = np.transpose(val[0, 0, :])
+val_1d = val[0, 0, :]
 val_1d = val_1d[::x_step]
 
 ax0_twinx.yaxis.set_major_formatter(yformatter)
@@ -90,20 +89,20 @@ ax0=fig.add_subplot(3,1,2)
 
 val = collect("/Fields/", "Rho_global_e_avg", itime = t)
 val = val / n0
-val_1d = np.transpose(val[0, 0, :])
-print( "Electron density: ",val_1d[x0], val_1d[x1] )
+val_1d = val[0, 0, :]
+print( "Electron density min and max: ",val_1d.min(), val_1d.max())
 val0_1d = val_1d
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r"Electron")
-print("e rho: ", val_1d[-1])
 
 val = collect("/Fields/", "Rho_global_D1_avg", itime = t)
 val = val / n0
-val_1d = np.transpose(val[0, 0, :])
+val_1d = val[0, 0, :]
+print( "Ion density min and max: ",val_1d.min(), val_1d.max())
 val1_1d = val_1d
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r'$\mathrm{D^+}$ ion', linestyle = linestyles[1])
-print("ion rho: ", val_1d[-1])
+
 ax0.grid(True)
 
 '''
@@ -145,8 +144,8 @@ ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ax0=fig.add_subplot(3,1,3)
 
 val = collect("/Fields/", "T_global_e_avg", itime = t)
-val_1d = np.transpose(val[0, 0, :])
-print( "Electron Temperature: ",val_1d[x0], val_1d[x1] )
+val_1d = val[0, 0, :]
+print( "Electron Temperature min and max: ",val_1d.min(), val_1d.max() )
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = "Electron")
 
@@ -154,8 +153,8 @@ line0=ax0.plot(x_less, val_1d, label = "Electron")
 ax0.grid(True)
 
 val = collect("/Fields/", "T_global_D1_avg", itime = t)
-val_1d = np.transpose(val[0, 0, :])
-print( "D+1 ion temperature: ",val_1d[x0], val_1d[x1] )
+val_1d = val[0, 0, :]
+print( "D+1 ion temperature min and max: ",val_1d.min(), val_1d.max() )
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r'$\mathrm{D^+}$ ion', linestyle = linestyles[1])
 

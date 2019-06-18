@@ -34,7 +34,7 @@ rotation_period_ion = 2.0 * const.pi * mi / (qi * const.e * Bmag)
 rotation_radius_e   = me * thermal_speed_e / (const.e * Bmag)
 rotation_radius_ion = mi * thermal_speed_ion / (qi * const.e * Bmag)
 
-particle_flux       = ni * thermal_speed_ion * math.sin(Bangle)
+particle_flux       = ni * ion_sound_speed * math.sin(Bangle)
 
 print("==========================================")
 print("debye_length:        ", debye_length)
@@ -53,6 +53,7 @@ print("==========================================")
 print(" ")
 
 print("==========================================")
+print("ion_sound_speed:  ", ion_sound_speed)
 print("particle_flux:    ", particle_flux)
 print("==========================================")
 print(" ")

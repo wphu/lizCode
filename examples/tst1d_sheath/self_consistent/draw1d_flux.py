@@ -58,8 +58,10 @@ ax0.annotate(r'$\mathbf{(a)}$', xy=get_axis_limits(ax0), annotation_clip=False)
 ##============Particle flux======================================================
 val = collect("/Diagnostic/", "particle_flux_right")
 val = val / pFlux0
-val1_1d = val1[1:, 0, 0, 0]
-val2_1d = val1[1:, 0, 0, 1]
+val1_1d = val[1:, 0, 0, 0]
+val2_1d = val[1:, 0, 0, 1]
+print("electron particle flux min and max: ", val1_1d.min(), val1_1d.max())
+print("ion particle flux min and max:      ", val2_1d.min(), val2_1d.max())
 
 ax0=fig.add_subplot(3,1,2)
 
@@ -73,6 +75,7 @@ ymin = 0.0
 ymax = 1.2 * max( val1_1d.max(), val2_1d.max() )
 
 ax0.set_xlim((xmin, xmax))
+ax0.set_ylim((ymin, ymax))
 ax0.set_ylabel(r"$\Gamma\ \mathrm{(10^{23}m^{-2}s^{-1})}$", fontsize = label_fontsize)
 #ax0.yaxis.set_label_coords(ylabel_x, 0.5)
 

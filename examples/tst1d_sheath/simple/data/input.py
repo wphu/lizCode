@@ -16,7 +16,7 @@ Lsim = [500.*l0]	# length of the simulation
 
 t0 = 0.5e-12
 ns = int( 1.0e-9 / t0 )
-Tsim = 100 * ns			# duration of the simulation
+Tsim = 200 * ns			# duration of the simulation
 output_step = 20
 
 # free parameters
@@ -39,7 +39,7 @@ particle_number_per_cell_for_weight = 100
 bc_em_type_x = ['Dirichlet', 'Dirichlet']
 #bc_em_type_x = ['Neumann', 'Dirichlet']
 
-bc_em_value_x = [60.0, 0.0]
+bc_em_value_x = [0.0, -60.0]
 
 
 
