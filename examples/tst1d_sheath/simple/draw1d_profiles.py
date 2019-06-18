@@ -3,13 +3,12 @@ from collect import collect
 
 import sys
 
-itime = 0
 if len(sys.argv) == 2:
 	t = int(sys.argv[1])
 elif len(sys.argv) > 2:
 	print("error: should have one argument, as time step")
 else:
-	t = itime
+	t = 0
 
 n0 = 1.0e19
 Ex0 = 1.0e6
@@ -19,8 +18,8 @@ x_step = 1
 amplification_factor = 1.0
 
 
-data_temp = collect("/Fields/", "Phi_global_avg")
-nx = data_temp.shape[3]
+data_temp = collect("/Fields/", "Phi_global_avg", itime = t)
+nx = data_temp.shape[2]
 
 
 dx = 0.5e-5  # unit (m)
@@ -45,8 +44,8 @@ fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.5,hspace=0.55)
 ##============potential======================================================
 ax0=fig.add_subplot(3,1,1)
 
-val = collect("/Fields/", "Phi_global_avg")
-val_1d = np.transpose(val[t, 0, 0, :])
+val = collect("/Fields/", "Phi_global_avg", itime = t)
+val_1d = np.transpose(val[0, 0, :])
 print( "potential max: ", val_1d.max() )
 print( "potential: ",val_1d[x0], val_1d[x1] )
 val_1d = val_1d[::x_step]
@@ -56,17 +55,17 @@ line0=ax0.plot(x_less, val_1d, label = r"$\phi$", color='#1f77b4')
 ax0.set_ylabel(r"$\phi\ \mathrm{(V)}$", color='#1f77b4', fontsize = label_fontsize)
 ax0.tick_params('y', colors='#1f77b4')
 
-major_ticks = np.arange(0, 91, 30)
-ax0.set_yticks(major_ticks)
+#major_ticks = np.arange(0, 91, 30)
+#ax0.set_yticks(major_ticks)
 
 
 
 
 #double y axis
 ax0_twinx = ax0.twinx()
-val = collect("/Fields/", "Ex_global_avg")
+val = collect("/Fields/", "Ex_global_avg", itime = t)
 val = val / Ex0
-val_1d = np.transpose(val[t, 0, 0, :])
+val_1d = np.transpose(val[0, 0, :])
 val_1d = val_1d[::x_step]
 
 ax0_twinx.yaxis.set_major_formatter(yformatter)
@@ -89,18 +88,18 @@ ax0.annotate(r"$\mathbf{(a)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ##============rho======================================================
 ax0=fig.add_subplot(3,1,2)
 
-val = collect("/Fields/", "Rho_global_e_avg")
+val = collect("/Fields/", "Rho_global_e_avg", itime = t)
 val = val / n0
-val_1d = np.transpose(val[t, 0, 0, :])
+val_1d = np.transpose(val[0, 0, :])
 print( "Electron density: ",val_1d[x0], val_1d[x1] )
 val0_1d = val_1d
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r"Electron")
 print("e rho: ", val_1d[-1])
 
-val = collect("/Fields/", "Rho_global_D1_avg")
+val = collect("/Fields/", "Rho_global_D1_avg", itime = t)
 val = val / n0
-val_1d = np.transpose(val[t, 0, 0, :])
+val_1d = np.transpose(val[0, 0, :])
 val1_1d = val_1d
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r'$\mathrm{D^+}$ ion', linestyle = linestyles[1])
@@ -135,9 +134,9 @@ for tick in ax_inset0.yaxis.get_major_ticks():
 
 ax0.legend(loc = 3, framealpha=1)
 ax0.set_xlim((xmin, xmax))
-ax0.set_ylim((0.0, 1.1))
-major_ticks = np.arange(0, 1.1, 0.5)
-ax0.set_yticks(major_ticks)
+#ax0.set_ylim((0.0, 1.1))
+#major_ticks = np.arange(0, 1.1, 0.5)
+#ax0.set_yticks(major_ticks)
 ax0.set_ylabel(r"$n\ \mathrm{(10^{19}m^{-3})}$", fontsize = label_fontsize)
 
 ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
@@ -145,8 +144,8 @@ ax0.annotate(r"$\mathbf{(b)}$", xy=get_axis_limits(ax0), annotation_clip=False)
 ##============ Temperature ======================================================
 ax0=fig.add_subplot(3,1,3)
 
-val = collect("/Fields/", "T_global_e_avg")
-val_1d = np.transpose(val[t, 0, 0, :])
+val = collect("/Fields/", "T_global_e_avg", itime = t)
+val_1d = np.transpose(val[0, 0, :])
 print( "Electron Temperature: ",val_1d[x0], val_1d[x1] )
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = "Electron")
@@ -154,8 +153,8 @@ line0=ax0.plot(x_less, val_1d, label = "Electron")
 
 ax0.grid(True)
 
-val = collect("/Fields/", "T_global_D1_avg")
-val_1d = np.transpose(val[t, 0, 0, :])
+val = collect("/Fields/", "T_global_D1_avg", itime = t)
+val_1d = np.transpose(val[0, 0, :])
 print( "D+1 ion temperature: ",val_1d[x0], val_1d[x1] )
 val_1d = val_1d[::x_step]
 line0=ax0.plot(x_less, val_1d, label = r'$\mathrm{D^+}$ ion', linestyle = linestyles[1])
@@ -167,11 +166,11 @@ ax0.legend(loc = 3, framealpha=1)
 ymin = 0
 ymax = val_1d.max() * 1.2
 ax0.set_xlim((xmin, xmax))
-ax0.set_ylim((ymin, 91))
+#ax0.set_ylim((ymin, 91))
 
 
-major_ticks = np.arange(0, 91, 30)
-ax0.set_yticks(major_ticks)
+#major_ticks = np.arange(0, 91, 30)
+#ax0.set_yticks(major_ticks)
 
 ax0.set_xlabel(r"$x\ \mathrm{(mm)}$", fontsize = label_fontsize)
 ax0.set_ylabel(r"$T\ \mathrm{(eV)}$", fontsize = label_fontsize)

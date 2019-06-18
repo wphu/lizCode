@@ -16,11 +16,11 @@ Lsim = [500.*l0]	# length of the simulation
 t0 = 0.5e-12
 ns = int( 1.0e-9 / t0 )
 Tsim = 200 * ns 			# duration of the simulation
-output_step = 100
+output_step = 20
 
 
 # free parameters
-nx_source_left = 50
+nx_source_left = 100
 
 # number of processes
 n_procs = 20

@@ -3,13 +3,12 @@ from collect import collect
 
 import sys
 
-itime = 0
 if len(sys.argv) == 2:
 	t = int(sys.argv[1])
 elif len(sys.argv) > 2:
 	print("error: should have one argument, as time step")
 else:
-	t = itime
+	t = 0
 
 print("time: ", t)
 
@@ -19,9 +18,9 @@ fig.subplots_adjust(top=0.9,bottom=0.1,wspace=0.6,hspace=0.55)
 
 
 #============angle distribution=======================================
-val = collect("/Diagnostic/", "angle_distribution_right")
-val1_1d = val[t, 0, 0, :]
-val2_1d = val[t, 0, 1, :]
+val = collect("/Diagnostic/", "angle_distribution_right", itime = t)
+val1_1d = val[0, 0, :]
+val2_1d = val[0, 1, :]
 print(val.shape)
 
 nx = (val1_1d.shape)[0]
@@ -55,9 +54,9 @@ ax0.legend(loc = 4, framealpha=1)
 ax0.annotate(r'$\mathbf{(a)}$', xy=get_axis_limits(ax0), annotation_clip=False)
 
 ##============Particle flux======================================================
-val = collect("/Diagnostic/", "energy_distribution_right")
-val1_1d = val[t, 0, 0, :]
-val2_1d = val[t, 0, 1, :]
+val = collect("/Diagnostic/", "energy_distribution_right", itime = t)
+val1_1d = val[0, 0, :]
+val2_1d = val[0, 1, :]
 print(val.shape)
 
 nx = (val1_1d.shape)[0]
