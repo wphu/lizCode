@@ -15,6 +15,7 @@ using namespace std;
 PSI1D_SEE::PSI1D_SEE(
     PicParams& params,
     SmileiMPI* smpi,
+    int n_psi_in,
     unsigned int psi_species1,
     unsigned int psi_species2,
     bool psi_is_self_consistent,
@@ -25,10 +26,11 @@ PSI1D_SEE::PSI1D_SEE(
 PSI1D(params, smpi),
 SEEYield(SEEYield)
 {
-    species1 = psi_species1;
-    species2 = psi_species2;
-    psiPos = psiPosition;
-    emitTemp = emitTemperature;
+    species1    = psi_species1;
+    species2    = psi_species2;
+    psiPos      = psiPosition;
+    emitTemp    = emitTemperature;
+    n_psi       = n_psi_in;
     is_self_consistent = psi_is_self_consistent;
 }
 

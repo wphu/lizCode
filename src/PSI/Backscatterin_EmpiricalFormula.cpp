@@ -10,15 +10,15 @@ using namespace std;
 Backscatterin_EmpiricalFormula::Backscatterin_EmpiricalFormula(
     int an1_in,
     int am1_in,
-    int ne_in,
-    vector<int> an2_in,
-    vector<int> nw_in ) : Backscattering()
+    int ne2_in,
+    vector<int> an2_vector_in,
+    vector<int> nw2_vector_in ) : Backscattering()
 {
     an1     = an1_in;
     am1      = am1_in;
-    ne      = ne_in;
-    an2     = an2_in;
-    nw      = nw_in;
+    ne2      = ne2_in;
+    an2_vector     = an2_vector_in;
+    nw2_vector      = nw2_vector_in;
 }
 
 Backscatterin_EmpiricalFormula::~Backscatterin_EmpiricalFormula()
@@ -54,25 +54,26 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
     else if(an1 > 2)
     {
         a1 = a1t[an1 + 2];
-        a2eff = 0.0;
-        sum = 0.0;
-        for( int i = 0; i < ne; i++ )
-        {
-            a2 = a2t[ an2[i] -1 ];
-            a2eff += ( nw[i] * a2 );
-            sum += nw[i];
-        }
-        a2 = a2eff / sum;
-        delta = a1 / a2;
-        if( delta > 4.5 )
-        {
-            cout<<"BackScattering Message:  3"<<endl;
-        }
     }
     else
     {
         cout<<"BackScattering Error:  4"<<endl;
         return;
+    }
+
+    a2eff = 0.0;
+    sum = 0.0;
+    for( int i = 0; i < ne2; i++ )
+    {
+        a2 = a2t[ an2_vector[i] -1 ];
+        a2eff += ( nw2_vector[i] * a2 );
+        sum += nw2_vector[i];
+    }
+    a2 = a2eff / sum;
+    delta = a1 / a2;
+    if( delta > 4.5 )
+    {
+        cout<<"BackScattering Message:  3"<<endl;
     }
 
     z1 = an1;
@@ -83,11 +84,11 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
     sbeff = 0.0;
     sum = 0.0;
 
-    for( int i = 0; i < ne; i++ )
+    for( int i = 0; i < ne2; i++ )
     {
-        z2 = an2[i];
-        a2 = a2t[ an2[i] -1 ];
-        wi = nw[i];
+        z2 = an2_vector[i];
+        a2 = a2t[ an2_vector[i] -1 ];
+        wi = nw2_vector[i];
         z2eff = z2eff + wi * z2;
         a2eff = a2eff + wi * a2;
         sum = sum + wi;
@@ -100,7 +101,7 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
         w = z1 * zz * aa / z2p;
         wi = wi * z1 / w / a2;
         saeff = saeff + wi * sa;
-        sl = d[ an2[i] -1 ] * z1p * pow( aa / zz, 1.5 ) * sa / sqrt(a1);
+        sl = d[ an2_vector[i] -1 ] * z1p * pow( aa / zz, 1.5 ) * sa / sqrt(a1);
 
         if ( z2 - 12.9 <= 0.0 )
         {
@@ -135,11 +136,14 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
     a2 = a2eff / sum;
     sa = saeff;
     sb = sbeff;
-    eps = fneps( energy, z1, a1, z2, a2 );
+    
+    //heavy projectile calculation
     if( delta > 0.5 )
     {
+        eps = fneps_heavy( energy, z1, a1, z2, a2 );
+
         redRN = 1.0 / ( 1 + pow( eps/0.104, 0.577) + pow( eps/0.73, 1.5 ) );
-        fmu = a1 / a2;
+        fmu = a2 / a1;
         psinum = 1.0 + 24.1 * pow( fmu, -3.995 );
         psiden1 = fmu / ( (1 + fmu) * (eps / 1.84 + 1.0) );
         psiden2 = pow( 1.0 + fmu, 3 ) * eps /
@@ -149,13 +153,14 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
         // sbeff/saeff corresponds to the rho_a/rho-t in the reference paper ( of course
         // sbeff is not equal to rho_a nor is saeff equal to rho_t).
 
+        //equation 56
         sklfact = pow(z1, 0.66666667) / sqrt(a1) * sb/sa * pow(fmu,2) / pow(1.0+fmu,2) / psi;
+        //equation 54
         r0heavy = redRN / sklfact;
 
         //write(*,*)'did heavy projectile calculation for delta > 0.5 '
 
         // =====================Calculate rnion=============================
-        r = 1.0 / ( 1.0 + pow(eps/0.133, 0.285) ) + 0.530 / ( 1.0 + pow(85.0/eps, 1.46) );
 
         //write(*,*)'did heavy proj calculation for rnion'
         if (th != 0.0)
@@ -194,8 +199,11 @@ void Backscatterin_EmpiricalFormula::scatter(double &rnion, double &reion, doubl
             //go to 79
         }
     }
+    //light projectile calculation
     else
     {
+        eps = fneps( energy, z1, a1, z2, a2 );
+        
         feps = (2.0 * eps - 3.0 ) / ( eps + 1.0 );
         r0 = 0.705 * sa / sb / pow( ( 1.0 + a1/a2 ), feps );
         r0 = r0 / ( 1.0 + pow( (eps/0.047), 0.597 ) + pow( (eps/0.619), 1.5 ) );

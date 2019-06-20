@@ -151,9 +151,9 @@ struct SpeciesStructure
     double density_solid;           // number density---unit-- C/A**3 ---*
 
     // ============Parameters for backscattering as the target
-    int ne;             // number of constituent elements in the target.
-    std::vector<int> nz2;	// array for atomic numbers of the constituents.
-    std::vector<int> nw;     // array for relative numbers of the constituents.
+    int ne2;             // number of constituent elements in the target.
+    std::vector<int> an2_vector;	// array for atomic numbers of the constituents.
+    std::vector<int> nw2_vector;     // array for relative numbers of the constituents.
 
 };
 

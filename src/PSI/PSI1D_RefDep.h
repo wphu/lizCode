@@ -25,8 +25,10 @@ public:
         PicParams& params,
         SmileiMPI* smpi,
         vector<Species*>& vecSpecies,
+        int n_psi_in,
         unsigned int psi_species1,
         unsigned int psi_species2,
+        unsigned int psi_species3,
         bool psi_is_self_consistent,
         string psiPosition,
         double emitTemperature

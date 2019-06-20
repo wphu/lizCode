@@ -15,6 +15,7 @@ using namespace std;
 PSI1D_Recycling::PSI1D_Recycling(
     PicParams& params,
     SmileiMPI* smpi,
+    int n_psi_in,
     unsigned int psi_species1,
     unsigned int psi_species2,
     bool psi_is_self_consistent,
@@ -30,6 +31,7 @@ PSI1D(params, smpi)
     emitTemp            = emitTemperature;
     recycling_factor    = recycling_factor_temp;
     is_self_consistent  = psi_is_self_consistent;
+    n_psi               = n_psi_in;
 
 }
 

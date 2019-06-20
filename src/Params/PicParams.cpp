@@ -402,14 +402,15 @@ void PicParams::readSpecies(InputData &ifile) {
         ifile.extract("atomic_mass", tmpSpec.atomic_mass, "Species",ispec);
         ifile.extract("surface_binding_energy", tmpSpec.surface_binding_energy, "Species",ispec);
         ifile.extract("density_solid", tmpSpec.density_solid, "Species",ispec);
-        ifile.extract("ne", tmpSpec.ne, "Species",ispec);
-        ifile.extract("nz2", tmpSpec.nz2, "Species",ispec);
-        ifile.extract("nw", tmpSpec.nw, "Species",ispec);
+        ifile.extract("ne2", tmpSpec.ne2, "Species",ispec);
+        ifile.extract("an2_vector", tmpSpec.an2_vector, "Species",ispec);
+        ifile.extract("nw2_vector", tmpSpec.nw2_vector, "Species",ispec);
 
 
         tmpSpec.isTest = false; // default value
         ifile.extract("isTest",tmpSpec.isTest ,"Species",ispec);
-        if (tmpSpec.ionization_model!="none" && (!tmpSpec.isTest)) {
+        if (tmpSpec.ionization_model!="none" && (!tmpSpec.isTest)) 
+        {
             ERROR("Disabled for now : test & ionized");
         }
 

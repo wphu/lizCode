@@ -16,18 +16,22 @@ PSI2D_RefDep::PSI2D_RefDep(
     PicParams& params,
     SmileiMPI* smpi,
     vector<Species*>& vecSpecies,
+    int n_psi_in,
     unsigned int psi_species1,
     unsigned int psi_species2,
+    unsigned int psi_species3,
     bool psi_is_self_consistent,
     string psiPosition,
     double emitTemperature
     ):
 PSI2D(params, smpi)
 {
-    species1 = psi_species1;
-    species2 = psi_species2;
-    psiPos = psiPosition;
-    emitTemp = emitTemperature;
+    species1    = psi_species1;
+    species2    = psi_species2;
+    species3    = psi_species3;
+    psiPos      = psiPosition;
+    emitTemp    = emitTemperature;
+    n_psi       = n_psi_in;
     is_self_consistent = psi_is_self_consistent;
 
     const_e = params.const_e;
@@ -49,13 +53,13 @@ void PSI2D_RefDep::init(vector<Species*>& vecSpecies)
     p1 = &(s1->psi_particles);
     p2 = &(s2->psi_particles);
 
-    int nz1 = s1->species_param.atomic_number;
-    int m1 = s1->species_param.atomic_mass;
-    int ne = s2->species_param.ne;
-    vector<int> nz2 = s2->species_param.nz2;
-    vector<int> nw = s2->species_param.nw;
+    int an1 = s1->species_param.atomic_number;
+    int am1 = s1->species_param.atomic_mass;
+    int ne2 = s2->species_param.ne2;
+    vector<int> an2_vector = s2->species_param.an2_vector;
+    vector<int> nw2_vector = s2->species_param.nw2_vector;
 
-    backscattering = new Backscatterin_EmpiricalFormula(nz1, m1, ne, nz2, nw);
+    backscattering = new Backscatterin_EmpiricalFormula(an1, am1, ne2, an2_vector, nw2_vector);
 }
 
 // Calculates the PSI2D for a given Collisions object
@@ -73,8 +77,8 @@ void PSI2D_RefDep::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid, ve
     bool has_find;
     bool is_in_wall;
     int iLine_cross, iSegment_cross;
-    Species   *s1, *s2;
-    Particles *p1, *p2;
+    Species   *s1, *s2, *s3;
+    Particles *p1, *p2, *p3;
 
     s1 = vecSpecies[species1];
     s2 = vecSpecies[species2];

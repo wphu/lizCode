@@ -208,6 +208,7 @@ void Diagnostic1D::run( SmileiMPI* smpi, Grid* grid, vector<Species*>& vecSpecie
 			if(particle_flux_right[psi_species1[i_psi]] != 0.0)
 			{
 				psi_rate_right[i_psi] /= particle_flux_right[psi_species1[i_psi]];
+				
 			}				
 		}
 

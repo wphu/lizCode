@@ -26,11 +26,6 @@ public:
     {
         const_e = params.const_e;
         const_pi = params.const_pi;
-        count_of_particles_to_insert_s2.resize(params.n_space[0]);
-        for(int i = 0; i < count_of_particles_to_insert_s2.size(); i++)
-        {
-            count_of_particles_to_insert_s2[i] = 0;
-        }
         posOffset = 0.1;
 
     };
@@ -85,18 +80,16 @@ public:
     // not create new particles
     bool is_self_consistent;
 
-    //! Group of the species numbers that are associated for PSI.
-    //> actually, each species gourp only contains one species for PSI
-    //> for PSI_Injection, only species1 is used;
-    //> for sputtering and secondary electron emission, species1 is the incident particle.
-    unsigned int species1, species2;
+    //group of the species numbers that are associated for PSI.
+    unsigned int species1, species2, species3;
 
-    Species   *s1, *s2;
-    Particles *p1, *p2;
+    Species   *s1, *s2, *s3;
+    Particles *p1, *p2, *p3;
 
     Particles new_particles;
     vector<int> count_of_particles_to_insert_s1;
     vector<int> count_of_particles_to_insert_s2;
+    vector<int> count_of_particles_to_insert_s3;
     double const_e;
     double const_pi;
 

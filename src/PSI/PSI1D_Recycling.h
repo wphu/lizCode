@@ -18,6 +18,7 @@ public:
     PSI1D_Recycling(
         PicParams& params,
         SmileiMPI* smpi,
+        int n_psi_in,
         unsigned int psi_species1,
         unsigned int psi_species2,
         bool psi_is_self_consistent,

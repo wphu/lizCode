@@ -9,6 +9,8 @@ Ref: Subroutines for some plasma surface interaction processes:
 These formulas are not valid at low incident energies (below 10 eV) 
 because they do not account for the binding of projectiles chemically 
 to the surface at low energies [26].
+
+!original fortran subroutine for heary projectile is wrong, rn will excell 1.
 ================================================================*/
 #ifndef BACKSCATTERING_EMPIRICALFORMULA_H
 #define BACKSCATTERING_EMPIRICALFORMULA_H
@@ -26,9 +28,10 @@ public:
     Backscatterin_EmpiricalFormula(
         int an1_in,
         int am1_in,
-        int ne_in,
-        vector<int> an2_in,
-        vector<int> nw_in );
+        int ne2_in,
+        vector<int> an2_vector_in,
+        vector<int> nw2_vector_in 
+    );
 
 
     ~Backscatterin_EmpiricalFormula();
@@ -39,9 +42,9 @@ public:
     // the name is from original fortran77 code
     int an1;         // atomic number of incident atomic
     int am1;          // atomic mass of incident atomic (amu)
-    int ne;             // number of constituent elements in the target.
-    vector<int> an2;	// array for atomic numbers of the constituents.
-    vector<int> nw;     // array for relative numbers of the constituents.
+    int ne2;             // number of constituent elements in the target.
+    vector<int> an2_vector;	// array for atomic numbers of the constituents.
+    vector<int> nw2_vector;     // array for relative numbers of the constituents.
     //	example :   for Tritium ions of 1 KeV energy incident on the TiO2
     //		        ( Titanium Dioxide ) target, Energy=1000 , an1=1 ,
     //		        am1=3 , ne=2 , an2(1)=22 , nw(1)=1 , an2(2)=8 and
@@ -58,12 +61,28 @@ public:
     double expint(double x);
 
 
+    inline double fneps(double e, double z1, double a1, double z2, double a2 )
+    {
+        double f = sqrt( pow(z1, 2.0/3.0) + pow(z2, 2.0/3.0) );
+        return 0.032534 * e / ( z1 * z2 * (1.0 + a1/a2) * f );
+    }
+
+    //equation 2 from ref2
+    inline double fneps_heavy(double e, double z1, double a1, double z2, double a2 )
+    {
+        double f = sqrt( pow(z1, 2.0/3.0) + pow(z2, 2.0/3.0) );
+        return 32.534 * e * a2 / ( z1 * z2 * (a1 + a2) * f );
+    }
+
+    inline double rne(double th, double r0, double as1, double as2)
+    {
+        return r0 + (1.0 - r0) / ( 1.0 + as1 / pow( tan(th), (2.0*as2) ) );
+    }
 
 
 
 
-
-    // ===========data table alt:======================================
+    // ===========table of masses of projectiles======================================
     const double  a1t[95] =
     {
         // z1 = 1 ( for hydrogen , deuterium and tritium )
@@ -99,7 +118,7 @@ public:
         231.0,238.0289
     } ;
 
-    // ===========data table a2t =========================================
+    // ===========table of atomic weights of elemental targets IUPAC (1983) , C12=12=========================================
     const double a2t[92] =
     {
         //z2 = 1 - 10
@@ -132,7 +151,7 @@ public:
         231.0,238.0289
     } ;
 
-    // ===============data table d :======================================
+    // ===============table of correction factors for the low energy electronic stopping cross-section======================================
     const double  d[92] =
     {
         //z2 = 1 - 10
@@ -166,16 +185,6 @@ public:
         2.084e0,2.050e0
     };
 
-    inline double fneps(double e, double z1, double a1, double z2, double a2 )
-    {
-        double f = sqrt( pow(z1, 2.0/3.0) + pow(z2, 2.0/3.0) );
-        return 0.032534 * e / ( z1 * z2 * (1.0 + a1/a2) * f );
-    }
-
-    inline double rne(double th, double r0, double as1, double as2)
-    {
-        return r0 + (1.0 - r0) / ( 1.0 + as1 / pow( tan(th), (2.0*as2) ) );
-    }
 
 
 

@@ -17,6 +17,7 @@ PSI2D_Sputtering::PSI2D_Sputtering(
     PicParams& params,
     SmileiMPI* smpi,
     vector<Species*>& vecSpecies,
+    int n_psi_in,
     unsigned int psi_species1,
     unsigned int psi_species2,
     bool psi_is_self_consistent,
@@ -25,14 +26,14 @@ PSI2D_Sputtering::PSI2D_Sputtering(
     ):
 PSI2D(params, smpi)
 {
-    species1 = psi_species1;
-    species2 = psi_species2;
-    psiPos = psiPosition;
-    emitTemp = emitTemperature;
+    species1    = psi_species1;
+    species2    = psi_species2;
+    psiPos      = psiPosition;
+    emitTemp    = emitTemperature;
+    n_psi       = n_psi_in;
+    const_e     = params.const_e;
     is_self_consistent = psi_is_self_consistent;
-
-    const_e = params.const_e;
-
+    
     init(vecSpecies);
 
 }
