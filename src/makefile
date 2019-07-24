@@ -80,8 +80,6 @@ ifeq ($(config),debug)
 	CFLAGS 		+= -g -D__DEBUG -O0# -shared-intel
 	LDFLAGS 	+= -g 
 else
-	#CFLAGS 		+= -O3#  -xHost -ipo -no-pie
-	#LDFLAGS 	+= -no-pie
 	CFLAGS 		+= -Ofast #  -xHost -ipo
 	LDFLAGS 	+= -Ofast -no-pie
 endif

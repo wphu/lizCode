@@ -206,6 +206,9 @@ class PicParams
 
     bool self_consistent_electric_field;
 
+    // velocity due to classical or anomalous transport, along y direction
+    double v_transport;
+
     // define poisson equation solver: SuperLU_serial, SuperLU_mpi, petsc
     std::string poisson_solver;
 

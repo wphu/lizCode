@@ -599,9 +599,10 @@ void Species::dynamics(double time_dual, unsigned int ispec, ElectroMagn* EMfiel
 
                 // Push the particle
                 //(*Push)(particles, iPart, Epart);
-                (*Push)(particles, iPart, Epart, Bpart);
-                //(*Push)(particles, iPart, Epart, Bpart, gf);
+                //(*Push)(particles, iPart, Epart, Bpart);
+                (*Push)(particles, iPart, Epart, Bpart, params.v_transport);
 
+            
                 // Apply boundary condition on the particles
                 // Boundary Condition may be physical or due to domain decomposition
                 // apply returns 0 if iPart is no more in the domain local

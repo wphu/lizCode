@@ -104,8 +104,8 @@ void PusherBoris::operator() (Particles &particles, int ipart, LocalFields Epart
 
 }
 
-// add a displacement for particles due to classical or anomalous transport
-void PusherBoris::push_tranportV(Particles &particles, int ipart, LocalFields Epart, LocalFields Bpart)
+// add a displacement for particles due to classical or anomalous transport, along y direction
+void PusherBoris::push_tranportV(Particles &particles, int ipart, LocalFields Epart, LocalFields Bpart, double v_transport)
 {
     //double charge_over_mass_ = static_cast<double>(particles.charge(ipart))*one_over_mass_;
     double umx, umy, umz, upx, upy, upz, pxdot, pydot, pzdot;
@@ -169,6 +169,8 @@ void PusherBoris::push_tranportV(Particles &particles, int ipart, LocalFields Ep
         );
     }
 
+    // transport along y direction
+    particles.position(1, ipart)     += v_transport * dt;
 }
 
 

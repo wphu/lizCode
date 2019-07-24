@@ -2,7 +2,7 @@ import math
 from scipy import constants as const
 
 Te = 20.0
-Ti = 20.0
+Ti = 20.0 * 1000
 
 ne = 1.0e19
 ni = 1.0e19
@@ -34,7 +34,8 @@ rotation_period_ion = 2.0 * const.pi * mi / (qi * const.e * Bmag)
 rotation_radius_e   = me * thermal_speed_e / (const.e * Bmag)
 rotation_radius_ion = mi * thermal_speed_ion / (qi * const.e * Bmag)
 
-particle_flux       = ni * ion_sound_speed * math.sin(Bangle)
+particle_flux          = ni * ion_sound_speed * math.sin(Bangle)
+ion_saturation_current = ni * ion_sound_speed * const.e
 
 print("==========================================")
 print("debye_length:        ", debye_length)
@@ -53,8 +54,10 @@ print("==========================================")
 print(" ")
 
 print("==========================================")
-print("ion_sound_speed:  ", ion_sound_speed)
-print("particle_flux:    ", particle_flux)
+print("ion_sound_speed:        ", ion_sound_speed)
+print("thermal_speed_ion:      ", thermal_speed_ion)
+print("particle_flux:          ", particle_flux)
+print("ion_saturation_current: ", ion_saturation_current)
 print("==========================================")
 print(" ")
 
