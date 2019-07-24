@@ -7,16 +7,29 @@ import math
 method = 'explicit'
 
 l0 = 1.0e-5
-nx = 800
-ny = 519
+nx = 499
+ny = 499
 Lsim = [nx*l0,ny*l0]
 
-t0 = 0.5e-12
+t0 = 2.0e-12
 ns = int(1.0e-9 / t0)
-Tsim = 50 # * ns			# duration of the simulation
-number_output = 5
+Tsim = 1 * ns			# duration of the simulation
+number_output = 2
 
-number_of_procs = [5, 4]
+
+number_of_procs = [22, 1]
+
+B = 2.0
+Bangle = 5.0
+
+#temperature of electron and ion is equal (eV)
+plasma_temperature = 20
+
+plasma_density = 1.0e18
+
+particle_number_per_cell = 0
+particle_number_per_cell_for_weight = 100
+
 
 
 #> Timestep to output some fields into hdf5 file
@@ -67,14 +80,14 @@ bc_em_type_x = ['periodic']
 bc_em_type_y = ['silver-muller']
 bc_em_value_x = [0.0, 0.0]
 
-B = 2.0
-angle = (180.0 - 5.0) * math.pi / 180.0
+
+angle = (180.0 - Bangle) * math.pi / 180.0
 Bx = -B * math.cos(angle)
 By = -B * math.sin(angle)
 Bz = 0.0
 externB = [Bx, By, Bz]
 
-ion_sound_velocity = math.sqrt( (20.0 * 1.6021766208e-19) / (2.0 * 1.67262158e-27) )
+ion_sound_velocity = math.sqrt( (plasma_temperature * 1.6021766208e-19) / (2.0 * 1.67262158e-27) )
 vx = -ion_sound_velocity * math.cos(angle)
 vy = -ion_sound_velocity * math.sin(angle)
 vz = 0.0
@@ -125,13 +138,13 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 0,
-	n_part_per_cell_for_weight = 100,
+	n_part_per_cell = particle_number_per_cell,
+	n_part_per_cell_for_weight = particle_number_per_cell_for_weight,
 	c_part_max = 1.0,
 	mass = 9.109382616e-31,
 	charge = -1.6021766208e-19,
-	nb_density = 1.0e19,
-	temperature = [20],
+	nb_density = plasma_density,
+	temperature = [plasma_temperature],
 	mean_velocity = [0.0, 0.0, 0.0],
 	time_frozen = 0.,
 	bc_part_type_west  = 'periodic',
@@ -146,13 +159,13 @@ Species(
 	initPosition_type = 'random',
 	initMomentum_type = 'maxwell',
 	ionization_model = 'none',
-	n_part_per_cell = 0,
-	n_part_per_cell_for_weight = 100,
+	n_part_per_cell = particle_number_per_cell,
+	n_part_per_cell_for_weight = particle_number_per_cell_for_weight,
 	c_part_max = 1.0,
 	mass = 2.0 * 1.67262158e-27,
 	charge = 1.6021766208e-19,
-	nb_density = 1.0e19,
-	temperature = [20],
+	nb_density = plasma_density,
+	temperature = [plasma_temperature],
 	mean_velocity = [vx, vy, vz],
 	time_frozen = 0.0,
 	bc_part_type_west  = 'periodic',
@@ -175,8 +188,8 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 0,
 	loadStep = 100,
-	loadDensity = 1.0e19,
-	loadTemperature = 20.0,
+	loadDensity = plasma_density,
+	loadTemperature = plasma_temperature,
 	mean_velocity = [0, 0 ,0],
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
@@ -193,8 +206,8 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 0,
 	loadStep = 100,
-	loadDensity = 1.0e19,
-	loadTemperature = 20.0,
+	loadDensity = plasma_density,
+	loadTemperature = plasma_temperature,
 	mean_velocity = [vx, vy ,vz],
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
@@ -213,15 +226,15 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 1,
 	loadStep = 100,
-	loadDensity = 1.0e19,
-	loadTemperature = 20.0,
+	loadDensity = plasma_density,
+	loadTemperature = plasma_temperature,
 	mean_velocity = [0, 0 ,0],
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
 	loadPos_end 	= nx*l0,
 	loadPos_Ystart 	= (ny-sourceLength)*l0,
 	loadPos_Yend 	= ny*l0,
-	step_update	= 10,
+	step_update	= 20,
 
 )
 
@@ -232,15 +245,15 @@ PartSource(
 	loadKind = "nT",
 	everyTime = 1,
 	loadStep = 100,
-	loadDensity = 1.0e19,
-	loadTemperature = 20.0,
+	loadDensity = plasma_density,
+	loadTemperature = plasma_temperature,
 	mean_velocity = [vx, vy ,vz],
 	#loadDn = 2.0e25,
 	loadPos_start 	= 0.0,
 	loadPos_end 	= nx*l0,
 	loadPos_Ystart 	= (ny-sourceLength)*l0,
 	loadPos_Yend 	= ny*l0,
-	step_update	= 10,
+	step_update	= 20,
 
 )
 

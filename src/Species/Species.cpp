@@ -600,7 +600,7 @@ void Species::dynamics(double time_dual, unsigned int ispec, ElectroMagn* EMfiel
                 // Push the particle
                 //(*Push)(particles, iPart, Epart);
                 //(*Push)(particles, iPart, Epart, Bpart);
-                (*Push)(particles, iPart, Epart, Bpart, params.v_transport);
+                Push->push_tranportV(particles, iPart, Epart, Bpart, params.v_transport);
 
             
                 // Apply boundary condition on the particles

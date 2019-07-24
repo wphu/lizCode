@@ -201,10 +201,10 @@ class PicParams
     // define the method of PIC: explicit or implicit
     std::string method;
 
+    bool self_consistent_electric_field;
+
     // read data from h5 file as initial condition, or constant external field
     std::string read_data_file_name;
-
-    bool self_consistent_electric_field;
 
     // velocity due to classical or anomalous transport, along y direction
     double v_transport;

@@ -1,0 +1,20 @@
+#PBS -S /bin/bash
+#PBS -N tst2d_probe
+#PBS -l nodes=1:ppn=32
+#PBS -m b
+#PBS -m e
+#PBS -m a
+#PBS -o data/outfile
+#PBS -e data/errfile
+##PBS -l walltime=2000:00:00
+#PBS -q long
+
+echo "begin time"; date
+echo "job run on :"; hostname
+echo "with job id:" $PBS_JOBID
+echo "end time"; date
+
+##do your job
+cd $PBS_O_WORKDIR
+
+mpiexec -n 32 liz data/input.py

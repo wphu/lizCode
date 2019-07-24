@@ -289,7 +289,7 @@ void PusherBoris::operator() (Particles &particles, int ipart, LocalFields Epart
     particles.momentum(2, ipart) = pzsm;
 
     //if(ipart<20) cout<<particles.momentum(0, ipart)<<" "<<particles.momentum(1, ipart)<<endl;
-/*
+    /*
     particles.momentum(0, ipart) = 0.0;
     particles.momentum(1, ipart) = 0.0;
     particles.momentum(2, ipart) = 0.0;
@@ -298,7 +298,7 @@ void PusherBoris::operator() (Particles &particles, int ipart, LocalFields Epart
     if(particles.momentum(0, ipart) != 0.0 || particles.momentum(1, ipart) != 0.0 || particles.momentum(2, ipart) != 0.0){
         cout<<"velocity is not zero"<<endl;
     }
-*/
+    */
 
     // Move the particle
     for ( int i = 0 ; i<nDim_ ; i++ ) {

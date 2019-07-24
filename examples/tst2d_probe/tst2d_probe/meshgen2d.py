@@ -2,21 +2,21 @@ from mesh2d import *
 
 
 if __name__ == "__main__":
-    dx = 0.5e-5 #3.5e-6
-    dy = 0.5e-5 #3.5e-6
-    lx = 24.0e-3
-    ly = 5.2e-3
+    dx = 1.0e-5 #3.5e-6
+    dy = 1.0e-5 #3.5e-6
+    lx = 5.0e-3
+    ly = 5.0e-3
     nx = int(lx / dx)
     ny = int(ly / dy)
     ny_source = 20
     ny_base = 3
 
-    x1 = 20.0e-3
-    x2 = 2.0e-3
-    x3 = 10.0e-3
-    x4 = 2.0e-3
+    x1 = 3.0e-3
+    x2 = 1.0e-3
+    x3 = 1.0e-3
+    x4 = 1.0e-3
     y1 = 2.0e-3
-    y2 = 1.0e-3
+    y2 = 1.5e-3
 
 
     print("nx, ny is : ", nx, ny)
