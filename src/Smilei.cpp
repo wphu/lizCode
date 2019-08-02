@@ -232,6 +232,11 @@ int main (int argc, char* argv[])
     {
         (*solver)(smpi, EMfields, diag);
     }
+    else
+    {
+        sio->read(params, smpi, EMfields, vecSpecies, diag, itime);
+    }
+    
     
     smpi->barrier();
 

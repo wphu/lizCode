@@ -33,6 +33,8 @@ public:
     // Create particles h5 file pattern
     void createPartsPattern( PicParams& params, ElectroMagn* fields, vector<Species*>& vecSpecies );
 
+    virtual void createFieldsGroup( ElectroMagn* fields );
+    
     // Create particles h5 file pattern
     void createDiagsPattern( PicParams& params, Diagnostic* diag);
 

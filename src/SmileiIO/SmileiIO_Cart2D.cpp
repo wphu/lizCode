@@ -65,6 +65,36 @@ void SmileiIO_Cart2D::createFieldsPattern( PicParams& params, ElectroMagn* field
 } // END createPattern
 
 
+void SmileiIO_Cart2D::createFieldsGroup( ElectroMagn* fields )
+{
+    const char* h5_name;
+    int data_dims = 3;
+
+    // ============ Create fieldsGroup ============================================
+    //addField(fields->rho_global);
+    //addField(fields->phi_global);
+    //addField(fields->Ex_global);
+    addField(fields->rho_global_avg);
+    addField(fields->phi_global_avg);
+    addField(fields->Ex_global_avg);
+    addField(fields->Ey_global_avg);
+    addField(fields->phi_global);
+    addField(fields->Ex_global);
+    addField(fields->Ey_global);
+    for(int i = 0; i < fields->rho_s.size(); i++)
+    {
+        //addField(fields->rho_s_global[i]);
+        addField(fields->rho_s_global_avg[i]);
+        addField(fields->Vx_s_global_avg[i]);
+        addField(fields->Vy_s_global_avg[i]);
+        addField(fields->Vz_s_global_avg[i]);
+        addField(fields->Vp_s_global_avg[i]);
+        addField(fields->T_s_global_avg[i]);
+
+    }
+    fieldsGroup.dataset_id.resize( fieldsGroup.dataset_stringName.size() );
+}
+
 
 
 void SmileiIO_Cart2D::createPartsPattern( PicParams& params, ElectroMagn* fields, vector<Species*>& vecSpecies )
@@ -460,6 +490,10 @@ void SmileiIO_Cart2D::read( PicParams& params, SmileiMPI* smpi, ElectroMagn* fie
 
         group_id = H5Gopen(data_file_id, "/Fields", H5P_DEFAULT);
 
+        // =============read fields phi ============================================
+        dataset_id = H5Dopen(group_id, "phi_global_avg", H5P_DEFAULT);
+        status = H5Dread (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, fields->phi_global);
+
         // =============read fields Ex ============================================
         dataset_id = H5Dopen(group_id, "Ex_global_avg", H5P_DEFAULT);
         status = H5Dread (dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, fields->Ex_global);
@@ -474,8 +508,20 @@ void SmileiIO_Cart2D::read( PicParams& params, SmileiMPI* smpi, ElectroMagn* fie
         status = H5Fclose(data_file_id);
     }
     smpi->barrier();
-    smpi->scatterField(fields->Ex_global, fields->Ex_);
-    smpi->scatterField(fields->Ey_global, fields->Ey_);
+
+    SmileiMPI_Cart2D* smpi2D = static_cast<SmileiMPI_Cart2D*>(smpi);
+
+    Field2D* Ex2D = static_cast<Field2D*>(fields->Ex_);
+    Field2D* Ey2D = static_cast<Field2D*>(fields->Ey_);
+    Field2D* phi2D = static_cast<Field2D*>(fields->phi_);
+
+    Field2D* Ex2D_global    = static_cast<Field2D*>(fields->Ex_global);
+    Field2D* Ey2D_global    = static_cast<Field2D*>(fields->Ey_global);
+    Field2D* phi2D_global    = static_cast<Field2D*>(fields->phi_global);
+
+    smpi2D->scatterField(Ex2D_global, Ex2D);
+    smpi2D->scatterField(Ex2D_global, Ex2D);
+    smpi2D->scatterField(phi2D_global, phi2D);
 } // END read
 
 void SmileiIO_Cart2D::writeGrid(Grid* grid)
