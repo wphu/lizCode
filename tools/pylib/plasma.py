@@ -2,10 +2,10 @@ import math
 from scipy import constants as const
 
 Te = 20.0
-Ti = 20.0 * 1000
+Ti = 20.0
 
-ne = 1.0e19
-ni = 1.0e19
+ne = 1.0e18
+ni = 1.0e18
 
 Bmag = 2.0
 Bangle = (180.0 - 5.0) * math.pi / 180.0

@@ -4,9 +4,9 @@ if __name__ == "__main__":
     dx = 1.0e-5 #3.5e-6
     dy = 1.0e-5 #3.5e-6
     dz = 1.0e-5
-    lx = 0.2e-3
-    ly = 0.2e-3
-    lz = 0.2e-3
+    lx = 1.0e-3
+    ly = 1.0e-3
+    lz = 1.0e-3
     nx = int(lx / dx)
     ny = int(ly / dy)
     nz = int(lz / dz)

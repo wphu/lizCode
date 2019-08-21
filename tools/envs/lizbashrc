@@ -1,6 +1,6 @@
 export SuperLU_mpi=no
 export SuperLU_serial=yes
-export petsc=no
+export petsc=yes
 export umfpack=no
 
 export lizHomePath=${HOME}/codes/lizCode
