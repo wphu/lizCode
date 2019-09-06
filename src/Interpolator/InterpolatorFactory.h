@@ -10,6 +10,7 @@
 #include "Interpolator2D2Order.h"
 #include "Interpolator2D4Order.h"
 #include "Interpolator3D1Order.h"
+#include "Interpolator3D0Order.h"
 
 #include "PicParams.h"
 #include "SmileiMPI.h"
@@ -47,6 +48,11 @@ public:
         else if ( ( params.geometry == "3d3v" ) && ( params.interpolation_order == 1 ) ) 
         {
             Interp = new Interpolator3D1Order(params, smpi);
+        }
+        else if ( ( params.geometry == "3d3v" ) && ( params.interpolation_order == 0 ) ) 
+        {
+            Interp = new Interpolator3D0Order(params, smpi);
+            //MESSAGE("Interpolator3D0Order");
         }
         else {
             ERROR( "Unknwon parameters : " << params.geometry << ", Order : " << params.interpolation_order );

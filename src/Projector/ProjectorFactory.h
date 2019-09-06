@@ -9,6 +9,7 @@
 #include "Projector2D2Order.h"
 #include "Projector2D4Order.h"
 #include "Projector3D1Order.h"
+#include "Projector3D0Order.h"
 
 #include "PicParams.h"
 #include "SmileiMPI.h"
@@ -46,6 +47,11 @@ public:
         else if ( ( params.geometry == "3d3v" ) && ( params.interpolation_order == (unsigned int)1 ) ) 
         {
             Proj = new Projector3D1Order(params, smpi);
+        }
+        else if ( ( params.geometry == "3d3v" ) && ( params.interpolation_order == (unsigned int)0 ) ) 
+        {
+            Proj = new Projector3D0Order(params, smpi);
+            MESSAGE("Projector3D0Order");
         }
         else 
         {

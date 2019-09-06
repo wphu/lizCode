@@ -38,6 +38,12 @@ particle_flux          = ni * ion_sound_speed * math.sin(Bangle)
 ion_saturation_current = ni * ion_sound_speed * const.e
 
 print("==========================================")
+print("plasma temperature in K:        ", Te * const.e / const.k)
+print("==========================================")
+print(" ")
+
+
+print("==========================================")
 print("debye_length:        ", debye_length)
 print("debye_length_e:      ", debye_length_e)
 print("debye_length_ion:    ", debye_length_ion)
