@@ -5,6 +5,10 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+
+a0 = 5.2917706e-11
+
+
 # ============= Excitation: equation (6/7) ==========================
 
 id = 0
