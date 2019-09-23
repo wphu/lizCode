@@ -1,14 +1,21 @@
 import math
 from scipy import constants as const
 
-Te = 20.0
-Ti = 20.0
+Te = 50.0
+Ti = 50.0
 
 ne = 1.0e18
 ni = 1.0e18
 
-Bmag = 2.0
-Bangle = (180.0 - 5.0) * math.pi / 180.0
+B_mag = 2.0
+B_angle_alpha = 10.0 * math.pi / 180.0
+B_angle_beta =  10.0 * math.pi / 180.0
+B_x =  B_mag * math.sin(B_angle_alpha) * math.cos(B_angle_beta)
+B_y = -B_mag * math.cos(B_angle_alpha)
+B_z = -B_mag * math.sin(B_angle_alpha) * math.sin(B_angle_beta)
+
+dx = 5.0e-5
+
 
 # mass of H: 1.67262158e-27, D: 2.0 * 1.67262158e-27, T: 3.0 * 1.67262158e-27
 me = 9.109382616e-31
@@ -27,20 +34,22 @@ thermal_speed_ion   = math.sqrt(Ti * const.e / mi)
 ve                  = thermal_speed_e
 vi                  = thermal_speed_ion
 
-Omega_e             = const.e * Bmag / me
-Omega_i             = const.e * Bmag / mi
-rotation_period_e   = 2.0 * const.pi * me / (const.e * Bmag)
-rotation_period_ion = 2.0 * const.pi * mi / (qi * const.e * Bmag)
-rotation_radius_e   = me * thermal_speed_e / (const.e * Bmag)
-rotation_radius_ion = mi * thermal_speed_ion / (qi * const.e * Bmag)
+ion_sound_speed_x =  ion_sound_speed * math.sin(B_angle_beta) * math.cos(B_angle_alpha)
+ion_sound_speed_y = -ion_sound_speed * math.cos(B_angle_beta)
+ion_sound_speed_z = -ion_sound_speed * math.sin(B_angle_beta) * math.sin(B_angle_alpha)
 
-particle_flux          = ni * ion_sound_speed * math.sin(Bangle)
+
+
+Omega_e             = const.e * B_mag / me
+Omega_i             = const.e * B_mag / mi
+rotation_period_e   = 2.0 * const.pi * me / (const.e * B_mag)
+rotation_period_ion = 2.0 * const.pi * mi / (qi * const.e * B_mag)
+rotation_radius_e   = me * thermal_speed_e / (const.e * B_mag)
+rotation_radius_ion = mi * thermal_speed_ion / (qi * const.e * B_mag)
+
+particle_flux          = ni * ion_sound_speed * math.sin(B_angle_alpha)
 ion_saturation_current = ni * ion_sound_speed * const.e
-
-print("==========================================")
-print("plasma temperature in K:        ", Te * const.e / const.k)
-print("==========================================")
-print(" ")
+macro_particle_weight  = ne * dx * dx * dx / 100.0
 
 
 print("==========================================")
@@ -64,7 +73,15 @@ print("ion_sound_speed:        ", ion_sound_speed)
 print("thermal_speed_ion:      ", thermal_speed_ion)
 print("particle_flux:          ", particle_flux)
 print("ion_saturation_current: ", ion_saturation_current)
+print("macro_particle_weight:  ", macro_particle_weight)
 print("==========================================")
+print(" ")
+
+print("================== parameters for 3d simulation ========================")
+print("plasma temperature in K:  ", Te * const.e / const.k)
+print("magnetic field strenth:   ", B_mag, "(", B_x, B_y, B_z, ")")
+print("ion_sound_speed:          ", ion_sound_speed, "(", ion_sound_speed_x, ion_sound_speed_y, ion_sound_speed_z, ")")
+print("========================================================================")
 print(" ")
 
 
@@ -133,11 +150,11 @@ x4 = 2.0e-3
 y1 = 2.0e-3
 y2 = 1.5e-3
 
-Bangle = 5.0 * math.pi / 180.0
+B_angle_alpha = 5.0 * math.pi / 180.0
 
 # the height of intersection between the magnetic and left and right boudnary of the probe
-h0 = y1 - x3 * math.tan(Bangle)
-h1 = y1 - (x3 + x4) * math.tan(Bangle)
+h0 = y1 - x3 * math.tan(B_angle_alpha)
+h1 = y1 - (x3 + x4) * math.tan(B_angle_alpha)
 
 D_per = 1.0
 y_diffusion = math.pow(D_per * x1 / vi, 0.5)
