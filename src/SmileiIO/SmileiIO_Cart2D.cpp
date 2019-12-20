@@ -71,9 +71,9 @@ void SmileiIO_Cart2D::createFieldsGroup( ElectroMagn* fields )
     int data_dims = 3;
 
     // ============ Create fieldsGroup ============================================
-    //addField(fields->rho_global);
-    //addField(fields->phi_global);
-    //addField(fields->Ex_global);
+    addField(fields->rho_global);
+    addField(fields->phi_global);
+    addField(fields->Ex_global);
     addField(fields->rho_global_avg);
     addField(fields->phi_global_avg);
     addField(fields->Ex_global_avg);
@@ -83,7 +83,7 @@ void SmileiIO_Cart2D::createFieldsGroup( ElectroMagn* fields )
     addField(fields->Ey_global);
     for(int i = 0; i < fields->rho_s.size(); i++)
     {
-        //addField(fields->rho_s_global[i]);
+        addField(fields->rho_s_global[i]);
         addField(fields->rho_s_global_avg[i]);
         addField(fields->Vx_s_global_avg[i]);
         addField(fields->Vy_s_global_avg[i]);

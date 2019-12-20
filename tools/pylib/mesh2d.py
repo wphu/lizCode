@@ -388,6 +388,7 @@ class Grid2D:
         f['grid_point0'] = self.grid_point0
         f['grid_point1'] = self.grid_point1
         f.close()
+        print("n_segments: ",self.n_segments)
 
     def save_fig(self):
         ##inite the fig of matplotlib

@@ -41,6 +41,9 @@ mpl.rcParams['lines.linewidth'] = 3.0
 mpl.rcParams['grid.linestyle'] = ":"
 mpl.rcParams['grid.color'] = "black"
 
+#mpl.rcParams['font.serif'] = ['SimHei, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif']  # 设置matplotlib可以显示汉语
+#mpl.rcParams['axes.unicode_minus'] = False
+
 #for paper
 mpl.rcParams['font.size'] = 18
 label_fontsize = 21

@@ -206,16 +206,16 @@ PartBoundCond::PartBoundCond( PicParams& params, int ispec, SmileiMPI* smpi )
             }
 
             if ( params.species_param[ispec].bc_part_type_up == "refl" ) {
-                if (z_min==z_min_global) bc_up = &refl_particle;
+                if (z_max==z_max_global) bc_up = &refl_particle;
             }
             else if ( params.species_param[ispec].bc_part_type_up == "supp" )  {
-                if (z_min==z_min_global) bc_up = &supp_particle;
+                if (z_max==z_max_global) bc_up = &supp_particle;
             }
             else if ( params.species_param[ispec].bc_part_type_up == "stop" ) {
-                if (z_min==z_min_global) bc_up = &stop_particle;
+                if (z_max==z_max_global) bc_up = &stop_particle;
             }
             else if ( params.species_param[ispec].bc_part_type_up == "periodic" ) {
-                if (z_min==z_min_global) bc_up = &periodic_particle;
+                if (z_max==z_max_global) bc_up = &periodic_particle;
             }
 
         }//nDim_particle>2

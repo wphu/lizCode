@@ -1,8 +1,9 @@
 import math
 from scipy import constants as const
+import numpy as np
 
-Te = 50.0
-Ti = 50.0
+Te = 20.0
+Ti = 20.0
 
 ne = 1.0e18
 ni = 1.0e18
@@ -51,6 +52,15 @@ particle_flux          = ni * ion_sound_speed * math.sin(B_angle_alpha)
 ion_saturation_current = ni * ion_sound_speed * const.e
 macro_particle_weight  = ne * dx * dx * dx / 100.0
 
+#================== diagnostic ne Te Is ========================
+#saturated ion current density A/m^2
+
+Js = np.array([6.364, 5.271, 20.81, 15.47])
+Js = Js  * 1.0e4
+#divertor temperature and density: tet, net
+tet = np.array([1.746, 3.238, 10.93, 5.117]) * 5.0
+miH = mi  / 2.0
+net = Js * 1.0 / (const.e * np.sqrt(const.e * tet / miH))
 
 print("==========================================")
 print("debye_length:        ", debye_length)
@@ -81,6 +91,12 @@ print("================== parameters for 3d simulation ========================"
 print("plasma temperature in K:  ", Te * const.e / const.k)
 print("magnetic field strenth:   ", B_mag, "(", B_x, B_y, B_z, ")")
 print("ion_sound_speed:          ", ion_sound_speed, "(", ion_sound_speed_x, ion_sound_speed_y, ion_sound_speed_z, ")")
+print("========================================================================")
+print(" ")
+
+
+print("================== diagnostic ne Te Is ========================")
+print("divertor density:  ", net)
 print("========================================================================")
 print(" ")
 

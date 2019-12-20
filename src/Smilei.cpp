@@ -248,6 +248,7 @@ int main (int argc, char* argv[])
 
     //ouput fields at initial time
     EMfields->incrementAvgFields(itime);
+    EMfields->gatherFields(smpi);
     EMfields->gatherAvgFields(smpi);
     MESSAGE("time step = 0");
     sio->write(params, smpi, EMfields, vecSpecies, diag, itime);
