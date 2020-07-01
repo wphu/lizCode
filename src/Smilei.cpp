@@ -352,6 +352,7 @@ int main (int argc, char* argv[])
             timer[7].restart();
             for (unsigned int ipsi=0 ; ipsi<vecPSI.size(); ipsi++)
             {
+                //cout<<"PSI begin "<<ipsi<<endl;
                 vecPSI[ipsi]->performPSI(params, smpi, grid, vecSpecies, EMfields, diag, itime);
                 // if new particles are in other MPI region, exchange particles
                 for ( int iDim = 0 ; iDim<(int)params.nDim_particle ; iDim++ )
@@ -359,7 +360,9 @@ int main (int argc, char* argv[])
                     smpi->exchangeParticles(vecSpecies[vecPSI[ipsi]->species2], vecPSI[ipsi]->species2, params, tid, iDim);
                 }
                 vecSpecies[vecPSI[ipsi]->species2]->sort_part(); // Should we sort test particles ?? (JD)
+                //cout<<"PSI end "<<ipsi<<endl;
             }
+            //MESSAGE("PSI clean");
             for (unsigned int ispec=0 ; ispec<params.species_param.size(); ispec++)
             {
                 // clear psi_particles to avoid unnecessary repeated PSI performs for multiple ion timesteps

@@ -100,6 +100,34 @@ PartSource1D (params, smpi)
         }
         // get the middle position of source region
     }
+    else if(loadKind == "nq_hedpic")
+    {
+        loadTemperature_init = loadTemperature;
+
+        is_begin_change_dn = false;
+        loadq = loadDn; // load_dn is used as load_dq
+        //initial load_dn is 5 times larger, to pass the inital phase quickly
+        loadDn = 5.0 * loadq / (1.5 * loadTemperature_init);
+
+        loadStep = loadNumber * params.species_param[species1].weight / (loadDn * params.timestep);
+        loadNumber_init = loadDn * loadStep * params.timestep / params.species_param[species1].weight;
+        loadRemTot = 0.0;
+
+        MESSAGE("loadStep = "<<loadStep);
+
+        int mpiSize = smpi->getSize();
+        if(mpiSize % 2 == 0)
+        {
+            mpiRank_source_middle = mpiSize / 2;
+            index_source_middle = 3;
+        }
+        else
+        {
+            mpiRank_source_middle = mpiSize / 2;
+            index_source_middle = params.n_space[0] / 2;
+        }
+        // get the middle position of source region
+    }    
 
 
 
@@ -173,6 +201,10 @@ PartSource1D (params, smpi)
 	loadTemperature_heat = (loadTemperature_init * loadNumber_init - loadNumber * loadTemperature)
 							/ (loadNumber_heat * loadStep);
 
+    // Parameters for "nq_hedpic"
+    source_density_pre = 0.0;
+
+
     // Parameters for "dn"
     nextTimeStep = 0;
     nextTimeStep_index = 1;
@@ -204,6 +236,7 @@ void PartSource1D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
     double zoom_factor;
 	double loadDn_temp;
 
+    //cout<<"load 1d begin"<<endl;
     if(itime % step_update != 0){ return; }
 
     if(loadKind == "nq")
@@ -278,6 +311,74 @@ void PartSource1D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
                 //cout<<"Temperature pre and now: "<<temperature_pre<<" "<<loadTemperature<<endl;
                 temperature_pre = loadTemperature;
             }
+        }
+    }
+
+    if(loadKind == "nq_hedpic")
+    {
+        if(itime%loadStep == 0)
+        {
+            Field1D* rho1D = static_cast<Field1D*>(fields->rho_s[ species_group_dependent[0] ]);
+            source_density = (*rho1D)(index_source_middle);
+            smpi->bcast_double(&source_density, 1, mpiRank_source_middle);
+
+            if(is_begin_change_dn == false && source_density > 0.95 * loadDensity)
+            {
+                double load_dn_init = loadDn;
+                loadDn = 0.5 * loadDensity * sqrt(loadTemperature * params.const_e / 3.34524316e-27) / (loadPos_end - loadPos_start);
+                if(loadDn > load_dn_init)
+                {
+                    loadDn = load_dn_init;
+                }
+                is_begin_change_dn = true;
+            }
+
+            if(is_begin_change_dn == true)
+            {
+                if(source_density < loadDensity && source_density < source_density_pre )
+                {
+                    zoom_factor = (1.0 - 0.5*itime/params.n_time) * (source_density_pre - source_density) / loadDensity;
+                    loadDn *= (1.0 + zoom_factor);
+                    //cout<<"loadDn111  "<<loadDn<<"  "<<zoom_factor<<endl;
+                }
+                else if(source_density > loadDensity && source_density > source_density_pre)
+                {
+                    zoom_factor = (1.0 - 0.5*itime/params.n_time) * (source_density - source_density_pre) / loadDensity;
+                    loadDn_temp = loadDn;
+                    loadDn *= (1.0 - zoom_factor);
+                    //cout<<"loadDn2222  "<<loadDn<<"  "<<zoom_factor<<endl;
+                }
+
+                if(loadDn <= 0.0)
+                {
+                    loadDn = loadDn_temp;
+                }
+            }
+
+            source_density_pre = source_density;
+
+
+            double loadNumber_temp = loadDn * loadStep * params.timestep / params.species_param[species1].weight;
+            loadRemTot += loadNumber_temp;
+			loadNumber = loadRemTot;
+			loadRemTot -= loadNumber;
+			if(loadNumber < loadNumber_init)
+			{
+                load_dq_cell = loadTemperature_init * (loadNumber_init - loadNumber);
+				loadTemperature = loadTemperature_init;
+			}
+			else
+			{
+                load_dq_cell = 0.0;
+				loadTemperature = loadTemperature_init * loadNumber_init / loadNumber;
+
+			}
+			
+			//cout<<"loadNumber_init  "<<loadNumber_init<<endl;
+			//cout<<"loadNumber  "<<loadNumber<<endl;
+			//cout<<"loadTemperature  "<<loadTemperature<<endl;
+			
+
         }
     }
 
@@ -512,6 +613,73 @@ void PartSource1D_Load::emitLoad(PicParams& params, SmileiMPI* smpi, vector<Spec
 
 
     }
+    else if(loadKind == "nq_hedpic" && loadBin_end != loadBin_start)
+    {
+        s1 = vecSpecies[species1];
+        p1 = &(s1->particles);
+
+        if(itime%loadStep == 0)
+        {
+            //cout<<"load begin"<<endl;
+            cell_length.resize(params.nDim_particle);
+            max_jutt_cumul.resize(0);
+            temp[0] = loadTemperature;
+            temp[1] = loadTemperature;
+            temp[2] = loadTemperature;
+            vel[0] = mean_velocity[0];
+            vel[1] = mean_velocity[1];
+            vel[2] = mean_velocity[2];
+
+            for(int ibin = 0; ibin < count_of_particles_to_insert.size(); ibin++ )
+            {
+                count_of_particles_to_insert[ibin] = 0;
+                if(ibin >= loadBin_start && ibin <= loadBin_end)
+                {
+
+                    count_of_particles_to_insert[ibin] = loadNumber;
+                }
+            }
+            //cout<<"number: "<<loadDensity * params.timestep / s1->species_param.weight<<endl;
+
+            new_particles.clear();
+            for(int ibin = loadBin_start; ibin <= loadBin_end; ibin++ )
+            {
+                new_particles.create_particles(count_of_particles_to_insert[ibin]);
+            }
+            s1->insert_particles_to_bins(new_particles, count_of_particles_to_insert);
+
+            // re-initialize paritcles in source region
+            for(int ibin=loadBin_start; ibin<=loadBin_end; ibin++)
+            {
+                iPart = s1->bmax[ibin] - count_of_particles_to_insert[ibin];
+                nPart = count_of_particles_to_insert[ibin];
+                cell_length[0] = params.cell_length[0];
+                indexes[0] = smpi->getDomainLocalMin(0) + ibin*params.cell_length[0];
+
+                s1->initPosition(nPart, iPart, indexes, params.nDim_particle,
+                                cell_length, s1->species_param.initPosition_type);
+
+                s1->initMomentum(nPart,iPart, temp, vel,
+                                s1->species_param.initMomentum_type, max_jutt_cumul, params);
+
+                s1->initWeight_constant(nPart, species1, iPart, s1->species_param.weight);
+                s1->initCharge(nPart, species1, iPart, s1->species_param.charge);
+            }
+
+            // heat paritcles in source region
+            for(int ibin=loadBin_start; ibin<=loadBin_end; ibin++)
+            {
+                iPart = s1->bmin[ibin];
+                nPart = s1->bmax[ibin] - s1->bmin[ibin];
+                if(load_dq_cell > 0.0)
+                {
+                    s1->heat(nPart, nPart, iPart, load_dq_cell / nPart, params);
+                }
+            }
+            //cout<<"load end"<<endl;
+        }
+    }
+    //cout<<"load 1d end"<<endl;
     delete [] indexes;
     delete [] temp;
     delete [] vel;

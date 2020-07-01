@@ -33,6 +33,8 @@ PSI1D(params, smpi)
     is_self_consistent  = psi_is_self_consistent;
     n_psi               = n_psi_in;
 
+    count_of_particles_to_insert_s2.resize(params.n_space[0]);
+
 }
 
 PSI1D_Recycling::~PSI1D_Recycling()
@@ -78,6 +80,13 @@ void PSI1D_Recycling::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid,
             nPartEmit++;
         }
     };
+    
+    if(nPartEmit == 0)
+    {
+        return;
+    }
+    //cout<<"psi recycling number "<<psiPos<<" "<<nPartEmit<<endl;
+
     nPartEmit_double = nPartEmit * recycling_factor;
     nPartEmit = nPartEmit_double;
     nPartEmit_rem += ( nPartEmit_double - nPartEmit );
@@ -88,10 +97,13 @@ void PSI1D_Recycling::performPSI(PicParams& params, SmileiMPI* smpi, Grid* grid,
     }
 
     if( smpi->isWestern() || smpi->isEastern() ) {
+        //cout<<"psi emit begin "<<psiPos<<endl;
         emit(params, vecSpecies, species2);
+        //cout<<"psi emit end "<<psiPos<<endl;
         s2->insert_particles_to_bins(new_particles, count_of_particles_to_insert_s2);
         new_particles.clear();
     };
+    //cout<<"psi recycling end "<<psiPos<<endl;
 
 }
 
@@ -103,12 +115,17 @@ void PSI1D_Recycling::emit(PicParams& params, vector<Species*>& vecSpecies, unsi
     Species   *s1;
     s1 = vecSpecies[species_emit];
 
-
+    //cout<<"psi new particle begein "<<endl;
     new_particles.initialize(nPartEmit, params);
+    //cout<<"psi new particle end "<<endl;
+
     if(psiPos == "left"){
+        //cout<<"psi left gebgin 000 "<<endl;
         count_of_particles_to_insert_s2.front() = nPartEmit;
+        //cout<<"psi left gebgin 111"<<endl;
         for(int iPart=0; iPart<nPartEmit; iPart++)
         {
+            //cout<<"psi left gebgin "<<endl;
             new_particles.position(0,iPart)=(((double)rand() / RAND_MAX))*params.cell_length[0]*posOffset;
             new_particles.position_old(0,iPart) = new_particles.position(0,iPart);
 
@@ -139,6 +156,7 @@ void PSI1D_Recycling::emit(PicParams& params, vector<Species*>& vecSpecies, unsi
 
             new_particles.weight(iPart) = s1->species_param.weight;
             new_particles.charge(iPart) = s1->species_param.charge;
+            //cout<<"psi left end "<<endl;
         }
     }
     else if(psiPos == "right"){

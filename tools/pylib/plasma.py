@@ -2,15 +2,15 @@ import math
 from scipy import constants as const
 import numpy as np
 
-Te = 20.0
-Ti = 20.0
+Te = 50.0
+Ti = 50.0
 
 ne = 1.0e18
 ni = 1.0e18
 
 B_mag = 2.0
 B_angle_alpha = 10.0 * math.pi / 180.0
-B_angle_beta =  10.0 * math.pi / 180.0
+B_angle_beta =  90.0 * math.pi / 180.0
 B_x =  B_mag * math.sin(B_angle_alpha) * math.cos(B_angle_beta)
 B_y = -B_mag * math.cos(B_angle_alpha)
 B_z = -B_mag * math.sin(B_angle_alpha) * math.sin(B_angle_beta)
@@ -35,9 +35,9 @@ thermal_speed_ion   = math.sqrt(Ti * const.e / mi)
 ve                  = thermal_speed_e
 vi                  = thermal_speed_ion
 
-ion_sound_speed_x =  ion_sound_speed * math.sin(B_angle_beta) * math.cos(B_angle_alpha)
-ion_sound_speed_y = -ion_sound_speed * math.cos(B_angle_beta)
-ion_sound_speed_z = -ion_sound_speed * math.sin(B_angle_beta) * math.sin(B_angle_alpha)
+ion_sound_speed_x =  ion_sound_speed * math.sin(B_angle_alpha) * math.cos(B_angle_beta)
+ion_sound_speed_y = -ion_sound_speed * math.cos(B_angle_alpha)
+ion_sound_speed_z = -ion_sound_speed * math.sin(B_angle_alpha) * math.sin(B_angle_beta)
 
 
 

@@ -78,6 +78,9 @@ public:
     // index of field at source middle;
     int index_source_middle;
 
+    bool is_begin_change_dn;
+    double load_dq_cell;
+
 
 private:
     double dt_ov_dx;
